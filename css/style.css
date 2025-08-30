@@ -79,3 +79,7 @@ body {
 main {
     flex: 1;
 }
+
+.container, section {
+    flex: 1;
+}

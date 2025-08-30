@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuertoHogar</title>
+
+    <!-- CSS Personalizado -->
+    <link href="../css/style.css" rel="stylesheet">
+
+    <!-- CSS BootStrap -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- JS BootStrap -->
+    <script src="../js/bootstrap.bundle.min.js"></script>
+
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-success" href="../index.html">Huerto Hogar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="menu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a href="../index.html" class="nav-link">Inicio</a></li>
+                    <li class="nav-item"><a href="catalogo.html" class="nav-link">Catálogo</a></li>
+                    <li class="nav-item"><a href="nosotros.html" class="nav-link">Nosotros</a></li>
+                    <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
+                    <li class="nav-item"><a href="login.html" class="nav-link">Iniciar Sesión</a></li>
+                    <li class="nav-item"><a href="#" class="btn btn-success text-white ms-2">Registrarse</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Formulario de Login -->
+    <section class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h2 style="font-family: 'Playfair Display', serif;" class="text-success">Crear cuenta</h2>
+                            <p class="text-muted">Crea tu cuenta para Huerto Hogar</p>
+                        </div>
+
+                        <form>
+                            <div class="mb-3">
+                                <label for="text" class="form-label">Usuario</label>
+                                <input type="text" class="form-control" id="user" placeholder="vi.cente" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Correo Electrónico</label>
+                                <input type="email" class="form-control" id="email" placeholder="tu@correo.com"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" placeholder="••••••••"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Reingresar contraseña</label>
+                                <input type="password" class="form-control" id="spassword" placeholder="••••••••"
+                                    required>
+                            </div>
+                            <a href="perfil.html" class="btn btn-success w-100 mb-3">Crear cuenta</a>
+                        </form>
+
+                    </div>
+                </div>
+    </section>
+
+    <main>
+        <!-- Aquí va el contenido principal -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3">
+        <p class="mb-0">&copy; 2025 Huerto Hogar - Todos los derechos reservados</p>
+    </footer>
+
+</body>
+
+</html>
