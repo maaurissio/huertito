@@ -1,11 +1,11 @@
-1. Index
+1. Index MAURICIO
 
 La nav, que es HuertoHogar, texto, lugares de las tiendas físicas, el mapa interactivo, reseñas de clientes, redireccionar a catalogo
 
-2. Catalogo de productos
+2. Catalogo de productos    MAURICIO
 Barra de búsqueda, de filtro, y los productos
 
-3. Detalle del producto
+3. Detalle del producto     VICENTE
 Producto individual con fotos, detalle, precio, stock, código y mas
 
 4. Login
@@ -14,23 +14,23 @@ logeo xd
 5. Registro de usuario
 su usuario, correo, contraseña y esas cosas
 
-6. Nosotros
+6. Nosotros     MAURICIO
 La misión, vision, info, mapa de sucursales
 
-7. Blog qlo feo de noticias
+7. Blog qlo feo de noticias               VICENTE
 Alimentación saludable y weas
 
-8. Contacto
+8. Contacto 
 Los datos de contacto de la wea 
 
 -----------------------------------------
-9. Perfil de usuario
+9. Perfil de usuario    MAURICIO
 Datos personales, dirección, teléfono, historial de compras
 
-10. Carrito
+10. Carrito     MAURICIO / VICENTE
 las weas que lleva un carro
 
-11. Seguimiento de pedido
+11. Seguimiento de pedido       VICENTE
 los estaod sde la wea y donde va
 
-12. wea de admin
+12. wea de admin VICENTE
