@@ -83,3 +83,29 @@ main {
 .container, section {
     flex: 1;
 }
+
+/* Efectos hover para la navbar */
+.nav-link {
+    transition: background-color 0.5s ease, color 0.5s ease;
+    border-radius: 8px;
+    padding: 8px 12px !important;
+}
+
+.nav-link:hover {
+    background-color: #e9ecef;
+    color: #198754 !important;
+}
+
+/* Hover para el botón de registrarse */
+.btn-success:hover {
+    background-color: #157347 !important;
+    border-color: #146c43 !important;
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
+}
+
+/* Hover para el brand/logo */
+.navbar-brand:hover {
+    color: #157347 !important;
+    transition: color 0.3s ease;
+}
