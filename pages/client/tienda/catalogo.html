@@ -7,37 +7,22 @@
     <title>HuertoHogar</title>
 
     <!-- CSS Personalizado -->
-    <link href="../css/style.css" rel="stylesheet">
+    <link href="../../../css/style.css" rel="stylesheet">
 
     <!-- CSS BootStrap -->
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
 
     <!-- JS BootStrap -->
-    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script src="../../../js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript para componentes compartidos -->
+    <script src="../shared/components.js"></script>
 
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-success" href="../index.html">Huerto Hogar</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="menu">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a href="../index.html" class="nav-link">Inicio</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Catálogo</a></li>
-                    <li class="nav-item"><a href="nosotros.html" class="nav-link">Nosotros</a></li>
-                    <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
-                    <li class="nav-item"><a href="login.html" class="nav-link">Iniciar Sesión</a></li>
-                    <li class="nav-item"><a href="registro.html" class="btn btn-success text-white ms-2">Registrarse</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <!-- Contenedor para la navbar (se carga automáticamente) -->
+    <div id="navbar-container"></div>
 
     <main>
         <!-- Header del Catálogo -->
@@ -67,13 +52,13 @@
             </div>
         </section>
 
-        <!-- Grid de Productos -->
+        <!-- Productos -->
         <section class="container mb-5">
             <div class="row">
                 <!-- Producto 1 -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="../img/manzana.webp" class="card-img-top" alt="manzana"
+                        <img src="../../../img/manzana.webp" class="card-img-top" alt="manzana"
                             style="height: 250px; object-fit: cover;">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-success">Manzanas Rojas</h5>
@@ -93,7 +78,7 @@
                 <!-- Producto 2 -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="../img/platanos.webp" class="card-img-top" alt="plátanos"
+                        <img src="../../../img/platanos.webp" class="card-img-top" alt="plátanos"
                             style="height: 250px; object-fit: cover;">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-success">Plátanos</h5>
@@ -113,7 +98,7 @@
                 <!-- Producto 3 -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="../img/naranja.webp" class="card-img-top" alt="naranjas"
+                        <img src="../../../img/naranja.webp" class="card-img-top" alt="naranjas"
                             style="height: 250px; object-fit: cover;">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-success">Naranjas</h5>
@@ -133,7 +118,7 @@
                 <!-- Producto 4 -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="../img/zanahorias.webp" class="card-img-top" alt="zanahorias"
+                        <img src="../../../img/zanahorias.webp" class="card-img-top" alt="zanahorias"
                             style="height: 250px; object-fit: cover;">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-success">Zanahorias</h5>
@@ -153,7 +138,7 @@
                 <!-- Producto 5 -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="../img/pimientos.webp" class="card-img-top" alt="pimientos"
+                        <img src="../../../img/pimientos.webp" class="card-img-top" alt="pimientos"
                             style="height: 250px; object-fit: cover;">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-success">Pimientos</h5>
@@ -173,7 +158,7 @@
                 <!-- Producto 6 -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="../img/espinaca.webp" class="card-img-top" alt="espinaca"
+                        <img src="../../../img/espinaca.webp" class="card-img-top" alt="espinaca"
                             style="height: 250px; object-fit: cover;">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-success">Espinaca</h5>
@@ -192,7 +177,7 @@
                 <!-- Producto 7 -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="../img/miel.webp" class="card-img-top" alt="miel"
+                        <img src="../../../img/miel.webp" class="card-img-top" alt="miel"
                             style="height: 250px; object-fit: cover;">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-success">Miel</h5>
@@ -211,10 +196,8 @@
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3">
-        <p class="mb-0">&copy; 2025 Huerto Hogar - Todos los derechos reservados</p>
-    </footer>
+    <!-- Contenedor para el footer (se carga automáticamente) -->
+    <div id="footer-container"></div>
 
 </body>
 
