@@ -109,3 +109,44 @@ main {
     color: #157347 !important;
     transition: color 0.3s ease;
 }
+
+/* Header con imagen de fondo */
+.hero-header {
+    background-image: url('../img/vegetales1.webp'); /* Cambia por tu imagen */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Overlay oscuro opcional para mejor legibilidad del texto */
+.hero-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+/* Contenido del header por encima del overlay */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .hero-header {
+        background-attachment: scroll;
+        min-height: 400px;
+    }
+}
