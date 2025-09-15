@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,51 +19,79 @@
     <script src="../shared/components.js"></script>
 
 </head>
+
 <body>
     <!-- Contenedor para la navbar (se carga automáticamente) -->
     <div id="navbar-container"></div>
 
-    <!-- Formulario de Login -->
+    <!-- Formulario de Login con Card -->
     <section class="container my-5">
         <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <h2 style="font-family: 'Playfair Display', serif;" class="text-success">Iniciar Sesión</h2>
-                            <p class="text-muted">Accede a tu cuenta de Huerto Hogar</p>
+            <div class="col-md-10 col-lg-8">
+                <div class="card shadow-lg rounded-4 overflow-hidden login-card">
+                    <div class="row g-0 h-100">
+                        <!-- Imagen izquierda como fondo completo -->
+                        <div class="col-md-6 login-image-side"
+                            style="background-image: url('../../../img/huerto.webp'); background-size: cover; background-position: center; background-repeat: no-repeat; position: relative;">
+                            <!-- Overlay opcional para el texto -->
+                            <div class="login-image-overlay">
+                                <div class="text-center text-white p-4">
+                                    <h3 class="mb-3"
+                                        style="font-family: 'Playfair Display', serif; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
+                                        ¡Productos Frescos!</h3>
+                                    <p class="mb-0" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">Directo del huerto
+                                        a tu hogar</p>
+                                    <p class="small" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">Calidad
+                                        garantizada y sabor natural</p>
+                                </div>
+                            </div>
                         </div>
 
-                        <form>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="email" placeholder="tu@correo.com" required>
+                        <!-- Formulario derecha -->
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="w-100 p-5">
+                                <div class="text-center mb-4">
+                                    <h2 style="font-family: 'Playfair Display', serif;" class="text-success mb-2">
+                                        Iniciar Sesión</h2>
+                                    <p class="text-muted">Accede a tu cuenta de Huerto Hogar</p>
+                                </div>
+
+                                <form id="loginForm">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label fw-semibold">Correo Electrónico</label>
+                                        <input type="email" class="form-control form-control-lg" id="email"
+                                            placeholder="tu@correo.com" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label fw-semibold">Contraseña</label>
+                                        <input type="password" class="form-control form-control-lg" id="password"
+                                            placeholder="••••••••" required>
+                                    </div>
+
+                                    <div class="mb-4 form-check">
+                                        <input type="checkbox" class="form-check-input" id="remember">
+                                        <label class="form-check-label" for="remember">
+                                            Recordar mi sesión
+                                        </label>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-success btn-lg w-100 mb-3">Iniciar
+                                        Sesión</button>
+
+                                    <div class="text-center mb-3">
+                                        <a href="#" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+                                    </div>
+
+                                    <hr class="my-4">
+
+                                    <div class="text-center">
+                                        <p class="mb-3 text-muted">¿No tienes una cuenta?</p>
+                                        <a href="registro.html" class="btn btn-outline-success btn-lg w-100">Crear
+                                            Cuenta Nueva</a>
+                                    </div>
+                                </form>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="password" placeholder="••••••••" required>
-                            </div>
-
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="remember">
-                                <label class="form-check-label" for="remember">
-                                    Recordar mi sesión
-                                </label>
-                            </div>
-
-                            <button type="submit" class="btn btn-success w-100 mb-3">Iniciar Sesión</button>
-
-                            <div class="text-center">
-                                <a href="#" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
-                            </div>
-                        </form>
-
-                        <hr class="my-4">
-
-                        <div class="text-center">
-                            <p class="mb-2">¿No tienes una cuenta?</p>
-                            <a href="registro.html" class="btn btn-outline-success">Crear Cuenta Nueva</a>
                         </div>
                     </div>
                 </div>
@@ -72,6 +101,6 @@
 
     <!-- Contenedor para el footer (se carga automáticamente) -->
     <div id="footer-container"></div>
-
 </body>
+
 </html>

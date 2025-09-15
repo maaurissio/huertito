@@ -283,3 +283,69 @@ main {
 }
 
 
+=======
+
+/* ===== ESTILOS PARA LOGIN CARD ===== */
+
+/* Card principal de login */
+.login-card {
+    border: none;
+    min-height: 500px;
+}
+
+/* Lado izquierdo con imagen de fondo */
+.login-image-side {
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Overlay para el texto sobre la imagen */
+.login-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Efecto hover sutil en inputs del login */
+.login-card .form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Botones con hover effect en login */
+.login-card .btn {
+    transition: all 0.3s ease;
+}
+
+.login-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Efecto hover en la imagen del login */
+.login-card img {
+    transition: transform 0.3s ease;
+}
+
+.login-card img:hover {
+    transform: scale(1.02);
+}
+
+/* Responsive para móviles - login */
+@media (max-width: 768px) {
+    .login-card .row {
+        flex-direction: column;
+    }
+    
+    .login-card {
+        min-height: auto;
+    }
+}

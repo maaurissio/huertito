@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,16 +19,258 @@
     <script src="../shared/components.js"></script>
 
 </head>
+
 <body>
     <!-- Contenedor para la navbar (se carga automáticamente) -->
     <div id="navbar-container"></div>
 
     <main>
-        <!-- Aquí va el contenido principal -->
+        <!-- Hero -->
+        <header class="text-center py-5 bg-success text-white">
+            <div class="container">
+                <h1 style="font-family: 'Playfair Display', serif;">Conoce Huerto Hogar</h1>
+                <p class="lead">Conectando el campo con tu mesa, construyendo un futuro más saludable</p>
+            </div>
+        </header>
+
+        <!-- Nuestra Historia -->
+        <section class="container my-5">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 style="font-family: 'Playfair Display', serif;" class="text-success mb-4">Sobre nosotros</h2>
+                    <p class="lead">HuertoHogar es una tienda online dedicada a llevar la frescura y calidad de los
+                        productos del campo
+                        directamente a la puerta de nuestros clientes en Chile. Con más de 6 años de experiencia,
+                        operamos
+                        en más de 9 puntos a lo largo del país, incluyendo ciudades clave como Santiago, Puerto Montt,
+                        Villarica, Nacimiento, Viña del Mar, Valparaíso, y Concepción. Nuestra misión es conectar a las
+                        familias chilenas con el campo, promoviendo un estilo de vida saludable y sostenible.</p>
+                </div>
+                <div class="col-md-6">
+                    <img src="../../../img/vegetales1.webp" class="img-fluid rounded shadow"
+                        alt="Historia de Huerto Hogar">
+                </div>
+            </div>
+        </section>
+
+        <!-- Misión y Visión -->
+        <section class="bg-light py-5">
+            <div class="container">
+                <div class="row">
+                    <!-- Misión -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-4">
+                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
+                                        style="width: 80px; height: 80px;">
+                                        <span style="font-size: 2rem;">🎯</span>
+                                    </div>
+                                </div>
+                                <h3 style="font-family: 'Playfair Display', serif;"
+                                    class="text-success text-center mb-4">Misión</h3>
+                                <p class="text-justify">Nuestra misión es proporcionar productos frescos y de calidad
+                                    directamente desde el campo hasta la puerta de nuestros clientes, garantizando la
+                                    frescura y el sabor en cada entrega. Nos comprometemos a fomentar una conexión más
+                                    cercana entre los consumidores y los agricultores locales, apoyando prácticas
+                                    agrícolas sostenibles y promoviendo una alimentación saludable en todos los hogares
+                                    chilenos.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visión -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-4">
+                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
+                                        style="width: 80px; height: 80px;">
+                                        <span style="font-size: 2rem;">🌟</span>
+                                    </div>
+                                </div>
+                                <h3 style="font-family: 'Playfair Display', serif;"
+                                    class="text-success text-center mb-4">Visión</h3>
+                                <p class="text-justify">Nuestra visión es ser la tienda online líder en la distribución
+                                    de productos frescos y naturales en Chile, reconocida por nuestra calidad
+                                    excepcional, servicio al cliente y compromiso con la sostenibilidad. Aspiramos a
+                                    expandir nuestra presencia a nivel nacional e internacional, estableciendo un nuevo
+                                    estándar en la distribución de productos agrícolas directos del productor al
+                                    consumidor.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nuestros Valores -->
+        <section class="container my-5">
+            <h2 style="font-family: 'Playfair Display', serif;" class="text-center text-success mb-5">Nuestros Valores
+            </h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                            style="width: 80px; height: 80px;">
+                            <span style="font-size: 2rem;">🌱</span>
+                        </div>
+                        <h5 class="text-success">Sostenibilidad</h5>
+                        <p class="text-muted">Promovemos prácticas agrícolas responsables con el medio ambiente.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                            style="width: 80px; height: 80px;">
+                            <span style="font-size: 2rem;">⭐</span>
+                        </div>
+                        <h5 class="text-success">Calidad</h5>
+                        <p class="text-muted">Garantizamos productos frescos y de la más alta calidad.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                            style="width: 80px; height: 80px;">
+                            <span style="font-size: 2rem;">🤝</span>
+                        </div>
+                        <h5 class="text-success">Confianza</h5>
+                        <p class="text-muted">Construimos relaciones duraderas basadas en la transparencia.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                            style="width: 80px; height: 80px;">
+                            <span style="font-size: 2rem;">🚚</span>
+                        </div>
+                        <h5 class="text-success">Eficiencia</h5>
+                        <p class="text-muted">Entregamos tus productos frescos en tiempo récord.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nuestras Ubicaciones -->
+        <section class="bg-light py-5">
+            <div class="container">
+                <h2 style="font-family: 'Playfair Display', serif;" class="text-center text-success mb-5">Nuestras
+                    Ubicaciones</h2>
+                <p class="text-center mb-5">Encuentra nuestras tiendas físicas en las principales ciudades de Chile</p>
+
+                <!-- Mapa Interactivo -->
+                <div class="row justify-content-center mb-5">
+                    <div class="col-md-10">
+                        <div class="card shadow">
+                            <div class="card-body p-0">
+                                <div id="mapa"
+                                    style="height: 400px; background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); position: relative; border-radius: 0.375rem;">
+                                    <!-- Placeholder del mapa -->
+                                    <div class="d-flex align-items-center justify-content-center h-100">
+                                        <div class="text-center">
+                                            <h4 class="text-success mb-3">🗺️ Mapa Interactivo</h4>
+                                            <p class="text-muted">Aquí se integrará el mapa con lass 7 ubicaciones</p>
+                                            <small class="text-muted">TEORICAMENTE AQUI IRIA UN MAPA</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Ubicaciones -->
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 border-success">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-success">Región Metropolitana</h5>
+                                <div class="mb-3">
+                                    <strong>📍 Santiago</strong><br>
+                                    <small class="text-muted">Av. Providencia 1234, Providencia</small><br>
+                                    <small class="text-muted">📞 +56 1 2345 6789</small>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>📍 Viña del Mar</strong><br>
+                                    <small class="text-muted">Av. Libertad 567, Viña del Mar</small><br>
+                                    <small class="text-muted">📞 +56 1 2345 6789</small>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>📍 Valparaíso</strong><br>
+                                    <small class="text-muted">Av. Argentina 890, Valparaíso</small><br>
+                                    <small class="text-muted">📞 +56 1 2345 6789</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-success">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-success">Región del Biobío</h5>
+                                <div class="mb-3">
+                                    <strong>📍 Nacimiento</strong><br>
+                                    <small class="text-muted">Av. Bernardo O'Higgins 456, Nacimiento</small><br>
+                                    <small class="text-muted">📞 +56 1 2345 6789</small>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>📍 Concepción</strong><br>
+                                    <small class="text-muted">Av. O'Higgins 345, Concepción</small><br>
+                                    <small class="text-muted">📞 +56 1 2345 6789</small>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-success">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-success">Región Sur</h5>
+                                <div class="mb-3">
+                                    <strong>📍 Puerto Montt</strong><br>
+                                    <small class="text-muted">Av. Diego Portales 678, Puerto Montt</small><br>
+                                    <small class="text-muted">📞 +56 1 2345 6789</small>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>📍 Villarrica</strong><br>
+                                    <small class="text-muted">Av. Pedro de Valdivia 123, Villarrica</small><br>
+                                    <small class="text-muted">📞 +56 1 2345 6789</small>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <div class="bg-warning bg-opacity-25 rounded p-3">
+                                        <small class="text-warning-emphasis">
+                                            <strong>🚧 Próximamente</strong><br>
+                                            Más ubicaciones en esta región
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="container my-5 text-center">
+            <div class="bg-success bg-opacity-10 rounded p-5">
+                <h3 style="font-family: 'Playfair Display', serif;" class="text-success mb-3">¿Listo para experimentar
+                    la diferencia?</h3>
+                <p class="lead mb-4">Únete a miles de familias que ya disfrutan de productos frescos y naturales en sus
+                    hogares.</p>
+                <a href="../tienda/catalogo.html" class="btn btn-success btn-lg me-3">Ver Catálogo</a>
+                <a href="../auth/registro.html" class="btn btn-outline-success btn-lg">Crear Cuenta</a>
+            </div>
+        </section>
     </main>
 
     <!-- Contenedor para el footer (se carga automáticamente) -->
     <div id="footer-container"></div>
 
 </body>
+
 </html>
