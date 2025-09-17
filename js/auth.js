@@ -3,6 +3,70 @@
  * Maneja login, validación de usuarios y redirecciones por rol
  */
 
+/**
+ * Sistema de Notificaciones Toast
+ */
+function mostrarNotificacion(mensaje, tipo = 'success', duracion = 4000) {
+    // Crear contenedor si no existe
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container';
+        document.body.appendChild(toastContainer);
+    }
+
+    // Crear el toast
+    const toastId = 'toast-' + Date.now();
+    const iconos = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-times-circle',
+        info: 'fas fa-info-circle',
+        warning: 'fas fa-exclamation-triangle'
+    };
+
+    const toastHTML = `
+        <div id="${toastId}" class="toast-notification ${tipo}" role="alert" aria-live="assertive" aria-atomic="true">
+            <i class="${iconos[tipo]} toast-icon"></i>
+            ${mensaje}
+            <button type="button" class="btn-close" aria-label="Close">&times;</button>
+        </div>
+    `;
+
+    // Insertar el toast
+    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+    const toastElement = document.getElementById(toastId);
+
+    // Mostrar el toast con animación
+    setTimeout(() => {
+        toastElement.classList.add('show');
+    }, 100);
+
+    // Configurar auto-cierre
+    const autoClose = setTimeout(() => {
+        cerrarToast(toastElement);
+    }, duracion);
+
+    // Configurar botón de cerrar
+    const closeBtn = toastElement.querySelector('.btn-close');
+    closeBtn.addEventListener('click', () => {
+        clearTimeout(autoClose);
+        cerrarToast(toastElement);
+    });
+
+    return toastElement;
+}
+
+function cerrarToast(toastElement) {
+    toastElement.classList.remove('show');
+    toastElement.classList.add('hide');
+    
+    setTimeout(() => {
+        if (toastElement.parentNode) {
+            toastElement.parentNode.removeChild(toastElement);
+        }
+    }, 400);
+}
+
 // Base de datos simulada de usuarios
 const usuarios = {
     // Superusuarios (admin)
@@ -142,20 +206,12 @@ function obtenerUsuarioLogueado() {
 function cerrarSesion() {
     localStorage.removeItem('usuarioLogueado');
     actualizarNavbar(); // Actualizar navbar inmediatamente
-    alert('Sesión cerrada exitosamente');
     
-    // Determinar la ruta del login según la ubicación actual
-    const currentPath = window.location.pathname;
-    const currentFile = window.location.pathname.split('/').pop();
-    let loginPath;
+    // Mostrar notificación elegante
+    mostrarNotificacion('Sesión cerrada exitosamente', 'success', 3000);
     
-    if (currentFile === 'index.html' || currentPath.endsWith('/huertito/') || currentPath.endsWith('/huertito')) {
-        loginPath = 'pages/client/auth/login.html';
-    } else {
-        loginPath = '../auth/login.html';
-    }
-    
-    window.location.href = loginPath;
+    // No redirigir - mantenerse en la página actual
+    // La navbar ya se habrá actualizado para mostrar los botones de login/registro
 }
 
 /**
@@ -182,7 +238,7 @@ function protegerPagina(rolRequerido = 'usuario') {
     
     if (rolRequerido === 'superusuario' && usuario.rol !== 'superusuario') {
         // Se requiere superusuario pero el usuario actual no lo es
-        alert('No tienes permisos para acceder a esta página');
+        mostrarNotificacion('No tienes permisos para acceder a esta página', 'error');
         window.location.href = '../tienda/catalogo.html';
         return;
     }

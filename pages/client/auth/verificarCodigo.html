@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HuertoHogar</title>
+    <title>Verificar Código - HuertoHogar</title>
 
     <!-- CSS Personalizado -->
     <link href="../../../css/style.css" rel="stylesheet">
@@ -30,7 +30,10 @@
     <!-- Contenedor para la navbar (se carga automáticamente) -->
     <div id="navbar-container"></div>
 
-    <!-- Formulario de Login con Card -->
+    <!-- Toast container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
+
+    <!-- Formulario de Verificación con Card -->
     <section class="py-5">
         <div class="container">
             <div class="row justify-content-center">
@@ -45,15 +48,19 @@
                                     <!-- Contenido central -->
                                     <div class="d-flex flex-column justify-content-center flex-grow-1 text-center text-white">
                                         <h3 class="fw-bold" style="font-family: 'Playfair Display', serif; text-shadow: 1px 1px 3px rgba(0,0,0,0.7);">
-                                            ¡Productos Frescos!</h3>
-                                        <p class="mb-0" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">Directo del huerto a tu hogar</p>
+                                            ¡Revisa tu Email!</h3>
+                                        <p class="mb-0" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">Hemos enviado un código de 6 dígitos</p>
                                     </div>
                                     
-                                    <!-- Botón alineado con el botón del formulario -->
+                                    <!-- Enlaces -->
                                     <div class="text-center" style="margin-bottom: 3rem;">
-                                        <p class="text-white mb-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">¿No tienes cuenta?</p>
-                                        <a href="registro.html" class="text-white text-decoration-none simple-link" onclick="guardarPaginaOrigen()">
-                                            Regístrate aquí
+                                        <p class="text-white mb-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">¿No recibiste el código?</p>
+                                        <a href="#" class="text-white text-decoration-none simple-link" id="resendCode">
+                                            <i class="fas fa-redo me-2"></i>Reenviar código
+                                        </a>
+                                        <br><br>
+                                        <a href="olvidoContrasena.html" class="text-white text-decoration-none simple-link">
+                                            <i class="fas fa-arrow-left me-2"></i>Cambiar email
                                         </a>
                                     </div>
                                 </div>
@@ -64,42 +71,33 @@
                                 <div class="w-100 p-5">
                                     <div class="text-center mb-4">
                                         <h2 style="font-family: 'Playfair Display', serif;" class="text-success mb-2">
-                                            Iniciar Sesión</h2>
-                                        <p class="text-muted">Accede a tu cuenta de Huerto Hogar</p>
+                                            Verificar Código</h2>
+                                        <p class="text-muted">Ingresa el código de 6 dígitos enviado a:</p>
+                                        <p class="text-success fw-bold mb-4" id="emailDisplay">email@ejemplo.com</p>
+                                        <div class="text-muted small mb-3">
+                                            <i class="fas fa-clock me-1"></i>
+                                            El código expira en: <span id="countdown" class="text-warning fw-bold">15:00</span>
+                                        </div>
                                     </div>
 
-                                    <form id="loginForm">
-                                        <div class="mb-3">
-                                            <div class="input-icon-container">
-                                                <input type="email" class="form-control form-control-lg" id="email"
-                                                    placeholder="Correo Electrónico" required>
-                                                <i class="fas fa-envelope input-icon"></i>
-                                            </div>
-                                        </div>
-
+                                    <form id="verifyCodeForm">
                                         <div class="mb-4">
                                             <div class="input-icon-container">
-                                                <input type="password" class="form-control form-control-lg" id="password"
-                                                    placeholder="Contraseña" required>
-                                                <i class="fas fa-lock input-icon"></i>
+                                                <input type="text" class="form-control form-control-lg text-center" 
+                                                       id="verificationCode" placeholder="000000" maxlength="6" 
+                                                       pattern="[0-9]{6}" required style="letter-spacing: 0.5em; font-size: 1.5rem;">
+                                                <i class="fas fa-key input-icon"></i>
+                                            </div>
+                                            <div class="error-message d-none" id="codeError"></div>
+                                            <div class="text-center mt-2">
+                                                <small class="text-muted">Ingresa los 6 dígitos sin espacios</small>
                                             </div>
                                         </div>
 
-                                        <div class="mb-3 form-check">
-                                            <input type="checkbox" class="form-check-input" id="remember">
-                                            <label class="form-check-label" for="remember">
-                                                Recordar mi sesión
-                                            </label>
-                                        </div>
-
-                                        <div class="mb-4">
-                                            <div class="text-center">
-                                                <a href="olvidoContrasena.html" class="text-decoration-none small">¿Olvidaste tu contraseña?</a>
-                                            </div>
-                                        </div>
-
-                                        <button type="submit" class="btn btn-success btn-lg w-100 mb-3">Iniciar
-                                            Sesión</button>
+                                        <button type="submit" class="btn btn-success btn-lg w-100 mb-3" id="submitBtn">
+                                            <span class="btn-text">Verificar Código</span>
+                                            <span class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -121,6 +119,9 @@
             loadComponent('footer-container', '../shared/footer.html');
         });
     </script>
+
+    <!-- Script específico para verificación de código -->
+    <script src="../../../js/verifyCode.js"></script>
 </body>
 
 </html>

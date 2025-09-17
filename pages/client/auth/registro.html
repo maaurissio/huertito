@@ -79,8 +79,16 @@
                                         </div>
                                     </div>
 
-                                    <button type="submit" class="btn btn-success btn-lg w-100 mb-3">Crear
-                                        Cuenta</button>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="acceptPolicies" required>
+                                        <label class="form-check-label" for="acceptPolicies">
+                                            Acepto los <a href="#" class="text-success text-decoration-none">términos y condiciones</a> y las <a href="#" class="text-success text-decoration-none">políticas de privacidad</a>
+                                        </label>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-success btn-lg w-100 mb-3" id="createAccountBtn">
+                                        <span class="btn-text">Crear Cuenta</span>
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -114,6 +122,63 @@
 
     <!-- Contenedor para el footer (se carga automáticamente) -->
     <div id="footer-container"></div>
+
+    <!-- Script para validación del formulario -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            const acceptPolicies = document.getElementById('acceptPolicies');
+            const createAccountBtn = document.getElementById('createAccountBtn');
+
+            // Función para validar el estado del checkbox
+            function validatePolicies() {
+                if (acceptPolicies.checked) {
+                    // Agregar clase de animación de relleno
+                    createAccountBtn.classList.add('filling');
+                    
+                    // Después de la animación, habilitar el botón
+                    setTimeout(() => {
+                        createAccountBtn.disabled = false;
+                        createAccountBtn.classList.remove('btn-secondary', 'filling');
+                        createAccountBtn.classList.add('btn-success');
+                    }, 500); // Duración total: 0.5 segundos
+                    
+                } else {
+                    createAccountBtn.disabled = true;
+                    createAccountBtn.classList.remove('btn-success', 'filling');
+                    createAccountBtn.classList.add('btn-secondary');
+                }
+            }
+
+            // Validar al cargar la página
+            validatePolicies();
+
+            // Escuchar cambios en el checkbox
+            acceptPolicies.addEventListener('change', validatePolicies);
+
+            // Validar al enviar el formulario
+            form.addEventListener('submit', function(e) {
+                if (!acceptPolicies.checked) {
+                    e.preventDefault();
+                    mostrarNotificacion('Debes aceptar los términos y condiciones para crear una cuenta.', 'warning');
+                    return false;
+                }
+
+                // Validar que las contraseñas coincidan
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    mostrarNotificacion('Las contraseñas no coinciden.', 'error');
+                    return false;
+                }
+
+                // Si todo está bien, proceder con el registro
+                mostrarNotificacion('¡Cuenta creada exitosamente!', 'success');
+            });
+        });
+    </script>
 
     <!-- Script para cargar componentes -->
     <script>
