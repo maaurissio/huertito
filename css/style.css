@@ -123,6 +123,17 @@ main {
     position: relative;
 }
 
+/* Overlay oscuro para mejor legibilidad del texto */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
 /* Overlay oscuro opcional para mejor legibilidad del texto */
 .hero-header::before {
     content: '';
@@ -140,7 +151,6 @@ main {
     position: relative;
     z-index: 2;
     color: white;
-    text-align: center;
 }
 
 /* Responsive para móviles */
