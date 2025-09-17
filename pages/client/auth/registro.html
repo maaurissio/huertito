@@ -26,16 +26,17 @@
 
 </head>
 
-<body>
+<body class="registro-page">
     <!-- Contenedor para la navbar (se carga automáticamente) -->
     <div id="navbar-container"></div>
 
     <!-- Formulario de Registro con Card -->
-    <section class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <div class="card shadow-lg rounded-4 overflow-hidden login-card">
-                    <div class="row g-0 h-100">
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    <div class="card shadow-lg rounded-4 overflow-hidden">
+                        <div class="row g-0">
                         <!-- Formulario izquierda -->
                         <div class="col-md-6 d-flex align-items-center">
                             <div class="w-100 p-5">
@@ -48,8 +49,8 @@
                                 <form id="registerForm">
                                     <div class="mb-3">
                                         <div class="input-icon-container">
-                                            <input type="text" class="form-control form-control-lg" id="name"
-                                                placeholder="Usuario" required>
+                                            <input type="text" class="form-control form-control-lg" id="fullName"
+                                                placeholder="Nombre Completo" required>
                                             <i class="fas fa-user input-icon"></i>
                                         </div>
                                     </div>
@@ -80,29 +81,28 @@
 
                                     <button type="submit" class="btn btn-success btn-lg w-100 mb-3">Crear
                                         Cuenta</button>
-
-                                    <hr class="my-3">
-
-                                    <div class="text-center">
-                                        <p class="mb-2 text-muted">¿Ya tienes una cuenta?</p>
-                                        <a href="login.html" class="btn btn-outline-success btn-lg w-100">Iniciar
-                                            Sesión</a>
-                                    </div>
                                 </form>
                             </div>
                         </div>
 
                         <!-- Imagen derecha como fondo completo -->
-                        <div class="col-md-6 login-image-side"
-                            style="background-image: url('../../../img/huerto1.webp'); background-size: cover; background-position: center; background-repeat: no-repeat; position: relative;">
-                            <!-- Overlay opcional para el texto -->
-                            <div class="login-image-overlay">
-                                <div class="text-center text-white p-4">
-                                    <h3 class="mb-3"
-                                        style="font-family: 'Playfair Display', serif; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
-                                        ¡Únete a nosotros!</h3>
-                                    <p class="mb-0" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">Crea tu cuenta y
-                                        disfruta nuestros productos frescos</p>
+                        <div class="col-md-6 position-relative"
+                            style="background-image: url('../../../img/huerto.webp'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 500px;">
+                            <!-- Overlay sutil -->
+                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column p-4" style="background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.4));">
+                                <!-- Contenido central -->
+                                <div class="d-flex flex-column justify-content-center flex-grow-1 text-center text-white">
+                                    <h3 class="fw-bold" style="font-family: 'Playfair Display', serif; text-shadow: 1px 1px 3px rgba(0,0,0,0.7);">
+                                        ¡Únete Hoy!</h3>
+                                    <p class="mb-0" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">Productos frescos y naturales</p>
+                                </div>
+                                
+                                <!-- Botón alineado con el botón del formulario -->
+                                <div class="text-center" style="margin-bottom: 3rem;">
+                                    <p class="text-white mb-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">¿Ya tienes cuenta?</p>
+                                    <a href="login.html" class="text-white text-decoration-none simple-link">
+                                        Inicia sesión
+                                    </a>
                                 </div>
                             </div>
                         </div>
