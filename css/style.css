@@ -282,9 +282,6 @@ main {
   height: 100% !important;
 }
 
-
-=======
-
 /* ===== ESTILOS PARA LOGIN CARD ===== */
 
 /* Card principal de login */
@@ -348,4 +345,94 @@ main {
     .login-card {
         min-height: auto;
     }
+}
+
+/* ============================================
+   ESTILOS PARA INPUTS CON ÍCONOS
+   ============================================ */
+
+/* Contenedor para inputs con íconos */
+.input-icon-container {
+    position: relative;
+}
+
+.input-icon-container .form-control {
+    padding-right: 3rem; /* Espacio para el ícono a la derecha */
+    padding-top: 0.75rem; /* Un poco más de padding vertical */
+    padding-bottom: 0.75rem;
+}
+
+.input-icon {
+    position: absolute;
+    right: 1rem; /* Íconos a la derecha */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 10;
+    pointer-events: none; /* Para que no interfiera con el click */
+}
+
+.input-icon-container .form-control:focus {
+    border-color: #2E8B57;
+    box-shadow: 0 0 0 0.2rem rgba(46, 139, 87, 0.25);
+}
+
+/* Cambiar color del ícono cuando el input tiene focus */
+.input-icon-container .form-control:focus ~ .input-icon {
+    color: #2E8B57;
+}
+
+/* Estilos para el dropdown del usuario en la navbar */
+.user-dropdown .dropdown-toggle {
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: all 0.3s ease;
+}
+
+.user-dropdown .dropdown-toggle:hover {
+    background-color: rgba(46, 139, 87, 0.1);
+}
+
+.user-dropdown .dropdown-menu {
+    min-width: 200px;
+    padding: 0.5rem 0;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.user-dropdown .dropdown-item {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.user-dropdown .dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #2E8B57;
+}
+
+.user-dropdown .dropdown-item i {
+    width: 16px;
+    text-align: center;
+}
+
+.user-dropdown .dropdown-divider {
+    margin: 0.25rem 0;
+}
+
+/* Estilo especial para el botón de cerrar sesión */
+.user-dropdown .dropdown-item.text-danger:hover {
+    background-color: #f8d7da;
+    color: #dc3545;
+}
+
+/* Estilo especial para el link de dashboard admin */
+.user-dropdown .dropdown-item.text-primary:hover {
+    background-color: #cfe2ff;
+    color: #0d6efd;
 }

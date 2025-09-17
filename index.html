@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HuertoHogar</title>
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <!-- CSS Personalizado -->
     <link href="css/style.css" rel="stylesheet">
 
@@ -200,6 +203,16 @@
 
     <!-- Contenedor para el footer (se carga automáticamente) -->
     <div id="footer-container"></div>
+
+    <!-- Scripts para cargar componentes y autenticación -->
+    <script src="js/auth.js"></script>
+    <script>
+        // Cargar componentes al inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', 'pages/client/shared/navbar.html');
+            loadComponent('footer-container', 'pages/client/shared/footer.html');
+        });
+    </script>
 
 </body>
 

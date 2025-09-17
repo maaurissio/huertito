@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HuertoHogar</title>
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <!-- CSS Personalizado -->
     <link href="../../../css/style.css" rel="stylesheet">
 
@@ -263,13 +266,23 @@
                 <p class="lead mb-4">Únete a miles de familias que ya disfrutan de productos frescos y naturales en sus
                     hogares.</p>
                 <a href="../tienda/catalogo.html" class="btn btn-success btn-lg me-3">Ver Catálogo</a>
-                <a href="../auth/registro.html" class="btn btn-outline-success btn-lg">Crear Cuenta</a>
+                <a href="../auth/registro.html" class="btn btn-outline-success btn-lg" onclick="guardarPaginaOrigen()">Crear Cuenta</a>
             </div>
         </section>
     </main>
 
     <!-- Contenedor para el footer (se carga automáticamente) -->
     <div id="footer-container"></div>
+
+    <!-- Scripts para cargar componentes y autenticación -->
+    <script src="../../../js/auth.js"></script>
+    <script>
+        // Cargar componentes al inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../shared/navbar.html');
+            loadComponent('footer-container', '../shared/footer.html');
+        });
+    </script>
 
 </body>
 

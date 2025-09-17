@@ -12,11 +12,17 @@
     <!-- CSS BootStrap -->
     <link href="../../../css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Font Awesome para íconos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
     <!-- JS BootStrap -->
     <script src="../../../js/bootstrap.bundle.min.js"></script>
 
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
+
+    <!-- Sistema de autenticación -->
+    <script src="../../../js/auth.js"></script>
 
 </head>
 
@@ -41,37 +47,44 @@
 
                                 <form id="registerForm">
                                     <div class="mb-3">
-                                        <label for="name" class="form-label fw-semibold">Usuario</label>
-                                        <input type="text" class="form-control form-control-lg" id="name"
-                                            placeholder="Tu usuario" required>
+                                        <div class="input-icon-container">
+                                            <input type="text" class="form-control form-control-lg" id="name"
+                                                placeholder="Usuario" required>
+                                            <i class="fas fa-user input-icon"></i>
+                                        </div>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="email" class="form-label fw-semibold">Correo Electrónico</label>
-                                        <input type="email" class="form-control form-control-lg" id="email"
-                                            placeholder="tu@correo.com" required>
+                                        <div class="input-icon-container">
+                                            <input type="email" class="form-control form-control-lg" id="email"
+                                                placeholder="Correo Electrónico" required>
+                                            <i class="fas fa-envelope input-icon"></i>
+                                        </div>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="password" class="form-label fw-semibold">Contraseña</label>
-                                        <input type="password" class="form-control form-control-lg" id="password"
-                                            placeholder="••••••••" required>
+                                        <div class="input-icon-container">
+                                            <input type="password" class="form-control form-control-lg" id="password"
+                                                placeholder="Contraseña" required>
+                                            <i class="fas fa-lock input-icon"></i>
+                                        </div>
                                     </div>
 
                                     <div class="mb-4">
-                                        <label for="confirmPassword" class="form-label fw-semibold">Confirmar
-                                            Contraseña</label>
-                                        <input type="password" class="form-control form-control-lg" id="confirmPassword"
-                                            placeholder="••••••••" required>
+                                        <div class="input-icon-container">
+                                            <input type="password" class="form-control form-control-lg" id="confirmPassword"
+                                                placeholder="Confirmar Contraseña" required>
+                                            <i class="fas fa-lock input-icon"></i>
+                                        </div>
                                     </div>
 
                                     <button type="submit" class="btn btn-success btn-lg w-100 mb-3">Crear
                                         Cuenta</button>
 
-                                    <hr class="my-4">
+                                    <hr class="my-3">
 
                                     <div class="text-center">
-                                        <p class="mb-3 text-muted">¿Ya tienes una cuenta?</p>
+                                        <p class="mb-2 text-muted">¿Ya tienes una cuenta?</p>
                                         <a href="login.html" class="btn btn-outline-success btn-lg w-100">Iniciar
                                             Sesión</a>
                                     </div>
@@ -101,6 +114,15 @@
 
     <!-- Contenedor para el footer (se carga automáticamente) -->
     <div id="footer-container"></div>
+
+    <!-- Script para cargar componentes -->
+    <script>
+        // Cargar componentes al inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../shared/navbar.html');
+            loadComponent('footer-container', '../shared/footer.html');
+        });
+    </script>
 </body>
 
 </html>
