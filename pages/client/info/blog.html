@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HuertoHogar</title>
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <!-- CSS Personalizado -->
     <link href="../../../css/style.css" rel="stylesheet">
 
@@ -23,11 +26,260 @@
     <div id="navbar-container"></div>
 
     <main>
-        <!-- Aquí va el contenido principal -->
+        <!-- Hero Section -->
+        <section class="hero-section position-relative overflow-hidden" style="
+            background: linear-gradient(135deg, rgba(46, 139, 87, 0.9), rgba(34, 139, 34, 0.8)), 
+                        url('../../../img/huerto.webp');
+            background-size: cover;
+            background-position: center;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+        ">
+            <div class="container text-center text-white">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <h1 class="display-4 fw-bold mb-3" style="font-family: 'Playfair Display', serif; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                            Blog HuertoHogar
+                        </h1>
+                        <p class="lead mb-4" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                            Descubre los beneficios de una alimentación saludable y orgánica
+                        </p>
+                        <span class="badge bg-white text-success rounded-pill px-4 py-2 fs-6 fw-medium">
+                            <i class="fas fa-seedling me-2"></i>Vida Saludable
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Articles Section -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-lg-3 mb-4">
+                        <div class="sticky-top" style="top: 20px;">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-list me-2"></i>Categorías
+                                    </h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#frutas-frescas" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-apple-alt text-success me-2"></i>Frutas Frescas
+                                        </a>
+                                        <a href="#verduras-organicas" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-carrot text-success me-2"></i>Verduras Orgánicas
+                                        </a>
+                                        <a href="#productos-organicos" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-seedling text-success me-2"></i>Productos Orgánicos
+                                        </a>
+                                        <a href="#productos-lacteos" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-glass-milk text-success me-2"></i>Productos Lácteos
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="col-lg-9">
+                        <!-- Artículo 1: Frutas Frescas -->
+                        <article id="frutas-frescas" class="card border-0 shadow-sm mb-5">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="../../../img/manzanas.webp" class="img-fluid w-100 h-100" alt="Frutas Frescas" style="object-fit: cover; min-height: 250px;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                                        <h2 class="text-white mb-0" style="font-family: 'Playfair Display', serif;">
+                                            <i class="fas fa-apple-alt me-2"></i>Frutas Frescas
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <span class="badge bg-success rounded-pill me-2">
+                                                <i class="fas fa-calendar me-1"></i>17 Sep 2025
+                                            </span>
+                                            <span class="badge bg-info rounded-pill">
+                                                <i class="fas fa-user me-1"></i>HuertoHogar
+                                            </span>
+                                        </div>
+                                        <p class="card-text text-muted lh-lg">
+                                            Nuestra selección de frutas frescas ofrece una experiencia directa del campo a tu hogar. Estas frutas se cultivan y cosechan en el punto óptimo de madurez para asegurar su sabor y frescura. Disfruta de una variedad de frutas de temporada que aportan vitaminas y nutrientes esenciales a tu dieta diaria.
+                                        </p>
+                                        <p class="card-text text-muted lh-lg">
+                                            Perfectas para consumir solas, en ensaladas o como ingrediente principal en postres y smoothies. Cada fruta seleccionada garantiza el máximo sabor y valor nutricional para toda la familia.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-eye me-1"></i>1,234 lecturas
+                                            </small>
+                                            <a href="../tienda/catalogo.html" class="btn btn-outline-success btn-sm rounded-pill">
+                                                <i class="fas fa-shopping-basket me-1"></i>Ver Productos
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Artículo 2: Verduras Orgánicas -->
+                        <article id="verduras-organicas" class="card border-0 shadow-sm mb-5">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="../../../img/vegetales1.webp" class="img-fluid w-100 h-100" alt="Verduras Orgánicas" style="object-fit: cover; min-height: 250px;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                                        <h2 class="text-white mb-0" style="font-family: 'Playfair Display', serif;">
+                                            <i class="fas fa-carrot me-2"></i>Verduras Orgánicas
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <span class="badge bg-success rounded-pill me-2">
+                                                <i class="fas fa-calendar me-1"></i>17 Sep 2025
+                                            </span>
+                                            <span class="badge bg-info rounded-pill">
+                                                <i class="fas fa-user me-1"></i>HuertoHogar
+                                            </span>
+                                        </div>
+                                        <p class="card-text text-muted lh-lg">
+                                            Descubre nuestra gama de verduras orgánicas, cultivadas sin el uso de pesticidas ni químicos, garantizando un sabor auténtico y natural. Cada verdura es seleccionada por su calidad y valor nutricional, ofreciendo una excelente fuente de vitaminas, minerales y fibra.
+                                        </p>
+                                        <p class="card-text text-muted lh-lg">
+                                            Ideales para ensaladas, guisos y platos saludables, nuestras verduras orgánicas promueven una alimentación consciente y sostenible. El compromiso con la agricultura orgánica no solo beneficia tu salud, sino también el medio ambiente.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-eye me-1"></i>987 lecturas
+                                            </small>
+                                            <a href="../tienda/catalogo.html" class="btn btn-outline-success btn-sm rounded-pill">
+                                                <i class="fas fa-shopping-basket me-1"></i>Ver Productos
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Artículo 3: Productos Orgánicos -->
+                        <article id="productos-organicos" class="card border-0 shadow-sm mb-5">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="../../../img/miel1.webp" class="img-fluid w-100 h-100" alt="Productos Orgánicos" style="object-fit: cover; min-height: 250px;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                                        <h2 class="text-white mb-0" style="font-family: 'Playfair Display', serif;">
+                                            <i class="fas fa-seedling me-2"></i>Productos Orgánicos
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <span class="badge bg-success rounded-pill me-2">
+                                                <i class="fas fa-calendar me-1"></i>17 Sep 2025
+                                            </span>
+                                            <span class="badge bg-info rounded-pill">
+                                                <i class="fas fa-user me-1"></i>HuertoHogar
+                                            </span>
+                                        </div>
+                                        <p class="card-text text-muted lh-lg">
+                                            Nuestros productos orgánicos están elaborados con ingredientes naturales y procesados de manera responsable para mantener sus beneficios saludables. Desde aceites y miel hasta granos y semillas, ofrecemos una selección que apoya un estilo de vida saludable y respetuoso con el medio ambiente.
+                                        </p>
+                                        <p class="card-text text-muted lh-lg">
+                                            Estos productos son perfectos para quienes buscan opciones alimenticias que aporten bienestar sin comprometer el sabor ni la calidad. Cada producto ha sido cuidadosamente seleccionado por su pureza y origen responsable.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-eye me-1"></i>1,456 lecturas
+                                            </small>
+                                            <a href="../tienda/catalogo.html" class="btn btn-outline-success btn-sm rounded-pill">
+                                                <i class="fas fa-shopping-basket me-1"></i>Ver Productos
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Artículo 4: Productos Lácteos -->
+                        <article id="productos-lacteos" class="card border-0 shadow-sm mb-5">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="../../../img/alimentos.webp" class="img-fluid w-100 h-100" alt="Productos Lácteos" style="object-fit: cover; min-height: 250px;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                                        <h2 class="text-white mb-0" style="font-family: 'Playfair Display', serif;">
+                                            <i class="fas fa-glass-milk me-2"></i>Productos Lácteos
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <span class="badge bg-success rounded-pill me-2">
+                                                <i class="fas fa-calendar me-1"></i>17 Sep 2025
+                                            </span>
+                                            <span class="badge bg-info rounded-pill">
+                                                <i class="fas fa-user me-1"></i>HuertoHogar
+                                            </span>
+                                        </div>
+                                        <p class="card-text text-muted lh-lg">
+                                            Los productos lácteos de HuertoHogar provienen de granjas locales que se dedican a la producción responsable y de calidad. Ofrecemos una gama de leches, yogures y otros derivados que conservan su frescura y sabor auténtico.
+                                        </p>
+                                        <p class="card-text text-muted lh-lg">
+                                            Ricos en calcio y nutrientes esenciales, nuestros lácteos son perfectos para complementar una dieta equilibrada, proporcionando el mejor sabor y nutrición para toda la familia. Cada producto mantiene los más altos estándares de calidad y frescura.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-eye me-1"></i>823 lecturas
+                                            </small>
+                                            <a href="../tienda/catalogo.html" class="btn btn-outline-success btn-sm rounded-pill">
+                                                <i class="fas fa-shopping-basket me-1"></i>Ver Productos
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Call to Action -->
+                        <div class="card border-0 shadow-sm bg-gradient" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                            <div class="card-body text-center py-5">
+                                <h3 class="text-success mb-3" style="font-family: 'Playfair Display', serif;">
+                                    ¿Listo para una alimentación más saludable?
+                                </h3>
+                                <p class="text-muted mb-4">
+                                    Explora nuestro catálogo completo y descubre todos los productos frescos y orgánicos que tenemos para ti.
+                                </p>
+                                <a href="../tienda/catalogo.html" class="btn btn-success btn-lg rounded-pill px-5">
+                                    <i class="fas fa-shopping-basket me-2"></i>Ver Catálogo Completo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Contenedor para el footer (se carga automáticamente) -->
     <div id="footer-container"></div>
+
+    <!-- Scripts para cargar componentes y autenticación -->
+    <script src="../../../js/auth.js"></script>
+    <script>
+        // Cargar componentes al inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../shared/navbar.html');
+            loadComponent('footer-container', '../shared/footer.html');
+        });
+    </script>
 
 </body>
 </html>

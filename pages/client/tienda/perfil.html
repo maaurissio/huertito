@@ -562,23 +562,23 @@
             const confirm = document.getElementById('confirmNewPassword').value;
             
             if (newPass !== confirm) {
-                alert('Las contraseñas nuevas no coinciden');
+                mostrarNotificacion('Las contraseñas nuevas no coinciden', 'error');
                 return;
             }
             
             if (newPass.length < 6) {
-                alert('La nueva contraseña debe tener al menos 6 caracteres');
+                mostrarNotificacion('La nueva contraseña debe tener al menos 6 caracteres', 'warning');
                 return;
             }
             
-            alert('Contraseña cambiada exitosamente');
+            mostrarNotificacion('Contraseña cambiada exitosamente', 'success');
             this.reset();
         });
 
         // Guardar información personal
         document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Información guardada exitosamente');
+            mostrarNotificacion('Información guardada exitosamente', 'success');
         });
 
         // Funcionalidad de imagen de perfil

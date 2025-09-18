@@ -30,7 +30,10 @@
     <!-- Contenedor para la navbar (se carga automáticamente) -->
     <div id="navbar-container"></div>
 
-    <!-- Formulario de Login con Card -->
+    <!-- Toast container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
+
+    <!-- Formulario de Recuperación con Card -->
     <section class="py-5">
         <div class="container">
             <div class="row justify-content-center">
@@ -45,15 +48,15 @@
                                     <!-- Contenido central -->
                                     <div class="d-flex flex-column justify-content-center flex-grow-1 text-center text-white">
                                         <h3 class="fw-bold" style="font-family: 'Playfair Display', serif; text-shadow: 1px 1px 3px rgba(0,0,0,0.7);">
-                                            ¡Productos Frescos!</h3>
-                                        <p class="mb-0" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">Directo del huerto a tu hogar</p>
+                                            ¡Recupera tu Cuenta!</h3>
+                                        <p class="mb-0" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">Te ayudamos a volver a tu huerto</p>
                                     </div>
                                     
                                     <!-- Botón alineado con el botón del formulario -->
                                     <div class="text-center" style="margin-bottom: 3rem;">
-                                        <p class="text-white mb-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">¿No tienes cuenta?</p>
-                                        <a href="registro.html" class="text-white text-decoration-none simple-link" onclick="guardarPaginaOrigen()">
-                                            Regístrate aquí
+                                        <p class="text-white mb-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">¿Recordaste tu contraseña?</p>
+                                        <a href="login.html" class="text-white text-decoration-none simple-link">
+                                            <i class="fas fa-arrow-left me-2"></i>Volver al inicio de sesión
                                         </a>
                                     </div>
                                 </div>
@@ -64,42 +67,30 @@
                                 <div class="w-100 p-5">
                                     <div class="text-center mb-4">
                                         <h2 style="font-family: 'Playfair Display', serif;" class="text-success mb-2">
-                                            Iniciar Sesión</h2>
-                                        <p class="text-muted">Accede a tu cuenta de Huerto Hogar</p>
+                                            Recuperar Contraseña</h2>
+                                        <p class="text-muted">Ingresa tu correo y te enviaremos un enlace</p>
                                     </div>
 
-                                    <form id="loginForm">
-                                        <div class="mb-3">
+                                    <!-- Mensaje de éxito -->
+                                    <div class="alert alert-success d-none" id="successMessage">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        Se ha enviado un enlace de recuperación a tu correo electrónico.
+                                    </div>
+
+                                    <form id="forgotPasswordForm">
+                                        <div class="mb-4">
                                             <div class="input-icon-container">
                                                 <input type="email" class="form-control form-control-lg" id="email"
                                                     placeholder="Correo Electrónico" required>
                                                 <i class="fas fa-envelope input-icon"></i>
                                             </div>
+                                            <div class="error-message d-none" id="emailError"></div>
                                         </div>
 
-                                        <div class="mb-4">
-                                            <div class="input-icon-container">
-                                                <input type="password" class="form-control form-control-lg" id="password"
-                                                    placeholder="Contraseña" required>
-                                                <i class="fas fa-lock input-icon"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-3 form-check">
-                                            <input type="checkbox" class="form-check-input" id="remember">
-                                            <label class="form-check-label" for="remember">
-                                                Recordar mi sesión
-                                            </label>
-                                        </div>
-
-                                        <div class="mb-4">
-                                            <div class="text-center">
-                                                <a href="olvidoContrasena.html" class="text-decoration-none small">¿Olvidaste tu contraseña?</a>
-                                            </div>
-                                        </div>
-
-                                        <button type="submit" class="btn btn-success btn-lg w-100 mb-3">Iniciar
-                                            Sesión</button>
+                                        <button type="submit" class="btn btn-success btn-lg w-100 mb-3" id="submitBtn">
+                                            <span class="btn-text">Enviar codigo de recuperación</span>
+                                            <span class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -121,6 +112,9 @@
             loadComponent('footer-container', '../shared/footer.html');
         });
     </script>
+
+    <!-- Script específico para recuperación de contraseña -->
+    <script src="../../../js/forgotPassword.js"></script>
 </body>
 
 </html>
