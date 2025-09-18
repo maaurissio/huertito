@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HuertoHogar</title>
+    <title>Mi Perfil - HuertoHogar</title>
+
+    <!-- Preload de recursos críticos para carga rápida -->
+    <link rel="preload" href="../../../css/style.css" as="style">
+    <link rel="preload" href="../../../css/perfil.css" as="style">
+    <link rel="preload" href="../../../js/perfil.js" as="script">
+    <link rel="preload" href="../../../img/usuario-avatar.webp" as="image">
+    
+    <!-- Prefetch de páginas que el usuario podría visitar -->
+    <link rel="prefetch" href="../catalogo.html">
+    <link rel="prefetch" href="../../../index.html">
 
     <!-- CSS Personalizado -->
     <link href="../../../css/style.css" rel="stylesheet">
@@ -11,594 +21,343 @@
     <!-- CSS BootStrap -->
     <link href="../../../css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- JS BootStrap -->
     <script src="../../../js/bootstrap.bundle.min.js"></script>
 
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
-
 </head>
 <body>
     <!-- Contenedor para la navbar (se carga automáticamente) -->
     <div id="navbar-container"></div>
 
-    <main>
-        <!-- Header del Perfil -->
-        <section class="bg-success bg-opacity-10 py-5">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <div class="d-flex align-items-center">
-                            <!-- Foto de perfil -->
-                            <div class="profile-image-container me-4">
-                                <img src="../../../img/usuario-avatar.jpg" alt="Foto de perfil" class="profile-image" id="profileImage">
-                                <div class="profile-image-overlay">
+    <div class="profile-wrapper">
+        <!-- Header Minimalista del Perfil -->
+        <section class="bg-white border-bottom profile-header-shadow" style="padding: 0.5rem 0 !important;">
+            <div class="container-fluid" style="padding: 0 15px !important;">
+                <div class="row align-items-center" style="margin: 0 !important;">
+                    <div class="col-md-8" style="padding: 0.5rem 15px !important;">
+                        <div class="d-flex align-items-center" style="gap: 0.75rem !important;">
+                            <!-- Avatar -->
+                            <div class="profile-avatar" onclick="document.getElementById('profileImageInput').click()" style="width: 55px !important; height: 55px !important;">
+                                <img src="../../../img/usuario-avatar.webp" alt="Avatar" id="profileImage" class="rounded-circle" style="width: 55px !important; height: 55px !important;">
+                                <div class="avatar-overlay">
                                     <i class="fas fa-camera"></i>
                                 </div>
                             </div>
-                            <!-- Información básica -->
-                            <div>
-                                <h1 class="mb-1" style="font-family: 'Playfair Display', serif;">Juan Carlos Pérez</h1>
-                                <p class="text-muted mb-2">Cliente desde: Enero 2024</p>
-                                <span class="badge bg-success">Cliente Premium</span>
+                            <!-- Input oculto para el cambio de imagen -->
+                            <input type="file" id="profileImageInput" style="display: none;" accept="image/*">
+                            <!-- Info Usuario -->
+                            <div style="line-height: 1.3 !important;">
+                                <h1 class="mb-0 fw-semibold" id="userName" style="font-size: 1.25rem !important; margin: 0 !important;">Usuario</h1>
+                                <p class="text-muted mb-0" id="userEmail" style="font-size: 0.85rem !important; margin: 0 !important;">usuario@email.com</p>
+                                <small class="text-success fw-medium" style="font-size: 0.75rem !important;">Miembro desde <span id="joinDate">2024</span></small>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 text-md-end">
-                        <button class="btn btn-outline-success me-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                            <i class="fas fa-edit"></i> Editar Perfil
-                        </button>
-                        <button class="btn btn-success">
-                            <i class="fas fa-shopping-cart"></i> Comprar
+                    <div class="col-md-4 text-md-end" style="padding: 0.5rem 15px !important;">
+                        <button class="btn btn-outline-success btn-sm" onclick="editProfile()" style="padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important;">
+                            <i class="fas fa-edit me-1"></i>Editar
                         </button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Navegación por pestañas -->
-        <section class="container my-4">
-            <ul class="nav nav-pills nav-justified" id="profileTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="info-tab" data-bs-toggle="pill" data-bs-target="#info" type="button" role="tab">
-                        <i class="fas fa-user"></i> Información Personal
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="orders-tab" data-bs-toggle="pill" data-bs-target="#orders" type="button" role="tab">
-                        <i class="fas fa-shopping-bag"></i> Mis Pedidos
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="addresses-tab" data-bs-toggle="pill" data-bs-target="#addresses" type="button" role="tab">
-                        <i class="fas fa-map-marker-alt"></i> Direcciones
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="settings-tab" data-bs-toggle="pill" data-bs-target="#settings" type="button" role="tab">
-                        <i class="fas fa-cog"></i> Configuración
-                    </button>
-                </li>
-            </ul>
-        </section>
-
-        <!-- Contenido de las pestañas -->
-        <section class="container mb-5">
-            <div class="tab-content" id="profileTabsContent">
-                
-                <!-- Pestaña: Información Personal -->
-                <div class="tab-pane fade show active" id="info" role="tabpanel">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><i class="fas fa-user-circle"></i> Datos Personales</h5>
-                                </div>
-                                <div class="card-body">
-                                    <form id="personalInfoForm">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="firstName" class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" id="firstName" value="Juan Carlos">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="lastName" class="form-label">Apellidos</label>
-                                                <input type="text" class="form-control" id="lastName" value="Pérez García">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="email" class="form-label">Correo Electrónico</label>
-                                                <input type="email" class="form-control" id="email" value="juan.perez@email.com">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="phone" class="form-label">Teléfono</label>
-                                                <input type="tel" class="form-control" id="phone" value="+56 9 1234 5678">
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
-                                            <input type="date" class="form-control" id="birthDate" value="1990-05-15">
-                                        </div>
-                                        <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Estadísticas</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="stat-item mb-3">
-                                        <div class="d-flex justify-content-between">
-                                            <span>Pedidos totales:</span>
-                                            <strong class="text-success">24</strong>
-                                        </div>
-                                    </div>
-                                    <div class="stat-item mb-3">
-                                        <div class="d-flex justify-content-between">
-                                            <span>Dinero gastado:</span>
-                                            <strong class="text-success">$234,500</strong>
-                                        </div>
-                                    </div>
-                                    <div class="stat-item mb-3">
-                                        <div class="d-flex justify-content-between">
-                                            <span>Productos favoritos:</span>
-                                            <strong class="text-success">12</strong>
-                                        </div>
-                                    </div>
-                                    <hr>
-                                    <div class="text-center">
-                                        <span class="badge bg-warning text-dark">Nivel: Premium</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pestaña: Mis Pedidos -->
-                <div class="tab-pane fade" id="orders" role="tabpanel">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-history"></i> Historial de Pedidos</h5>
-                        </div>
-                        <div class="card-body">
-                            <!-- Pedido 1 -->
-                            <div class="order-item border-bottom pb-3 mb-3">
-                                <div class="row align-items-center">
-                                    <div class="col-md-3">
-                                        <strong>Pedido #2024-001</strong>
-                                        <br><small class="text-muted">02 Sep 2024</small>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <span>Espinacas orgánicas, Tomates cherry</span>
-                                        <br><small class="text-muted">3 productos</small>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <strong class="text-success">$12,500</strong>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <span class="badge bg-success">Entregado</span>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <button class="btn btn-sm btn-outline-success">Ver</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Pedido 2 -->
-                            <div class="order-item border-bottom pb-3 mb-3">
-                                <div class="row align-items-center">
-                                    <div class="col-md-3">
-                                        <strong>Pedido #2024-002</strong>
-                                        <br><small class="text-muted">28 Ago 2024</small>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <span>Lechugas, Zanahorias, Apio</span>
-                                        <br><small class="text-muted">5 productos</small>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <strong class="text-success">$18,200</strong>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <span class="badge bg-warning">En tránsito</span>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <button class="btn btn-sm btn-outline-success">Ver</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Más pedidos -->
-                            <div class="text-center">
-                                <button class="btn btn-outline-success">Cargar más pedidos</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pestaña: Direcciones -->
-                <div class="tab-pane fade" id="addresses" role="tabpanel">
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h6 class="mb-0"><i class="fas fa-home"></i> Casa</h6>
-                                    <span class="badge bg-success">Principal</span>
-                                </div>
-                                <div class="card-body">
-                                    <p class="mb-1"><strong>Juan Carlos Pérez</strong></p>
-                                    <p class="mb-1">Av. Providencia 1234, Depto 506</p>
-                                    <p class="mb-1">Providencia, Santiago</p>
-                                    <p class="mb-1">Región Metropolitana</p>
-                                    <p class="mb-3">+56 9 1234 5678</p>
-                                    <button class="btn btn-sm btn-outline-success me-2">Editar</button>
-                                    <button class="btn btn-sm btn-outline-danger">Eliminar</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h6 class="mb-0"><i class="fas fa-building"></i> Trabajo</h6>
-                                </div>
-                                <div class="card-body">
-                                    <p class="mb-1"><strong>Juan Carlos Pérez</strong></p>
-                                    <p class="mb-1">Av. Apoquindo 4500, Piso 12</p>
-                                    <p class="mb-1">Las Condes, Santiago</p>
-                                    <p class="mb-1">Región Metropolitana</p>
-                                    <p class="mb-3">+56 9 1234 5678</p>
-                                    <button class="btn btn-sm btn-outline-success me-2">Editar</button>
-                                    <button class="btn btn-sm btn-outline-danger">Eliminar</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 border-dashed">
-                                <div class="card-body text-center d-flex flex-column justify-content-center">
-                                    <i class="fas fa-plus-circle fa-3x text-muted mb-3"></i>
-                                    <h5 class="text-muted">Agregar nueva dirección</h5>
-                                    <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#addAddressModal">
-                                        Agregar Dirección
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pestaña: Configuración -->
-                <div class="tab-pane fade" id="settings" role="tabpanel">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Seguridad</h5>
-                                </div>
-                                <div class="card-body">
-                                    <form id="passwordForm">
-                                        <div class="mb-3">
-                                            <label for="currentPassword" class="form-label">Contraseña Actual</label>
-                                            <input type="password" class="form-control" id="currentPassword" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="newPassword" class="form-label">Nueva Contraseña</label>
-                                            <input type="password" class="form-control" id="newPassword" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="confirmNewPassword" class="form-label">Confirmar Nueva Contraseña</label>
-                                            <input type="password" class="form-control" id="confirmNewPassword" required>
-                                        </div>
-                                        <button type="submit" class="btn btn-warning">Cambiar Contraseña</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Zona de peligro -->
-                    <div class="card mt-4 border-danger">
-                        <div class="card-header bg-danger text-white">
-                            <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Zona de Peligro</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="text-muted">Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, ten cuidado.</p>
-                            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                                Eliminar Cuenta
+        <!-- Contenido Principal -->
+        <div class="profile-content">
+            <!-- Sidebar de Navegación -->
+            <nav class="sidebar">
+                <div class="p-3">
+                    <ul class="nav flex-column nav-pills" id="profileNav">
+                        <li class="nav-item">
+                            <button class="nav-link active w-100 text-start" onclick="mostrarSeccion('general')">
+                                <i class="fas fa-user me-2"></i>Mi Perfil
                             </button>
-                        </div>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link w-100 text-start" onclick="mostrarSeccion('pedidos')">
+                                <i class="fas fa-shopping-bag me-2"></i>Mis Pedidos
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link w-100 text-start" onclick="mostrarSeccion('favoritos')">
+                                <i class="fas fa-heart me-2"></i>Favoritos
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link w-100 text-start" onclick="mostrarSeccion('configuracion')">
+                                <i class="fas fa-cog me-2"></i>Configuración
+                            </button>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <button class="nav-link w-100 text-start text-danger" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Contenido Principal -->
+            <main class="main-profile-content">
+                <!-- Sección: Mi Perfil -->
+                <div id="general" class="profile-section active">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h4 mb-0 fw-semibold">Información Personal</h2>
                     </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Contenedor para el footer (se carga automáticamente) -->
-    <div id="footer-container"></div>
-
-    <!-- Modal: Editar Perfil -->
-    <div class="modal fade" id="editProfileModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Foto de Perfil</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img src="../../../img/usuario-avatar.jpg" alt="Foto actual" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                    <div class="mb-3">
-                        <input type="file" class="form-control" id="newProfileImage" accept="image/*">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-success">Guardar Cambios</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Agregar Dirección -->
-    <div class="modal fade" id="addAddressModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Agregar Nueva Dirección</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addAddressForm">
-                        <div class="mb-3">
-                            <label for="addressName" class="form-label">Nombre de la dirección</label>
-                            <input type="text" class="form-control" id="addressName" placeholder="Ej: Casa, Trabajo">
-                        </div>
-                        <div class="mb-3">
-                            <label for="fullAddress" class="form-label">Dirección completa</label>
-                            <input type="text" class="form-control" id="fullAddress" placeholder="Calle, número, depto">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="city" class="form-label">Comuna</label>
-                                <input type="text" class="form-control" id="city">
+                            
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body p-4">
+                                            <form id="profileForm">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label text-muted small">Nombre</label>
+                                                        <input type="text" class="form-control border-0 bg-light" id="profileName" name="nombre" placeholder="Tu nombre">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label text-muted small">Apellidos</label>
+                                                        <input type="text" class="form-control border-0 bg-light" id="profileLastName" name="apellidos" placeholder="Tus apellidos">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label text-muted small">Email</label>
+                                                        <input type="email" class="form-control border-0 bg-light" id="profileEmail" name="email" readonly>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label text-muted small">Teléfono</label>
+                                                        <input type="tel" class="form-control border-0 bg-light" id="profilePhone" name="telefono" placeholder="+56 9 1234 5678">
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label text-muted small">Fecha de Nacimiento</label>
+                                                    <input type="date" class="form-control border-0 bg-light" id="profileBirthDate" name="fechaNacimiento">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label text-muted small">Dirección Principal</label>
+                                                    <textarea class="form-control border-0 bg-light" id="profileAddress" name="direccion" rows="2" placeholder="Tu dirección principal"></textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-success px-4">
+                                                    <i class="fas fa-save me-1"></i>Guardar Cambios
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body p-4">
+                                            <h5 class="fw-semibold mb-3">Estadísticas</h5>
+                                            <div class="stats-grid">
+                                                <div class="stat-item">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="text-muted">Pedidos totales</span>
+                                                        <span class="fw-semibold text-success" id="totalPedidos">0</span>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="text-muted">Total gastado</span>
+                                                        <span class="fw-semibold text-success" id="totalGastado">$0</span>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="text-muted">Favoritos</span>
+                                                        <span class="fw-semibold text-success" id="totalFavoritos">0</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 text-center">
+                                                <span class="badge bg-success px-3 py-2">Cliente Premium</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="region" class="form-label">Región</label>
-                                <select class="form-control" id="region">
-                                    <option>Región Metropolitana</option>
-                                    <option>Valparaíso</option>
-                                    <option>O'Higgins</option>
+                        </div>
+
+                    <!-- Sección: Mis Pedidos -->
+                    <div id="pedidos" class="profile-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="h4 mb-0 fw-semibold">Mis Pedidos</h2>
+                            <div class="d-flex gap-2">
+                                <select class="form-select form-select-sm" id="filtroEstado">
+                                    <option value="">Todos los estados</option>
+                                    <option value="entregado">Entregado</option>
+                                    <option value="en-transito">En tránsito</option>
+                                    <option value="preparando">Preparando</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="addressPhone" class="form-label">Teléfono</label>
-                            <input type="tel" class="form-control" id="addressPhone">
+                        
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-0">
+                                <div id="ordersList" class="orders-list">
+                                    <!-- Los pedidos se cargarán dinámicamente -->
+                                    <div class="p-4 text-center text-muted">
+                                        <i class="fas fa-shopping-bag fa-2x mb-2 opacity-50"></i>
+                                        <p>No tienes pedidos aún</p>
+                                        <a href="../catalogo.html" class="btn btn-success btn-sm">
+                                            Hacer mi primer pedido
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-success">Agregar Dirección</button>
-                </div>
-            </div>
+                    </div>
+
+                    <!-- Sección: Favoritos -->
+                    <div id="favoritos" class="profile-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="h4 mb-0 fw-semibold">Mis Favoritos</h2>
+                        </div>
+                        
+                        <div id="favoritesList" class="row g-4">
+                            <!-- Los favoritos se cargarán dinámicamente -->
+                            <div class="col-12 text-center py-4">
+                                <i class="fas fa-heart fa-2x text-muted mb-2 opacity-50"></i>
+                                <p class="text-muted mb-3">Aún no tienes productos favoritos</p>
+                                <a href="catalogo.html" class="btn btn-outline-success btn-sm">
+                                    Explorar productos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Configuración -->
+                    <div id="configuracion" class="profile-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="h4 mb-0 fw-semibold">Configuración</h2>
+                        </div>
+                        
+                        <!-- Cambio de Contraseña -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-semibold mb-3">
+                                    <i class="fas fa-lock me-2 text-success"></i>Cambiar Contraseña
+                                </h5>
+                                <form id="passwordForm">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Contraseña Actual</label>
+                                        <input type="password" class="form-control border-0 bg-light" id="currentPassword" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Nueva Contraseña</label>
+                                        <input type="password" class="form-control border-0 bg-light" id="newPassword" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Confirmar Nueva Contraseña</label>
+                                        <input type="password" class="form-control border-0 bg-light" id="confirmPassword" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning px-4">
+                                        <i class="fas fa-key me-1"></i>Cambiar Contraseña
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Preferencias -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-semibold mb-3">
+                                    <i class="fas fa-sliders-h me-2 text-success"></i>Preferencias
+                                </h5>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Recibir notificaciones por email
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="smsNotifications">
+                                    <label class="form-check-label" for="smsNotifications">
+                                        Recibir notificaciones por SMS
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="promotionalEmails" checked>
+                                    <label class="form-check-label" for="promotionalEmails">
+                                        Recibir ofertas y promociones
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Zona de Peligro -->
+                        <div class="card border-danger shadow-sm">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Zona de Peligro
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Una vez que elimines tu cuenta, no hay vuelta atrás. Todos tus datos se perderán permanentemente.</p>
+                                <button class="btn btn-outline-danger" id="deleteAccountBtn">
+                                    <i class="fas fa-trash me-1"></i>Eliminar Cuenta
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
         </div>
     </div>
 
+    <!-- Contenedor para el footer -->
+    <div id="footer-container"></div>
+
+
     <!-- Modal: Confirmar Eliminar Cuenta -->
     <div class="modal fade" id="deleteAccountModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Eliminar Cuenta</h5>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 bg-danger text-white">
+                    <h5 class="modal-title fw-semibold">⚠️ Eliminar Cuenta</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <p><strong>¿Estás seguro de que quieres eliminar tu cuenta?</strong></p>
-                    <p>Esta acción no se puede deshacer. Se perderán permanentemente:</p>
-                    <ul>
+                <div class="modal-body p-4">
+                    <p class="mb-3"><strong>¿Estás seguro de que quieres eliminar tu cuenta?</strong></p>
+                    <p class="text-muted mb-3">Esta acción es irreversible. Se perderán permanentemente:</p>
+                    <ul class="text-muted">
                         <li>Tu información personal</li>
                         <li>Historial de pedidos</li>
-                        <li>Direcciones guardadas</li>
-                        <li>Preferencias de usuario</li>
+                        <li>Productos favoritos</li>
+                        <li>Preferencias guardadas</li>
                     </ul>
-                    <div class="mb-3">
-                        <label for="confirmDelete" class="form-label">Escribe "ELIMINAR" para confirmar:</label>
-                        <input type="text" class="form-control" id="confirmDelete" placeholder="ELIMINAR">
+                    <div class="mt-4">
+                        <label class="form-label small text-muted">Para confirmar, escribe <strong>ELIMINAR</strong>:</label>
+                        <input type="text" class="form-control border-0 bg-light" id="confirmDeleteInput" placeholder="ELIMINAR">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>Eliminar Cuenta</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- CSS Personalizado para el Perfil -->
-    <style>
-        /* Imagen de perfil */
-        .profile-image-container {
-            position: relative;
-            display: inline-block;
-        }
+    <!-- CSS Personalizado del Perfil -->
+    <link href="../../../css/perfil.css" rel="stylesheet">
 
-        .profile-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .profile-image-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            cursor: pointer;
-        }
-
-        .profile-image-container:hover .profile-image-overlay {
-            opacity: 1;
-        }
-
-        .profile-image-overlay i {
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        /* Pestañas del perfil */
-        .nav-pills .nav-link {
-            border-radius: 25px;
-            margin: 0 5px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-pills .nav-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .nav-pills .nav-link.active {
-            background-color: #28a745;
-        }
-
-        /* Estadísticas */
-        .stat-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .stat-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Pedidos */
-        .order-item:hover {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px !important;
-            transition: all 0.3s ease;
-        }
-
-        /* Card con borde punteado */
-        .border-dashed {
-            border: 2px dashed #dee2e6 !important;
-        }
-
-        .border-dashed:hover {
-            border-color: #28a745 !important;
-            background-color: #f8fff8;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .profile-image {
-                width: 80px;
-                height: 80px;
-            }
-            
-            .nav-pills {
-                flex-direction: column;
-            }
-            
-            .nav-pills .nav-link {
-                margin: 2px 0;
-            }
-        }
-
-        /* Botones outline personalizados en verde */
-        .btn-outline-success {
-            color: #28a745 !important;
-            border-color: #28a745 !important;
-        }
-
-        .btn-outline-success:hover {
-            color: #fff !important;
-            background-color: #28a745 !important;
-            border-color: #28a745 !important;
-        }
-
-        .btn-outline-success:focus {
-            color: #fff !important;
-            background-color: #28a745 !important;
-            border-color: #28a745 !important;
-            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
-        }
-    </style>
-
+    <!-- JavaScript para preload y cacheo -->
+    <script src="../../../js/preload.js"></script>
+    
     <!-- JavaScript para funcionalidad del perfil -->
-    <script>
-        // Confirmar eliminación de cuenta
-        document.getElementById('confirmDelete').addEventListener('input', function() {
-            const confirmBtn = document.getElementById('confirmDeleteBtn');
-            if (this.value === 'ELIMINAR') {
-                confirmBtn.disabled = false;
-            } else {
-                confirmBtn.disabled = true;
-            }
-        });
-
-        // Cambiar contraseña
-        document.getElementById('passwordForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const current = document.getElementById('currentPassword').value;
-            const newPass = document.getElementById('newPassword').value;
-            const confirm = document.getElementById('confirmNewPassword').value;
-            
-            if (newPass !== confirm) {
-                mostrarNotificacion('Las contraseñas nuevas no coinciden', 'error');
-                return;
-            }
-            
-            if (newPass.length < 6) {
-                mostrarNotificacion('La nueva contraseña debe tener al menos 6 caracteres', 'warning');
-                return;
-            }
-            
-            mostrarNotificacion('Contraseña cambiada exitosamente', 'success');
-            this.reset();
-        });
-
-        // Guardar información personal
-        document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            mostrarNotificacion('Información guardada exitosamente', 'success');
-        });
-
-        // Funcionalidad de imagen de perfil
-        document.querySelector('.profile-image-container').addEventListener('click', function() {
-            const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
-            modal.show();
-        });
-
-        // Preview de nueva imagen de perfil
-        document.getElementById('newProfileImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.querySelector('#editProfileModal img').src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
+    <script src="../../../js/auth.js"></script>
+    <script src="../../../js/perfil.js"></script>
 
 </body>
 </html>

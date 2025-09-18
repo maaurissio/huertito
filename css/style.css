@@ -39,6 +39,31 @@ body {
   color: #333333;
   background-color: #F7F7F7;
   line-height: 1.6;
+  /* Ocultar scrollbar en IE y Edge */
+  -ms-overflow-style: none;
+  /* Ocultar scrollbar en Firefox */
+  scrollbar-width: none;
+}
+
+/* Ocultar scrollbar en Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* Para HTML también */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
 }
 
 /* Fuente de Encabezado: Playfair Display*/
@@ -80,9 +105,10 @@ main {
     flex: 1;
 }
 
-.container, section {
+/* Remover flex de containers generales para no afectar el perfil */
+/* .container, section {
     flex: 1;
-}
+} */
 
 /* Efectos hover para la navbar */
 .nav-link {

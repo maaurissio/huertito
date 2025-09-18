@@ -297,16 +297,33 @@ function mostrarMenuUsuario(navbarMenu, usuario) {
     // Crear dropdown del usuario
     const userDropdown = document.createElement('li');
     userDropdown.className = 'nav-item dropdown user-dropdown';
+    
+    // Determinar la ruta al perfil según la ubicación actual
+    let perfilPath;
+    const currentPath = window.location.pathname;
+    const currentFile = window.location.pathname.split('/').pop();
+    
+    if (currentFile === 'index.html' || currentPath.endsWith('/huertito/') || currentPath.endsWith('/huertito')) {
+        // Estamos en la página principal
+        perfilPath = 'pages/client/tienda/perfil.html';
+    } else if (currentPath.includes('/admin/')) {
+        // Estamos en área admin
+        perfilPath = '../client/tienda/perfil.html';
+    } else {
+        // Estamos en páginas de cliente
+        perfilPath = '../tienda/perfil.html';
+    }
+    
     userDropdown.innerHTML = `
         <a class="nav-link dropdown-toggle text-success fw-semibold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fas fa-user-circle me-1"></i>
             ${usuario.nombre}
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-bag me-2"></i>Mis Pedidos</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-heart me-2"></i>Favoritos</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+            <li><a class="dropdown-item" href="${perfilPath}"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
+            <li><a class="dropdown-item" href="${perfilPath}?section=pedidos"><i class="fas fa-shopping-bag me-2"></i>Mis Pedidos</a></li>
+            <li><a class="dropdown-item" href="${perfilPath}?section=favoritos"><i class="fas fa-heart me-2"></i>Favoritos</a></li>
+            <li><a class="dropdown-item" href="${perfilPath}?section=configuracion"><i class="fas fa-cog me-2"></i>Configuración</a></li>
             ${usuario.rol === 'superusuario' ? '<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-primary" href="../../admin/dashboard.html"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</a></li>' : ''}
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item text-danger" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
