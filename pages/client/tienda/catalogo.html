@@ -42,6 +42,28 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+        
+        /* ESTILOS PARA UNIFICAR EL TAMAÑO DE IMÁGENES */
+        .product-card img {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .product-card {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-card .card-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-card .card-body .btn {
+            margin-top: auto;
+        }
     </style>
 </head>
 
@@ -155,7 +177,7 @@
             <!-- FR001 - Manzanas Fuji -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="frutas">
               <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Manzanas Fuji">
+                <img src="../../../img/manzana.webp" class="card-img-top" alt="Manzanas Fuji">
                 <div class="card-body">
                   <h5 class="card-title">FR001 - Manzanas Fuji</h5>
                   <p class="card-text">Manzanas frescas, jugosas y dulces, perfectas para cualquier ocasión.</p>
@@ -176,7 +198,7 @@
             <!-- FR002 - Naranjas Valencia -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="frutas">
               <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Naranjas Valencia">
+                <img src="../../../img/naranja.webp" class="card-img-top" alt="Naranjas Valencia">
                 <div class="card-body">
                   <h5 class="card-title">FR002 - Naranjas Valencia</h5>
                   <p class="card-text">Naranjas frescas, ideales para jugo o consumo directo.</p>
@@ -197,7 +219,7 @@
             <!-- FR003 - Plátanos Cavendish -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="frutas">
               <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Plátanos Cavendish">
+                <img src="../../../img/platanos3.webp" class="card-img-top" alt="Plátanos Cavendish">
                 <div class="card-body">
                   <h5 class="card-title">FR003 - Plátanos Cavendish</h5>
                   <p class="card-text">Plátanos dulces y nutritivos, perfectos para postres y colaciones.</p>
@@ -218,10 +240,10 @@
             <!-- VR001 - Zanahorias Orgánicas -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="verduras">
               <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Zanahorias Orgánicas">
+                <img src="../../../img/zanahorias.webp" class="card-img-top" alt="Zanahorias Orgánicas">
                 <div class="card-body">
                   <h5 class="card-title">VR001 - Zanahorias Orgánicas</h5>
-                  <p class="card-text">Zanahorias crujientes y llenas de vitaminas.</p>
+                  <p class="card-text">Zanahorias crujientes y llenas de vitamins.</p>
                   <p class="text-success fw-bold">$1.500 / Kg</p>
                   <button class="btn btn-success add-to-cart-btn" 
                           data-id="VR001" 
@@ -239,7 +261,7 @@
             <!-- VR002 - Espinacas Frescas -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="verduras">
               <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Espinacas Frescas">
+                <img src="../../../img/espinaca.webp" class="card-img-top" alt="Espinacas Frescas">
                 <div class="card-body">
                   <h5 class="card-title">VR002 - Espinacas Frescas</h5>
                   <p class="card-text">Espinacas frescas y saludables, ideales para ensaladas y guisos.</p>
@@ -260,7 +282,7 @@
             <!-- VR003 - Pimientos Tricolores -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="verduras">
               <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Pimientos Tricolores">
+                <img src="../../../img/pimientos.webp" class="card-img-top" alt="Pimientos Tricolores">
                 <div class="card-body">
                   <h5 class="card-title">VR003 - Pimientos Tricolores</h5>
                   <p class="card-text">Pimientos rojos, verdes y amarillos llenos de sabor y color.</p>
@@ -281,7 +303,7 @@
             <!-- PO001 - Miel Orgánica -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="organicos">
               <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Miel Orgánica">
+                <img src="../../../img/miel.webp" class="card-img-top" alt="Miel Orgánica">
                 <div class="card-body">
                   <h5 class="card-title">PO001 - Miel Orgánica</h5>
                   <p class="card-text">Miel 100% natural y sin aditivos, directamente del apicultor.</p>
@@ -302,11 +324,11 @@
             <!-- PO003 - Quinua Orgánica -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="organicos">
               <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Quinua Orgánica">
+                <img src="../../../img/quinoa.webp" class="card-img-top" alt="Quinua Orgánica">
                 <div class="card-body">
                   <h5 class="card-title">PO003 - Quinua Orgánica</h5>
                   <p class="card-text">Quinua natural y rica en proteínas, ideal para comidas saludables.</p>
-                  <p class="text-success fw-bold">$3.200 / Kg</p>
+                  <p class="text-success fw-bold">$4.000 / Kg</p>
                   <button class="btn btn-success add-to-cart-btn" 
                           data-id="PO003" 
                           data-name="Quinua Orgánica" 
@@ -323,7 +345,7 @@
             <!-- PL001 - Leche Entera -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="lacteos">
               <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Leche Entera">
+                <img src="../../../img/leche.webp" class="card-img-top" alt="Leche Entera">
                 <div class="card-body">
                   <h5 class="card-title">PL001 - Leche Entera</h5>
                   <p class="card-text">Leche entera fresca y nutritiva para toda la familia.</p>
@@ -419,4 +441,4 @@
 
 </body>
 
-</html> 
+</html>
