@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,12 +14,69 @@
     <!-- CSS BootStrap -->
     <link href="../../../css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+
     <!-- JS BootStrap -->
     <script src="../../../js/bootstrap.bundle.min.js"></script>
 
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
 
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, rgba(46, 139, 87, 0.9), rgba(34, 139, 34, 0.8)), url('../../../img/huerto.webp');
+            background-size: cover;
+            background-position: center;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-header.bg-gradient {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .article-img {
+            object-fit: cover;
+            min-height: 250px;
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Estilos para el mapa */
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            z-index: 1;
+        }
+        
+        .map-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .leaflet-popup-content {
+            font-family: inherit;
+        }
+        
+        .custom-marker {
+            background-color: #28a745;
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 
 <body>
@@ -28,284 +84,318 @@
     <div id="navbar-container"></div>
 
     <main>
-        <!-- Hero Section - Minimalista -->
-        <section class="py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
-            <div class="container">
-                <div class="row justify-content-center text-center">
-                    <div class="col-lg-8">
-                        <h1 class="display-4 fw-light mb-4" style="font-family: 'Playfair Display', serif; color: #2d3748;">
-                            Nosotros
-                        </h1>
-                        <p class="lead text-muted mb-0">
-                            Conectamos el campo chileno con tu hogar desde hace más de 6 años
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Historia - Minimalista -->
-        <section class="py-5">
-            <div class="container">
-                <div class="row align-items-center g-5">
-                    <div class="col-lg-6">
-                        <div class="pe-lg-5">
-                            <h2 class="h3 mb-4" style="font-family: 'Playfair Display', serif; color: #2d3748;">
-                                Nuestra Historia
-                            </h2>
-                            <p class="text-muted mb-4 lh-lg">
-                                HuertoHogar nació con una visión simple pero poderosa: llevar la frescura y calidad 
-                                de los productos del campo directamente a tu mesa.
-                            </p>
-                            <p class="text-muted mb-4 lh-lg">
-                                Durante más de 6 años, hemos operado en 9 puntos estratégicos de Chile, 
-                                desde Santiago hasta Puerto Montt, construyendo puentes entre agricultores 
-                                locales y familias que valoran la alimentación saludable.
-                            </p>
-                            <div class="d-flex align-items-center">
-                                <div class="me-4">
-                                    <div class="fw-bold h4 text-success mb-0">6+</div>
-                                    <small class="text-muted">Años de experiencia</small>
-                                </div>
-                                <div class="me-4">
-                                    <div class="fw-bold h4 text-success mb-0">9</div>
-                                    <small class="text-muted">Ubicaciones</small>
-                                </div>
-                                <div>
-                                    <div class="fw-bold h4 text-success mb-0">1000+</div>
-                                    <small class="text-muted">Familias satisfechas</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="position-relative">
-                            <img src="../../../img/vegetales1.webp" 
-                                 class="img-fluid rounded-3 shadow-sm" 
-                                 alt="Historia de Huerto Hogar"
-                                 style="border-radius: 20px !important;">
-                            <div class="position-absolute top-0 start-0 w-100 h-100 bg-success bg-opacity-10 rounded-3"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Misión y Visión - Minimalista -->
-        <section class="py-5" style="background-color: #fafafa;">
-            <div class="container">
-                <div class="row g-5">
-                    <div class="col-lg-6">
-                        <div class="h-100 p-5 bg-white rounded-3 shadow-sm">
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="me-3">
-                                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
-                                         style="width: 60px; height: 60px;">
-                                        <i class="fas fa-bullseye text-success fs-4"></i>
-                                    </div>
-                                </div>
-                                <h3 class="h4 mb-0" style="font-family: 'Playfair Display', serif; color: #2d3748;">
-                                    Misión
-                                </h3>
-                            </div>
-                            <p class="text-muted lh-lg mb-0">
-                                Proporcionar productos frescos y de calidad directamente desde el campo, 
-                                garantizando frescura en cada entrega y fomentando la conexión entre 
-                                consumidores y agricultores locales.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="h-100 p-5 bg-white rounded-3 shadow-sm">
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="me-3">
-                                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
-                                         style="width: 60px; height: 60px;">
-                                        <i class="fas fa-eye text-success fs-4"></i>
-                                    </div>
-                                </div>
-                                <h3 class="h4 mb-0" style="font-family: 'Playfair Display', serif; color: #2d3748;">
-                                    Visión
-                                </h3>
-                            </div>
-                            <p class="text-muted lh-lg mb-0">
-                                Ser la tienda online líder en distribución de productos frescos en Chile, 
-                                reconocida por nuestra calidad excepcional y compromiso con la sostenibilidad.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Valores - Minimalista -->
-        <section class="py-5">
-            <div class="container">
-                <div class="text-center mb-5">
-                    <h2 class="h3" style="font-family: 'Playfair Display', serif; color: #2d3748;">
-                        Nuestros Valores
-                    </h2>
-                    <p class="text-muted">Los principios que guían nuestro trabajo diario</p>
-                </div>
-                <div class="row g-4">
-                    <div class="col-md-6 col-lg-3">
-                        <div class="text-center h-100">
-                            <div class="mb-3">
-                                <i class="fas fa-leaf text-success fs-1 opacity-75"></i>
-                            </div>
-                            <h5 class="fw-semibold mb-3">Sostenibilidad</h5>
-                            <p class="text-muted small lh-lg">
-                                Promovemos prácticas agrícolas responsables con el medio ambiente
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="text-center h-100">
-                            <div class="mb-3">
-                                <i class="fas fa-gem text-success fs-1 opacity-75"></i>
-                            </div>
-                            <h5 class="fw-semibold mb-3">Calidad</h5>
-                            <p class="text-muted small lh-lg">
-                                Garantizamos productos frescos y de la más alta calidad
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="text-center h-100">
-                            <div class="mb-3">
-                                <i class="fas fa-handshake text-success fs-1 opacity-75"></i>
-                            </div>
-                            <h5 class="fw-semibold mb-3">Confianza</h5>
-                            <p class="text-muted small lh-lg">
-                                Construimos relaciones duraderas basadas en la transparencia
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="text-center h-100">
-                            <div class="mb-3">
-                                <i class="fas fa-shipping-fast text-success fs-1 opacity-75"></i>
-                            </div>
-                            <h5 class="fw-semibold mb-3">Eficiencia</h5>
-                            <p class="text-muted small lh-lg">
-                                Entregamos tus productos frescos en tiempo récord
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Ubicaciones - Minimalista -->
-        <section class="py-5" style="background-color: #fafafa;">
-            <div class="container">
-                <div class="text-center mb-5">
-                    <h2 class="h3" style="font-family: 'Playfair Display', serif; color: #2d3748;">
-                        Nuestras Ubicaciones
-                    </h2>
-                    <p class="text-muted">Presentes en las principales ciudades de Chile</p>
-                </div>
-                <div class="row g-4">
-                    <div class="col-lg-4">
-                        <div class="bg-white p-4 rounded-3 shadow-sm h-100">
-                            <h5 class="fw-semibold mb-3 text-success">Región Metropolitana</h5>
-                            <div class="mb-3">
-                                <div class="d-flex align-items-start mb-2">
-                                    <i class="fas fa-map-marker-alt text-success me-2 mt-1"></i>
-                                    <div>
-                                        <div class="fw-medium">Santiago</div>
-                                        <small class="text-muted">Centro de distribución principal</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="d-flex align-items-start mb-2">
-                                    <i class="fas fa-map-marker-alt text-success me-2 mt-1"></i>
-                                    <div>
-                                        <div class="fw-medium">Viña del Mar</div>
-                                        <small class="text-muted">Región de Valparaíso</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="d-flex align-items-start">
-                                    <i class="fas fa-map-marker-alt text-success me-2 mt-1"></i>
-                                    <div>
-                                        <div class="fw-medium">Valparaíso</div>
-                                        <small class="text-muted">Puerto principal</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="bg-white p-4 rounded-3 shadow-sm h-100">
-                            <h5 class="fw-semibold mb-3 text-success">Zona Sur</h5>
-                            <div class="mb-3">
-                                <div class="d-flex align-items-start mb-2">
-                                    <i class="fas fa-map-marker-alt text-success me-2 mt-1"></i>
-                                    <div>
-                                        <div class="fw-medium">Concepción</div>
-                                        <small class="text-muted">Región del Biobío</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="d-flex align-items-start mb-2">
-                                    <i class="fas fa-map-marker-alt text-success me-2 mt-1"></i>
-                                    <div>
-                                        <div class="fw-medium">Villarica</div>
-                                        <small class="text-muted">Región de la Araucanía</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="d-flex align-items-start">
-                                    <i class="fas fa-map-marker-alt text-success me-2 mt-1"></i>
-                                    <div>
-                                        <div class="fw-medium">Puerto Montt</div>
-                                        <small class="text-muted">Región de Los Lagos</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="bg-white p-4 rounded-3 shadow-sm h-100 d-flex align-items-center justify-content-center">
-                            <div class="text-center">
-                                <i class="fas fa-map text-success fs-1 opacity-75 mb-3"></i>
-                                <h6 class="fw-semibold mb-2">¿Tu ciudad no está?</h6>
-                                <p class="text-muted small mb-3">Pronto llegaremos a más ubicaciones</p>
-                                <a href="../tienda/catalogo.html" class="btn btn-outline-success btn-sm">
-                                    Ver cobertura
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Call to Action - Minimalista -->
-        <section class="py-5">
-            <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-section position-relative overflow-hidden">
+            <div class="container text-center text-white">
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
-                        <div class="text-center">
-                            <h2 class="h3 mb-4" style="font-family: 'Playfair Display', serif; color: #2d3748;">
-                                ¿Listo para experimentar la diferencia?
-                            </h2>
-                            <p class="text-muted mb-4 lh-lg">
-                                Únete a miles de familias que ya disfrutan de productos frescos y naturales
-                            </p>
-                            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                                <a href="../tienda/catalogo.html" class="btn btn-success px-4 py-2">
-                                    <i class="fas fa-shopping-basket me-2"></i>
-                                    Ver Catálogo
-                                </a>
-                                <a href="../auth/registro.html" class="btn btn-outline-success px-4 py-2" onclick="guardarPaginaOrigen()">
-                                    <i class="fas fa-user-plus me-2"></i>
-                                    Crear Cuenta
+                        <h1 class="display-4 fw-bold mb-3" style="font-family: 'Playfair Display', serif; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                            Nosotros
+                        </h1>
+                        <p class="lead mb-4" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                            Conoce más sobre HuertoHogar y nuestra pasión por los productos frescos
+                        </p>
+                        <span class="badge bg-white text-success rounded-pill px-4 py-2 fs-6 fw-medium">
+                            <i class="fas fa-seedling me-2"></i>Desde 2019
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Articles Section -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-lg-3 mb-4">
+                        <div class="sticky-top" style="top: 20px;">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>Más Información
+                                    </h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#nuestra-historia" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-history text-success me-2"></i>Nuestra Historia
+                                        </a>
+                                        <a href="#mision-vision" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-bullseye text-success me-2"></i>Misión y Visión
+                                        </a>
+                                        <a href="#nuestros-valores" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-heart text-success me-2"></i>Nuestros Valores
+                                        </a>
+                                        <a href="#ubicaciones" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-map-marker-alt text-success me-2"></i>Ubicaciones
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card border-0 shadow-sm mt-4">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-award me-2"></i>Logros
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-users text-success"></i>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h6 class="mb-0">1000+</h6>
+                                            <small class="text-muted">Familias satisfechas</small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-map-marked-alt text-success"></i>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h6 class="mb-0">9</h6>
+                                            <small class="text-muted">Ubicaciones</small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-calendar-alt text-success"></i>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h6 class="mb-0">6+</h6>
+                                            <small class="text-muted">Años de experiencia</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="col-lg-9">
+                        <!-- Artículo 1: Nuestra Historia -->
+                        <article id="nuestra-historia" class="card border-0 shadow-sm mb-5">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="../../../img/vegetales1.webp" class="article-img" alt="Nuestra Historia">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-header bg-gradient">
+                                        <h2 class="text-white mb-0" style="font-family: 'Playfair Display', serif;">
+                                            <i class="fas fa-history me-2"></i>Nuestra Historia
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <span class="badge bg-success rounded-pill me-2">
+                                                <i class="fas fa-calendar me-1"></i>Desde 2019
+                                            </span>
+                                            <span class="badge bg-info rounded-pill">
+                                                <i class="fas fa-user me-1"></i>Equipo HuertoHogar
+                                            </span>
+                                        </div>
+                                        <p class="card-text text-muted lh-lg">
+                                            HuertoHogar nació en 2019 con una visión simple pero poderosa: llevar la frescura y calidad 
+                                            de los productos del campo directamente a tu mesa. Lo que comenzó como un pequeño proyecto 
+                                            familiar hoy se ha convertido en una empresa con presencia en 9 ciudades de Chile.
+                                        </p>
+                                        <p class="card-text text-muted lh-lg">
+                                            Durante más de 6 años, hemos construido puentes entre agricultores locales y familias 
+                                            que valoran la alimentación saludable. Cada día trabajamos para conectar el campo chileno 
+                                            con tu hogar, manteniendo siempre nuestro compromiso con la calidad y frescura.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-eye me-1"></i>2,543 lecturas
+                                            </small>
+                                            <a href="../tienda/catalogo.html" class="btn btn-outline-success btn-sm rounded-pill">
+                                                <i class="fas fa-shopping-basket me-1"></i>Ver Productos
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Artículo 2: Misión y Visión -->
+                        <article id="mision-vision" class="card border-0 shadow-sm mb-5">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="../../../img/manzanas.webp" class="article-img" alt="Misión y Visión">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-header bg-gradient">
+                                        <h2 class="text-white mb-0" style="font-family: 'Playfair Display', serif;">
+                                            <i class="fas fa-bullseye me-2"></i>Misión y Visión
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <span class="badge bg-success rounded-pill me-2">
+                                                <i class="fas fa-calendar me-1"></i>Desde 2019
+                                            </span>
+                                            <span class="badge bg-info rounded-pill">
+                                                <i class="fas fa-user me-1"></i>Equipo HuertoHogar
+                                            </span>
+                                        </div>
+                                        <h5 class="text-success mt-4">
+                                            <i class="fas fa-bullseye me-2"></i>Misión
+                                        </h5>
+                                        <p class="card-text text-muted lh-lg">
+                                            Proporcionar productos frescos y de calidad directamente desde el campo, 
+                                            garantizando frescura en cada entrega y fomentando la conexión entre 
+                                            consumidores y agricultores locales.
+                                        </p>
+                                        
+                                        <h5 class="text-success mt-4">
+                                            <i class="fas fa-eye me-2"></i>Visión
+                                        </h5>
+                                        <p class="card-text text-muted lh-lg">
+                                            Ser la tienda online líder en distribución de productos frescos en Chile, 
+                                            reconocida por nuestra calidad excepcional y compromiso con la sostenibilidad.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-eye me-1"></i>1,876 lecturas
+                                            </small>
+                                            <a href="../auth/registro.html" class="btn btn-outline-success btn-sm rounded-pill" onclick="guardarPaginaOrigen()">
+                                                <i class="fas fa-user-plus me-1"></i>Unirse a Nosotros
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Artículo 3: Nuestros Valores -->
+                        <article id="nuestros-valores" class="card border-0 shadow-sm mb-5">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="../../../img/miel1.webp" class="article-img" alt="Nuestros Valores">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-header bg-gradient">
+                                        <h2 class="text-white mb-0" style="font-family: 'Playfair Display', serif;">
+                                            <i class="fas fa-heart me-2"></i>Nuestros Valores
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <span class="badge bg-success rounded-pill me-2">
+                                                <i class="fas fa-calendar me-1"></i>Desde 2019
+                                            </span>
+                                            <span class="badge bg-info rounded-pill">
+                                                <i class="fas fa-user me-1"></i>Equipo HuertoHogar
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="row mt-4">
+                                            <div class="col-sm-6 mb-3">
+                                                <h6 class="text-success">
+                                                    <i class="fas fa-leaf me-2"></i>Sostenibilidad
+                                                </h6>
+                                                <p class="text-muted small lh-lg">
+                                                    Promovemos prácticas agrícolas responsables con el medio ambiente
+                                                </p>
+                                            </div>
+                                            <div class="col-sm-6 mb-3">
+                                                <h6 class="text-success">
+                                                    <i class="fas fa-gem me-2"></i>Calidad
+                                                </h6>
+                                                <p class="text-muted small lh-lg">
+                                                    Garantizamos productos frescos y de la más alta calidad
+                                                </p>
+                                            </div>
+                                            <div class="col-sm-6 mb-3">
+                                                <h6 class="text-success">
+                                                    <i class="fas fa-handshake me-2"></i>Confianza
+                                                </h6>
+                                                <p class="text-muted small lh-lg">
+                                                    Construimos relaciones duraderas basadas en la transparencia
+                                                </p>
+                                            </div>
+                                            <div class="col-sm-6 mb-3">
+                                                <h6 class="text-success">
+                                                    <i class="fas fa-shipping-fast me-2"></i>Eficiencia
+                                                </h6>
+                                                <p class="text-muted small lh-lg">
+                                                    Entregamos tus productos frescos en tiempo récord
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-eye me-1"></i>1,542 lecturas
+                                            </small>
+                                            <a href="../tienda/catalogo.html" class="btn btn-outline-success btn-sm rounded-pill">
+                                                <i class="fas fa-shopping-basket me-1"></i>Productos con Valores
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Artículo 4: Ubicaciones -->
+                        <article id="ubicaciones" class="card border-0 shadow-sm mb-5">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="../../../img/alimentos.webp" class="article-img" alt="Nuestras Ubicaciones">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-header bg-gradient">
+                                        <h2 class="text-white mb-0" style="font-family: 'Playfair Display', serif;">
+                                            <i class="fas fa-map-marker-alt me-2"></i>Nuestras Ubicaciones
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <span class="badge bg-success rounded-pill me-2">
+                                                <i class="fas fa-calendar me-1"></i>Desde 2019
+                                            </span>
+                                            <span class="badge bg-info rounded-pill">
+                                                <i class="fas fa-user me-1"></i>Equipo HuertoHogar
+                                            </span>
+                                        </div>
+                                        
+                                        <p class="card-text text-muted lh-lg mb-4">
+                                            Estamos presentes en 9 puntos estratégicos de Chile, desde Santiago hasta Puerto Montt, 
+                                            llevando productos frescos a hogares en las principales ciudades del país.
+                                        </p>
+                                        
+                                        <!-- Mapa Interactivo -->
+                                        <div class="map-container">
+                                            <div id="map"></div>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mt-4">
+                                            <small class="text-muted">
+                                                <i class="fas fa-eye me-1"></i>2,120 lecturas
+                                            </small>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Call to Action -->
+                        <div class="card border-0 shadow-sm bg-gradient" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                            <div class="card-body text-center py-5">
+                                <h3 class="text-success mb-3" style="font-family: 'Playfair Display', serif;">
+                                    ¿Listo para una alimentación más saludable?
+                                </h3>
+                                <p class="text-muted mb-4">
+                                    Explora nuestro catálogo completo y descubre todos los productos frescos y orgánicos que tenemos para ti.
+                                </p>
+                                <a href="../tienda/catalogo.html" class="btn btn-success btn-lg rounded-pill px-5">
+                                    <i class="fas fa-shopping-basket me-2"></i>Ver Catálogo Completo
                                 </a>
                             </div>
                         </div>
@@ -318,6 +408,11 @@
     <!-- Contenedor para el footer (se carga automáticamente) -->
     <div id="footer-container"></div>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+
     <!-- Scripts para cargar componentes y autenticación -->
     <script src="../../../js/auth.js"></script>
     <script>
@@ -325,9 +420,80 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
+            initMap();
         });
+        
+        function guardarPaginaOrigen() {
+            localStorage.setItem('paginaOrigen', window.location.pathname);
+        }
+        
+        // Inicializar el mapa
+        function initMap() {
+            // Coordenadas de Chile (centro del mapa)
+            const chileCenter = [-35.6751, -71.5430];
+            
+            // Crear el mapa
+            const map = L.map('map').setView(chileCenter, 5);
+            
+            // Añadir capa de tiles (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Definir ubicaciones de HuertoHogar
+            const locations = [
+                {
+                    name: "Santiago - Centro de distribución principal",
+                    coords: [-33.4489, -70.6693],
+                    type: "principal"
+                },
+                {
+                    name: "Viña del Mar - Región de Valparaíso",
+                    coords: [-33.0245, -71.5518],
+                    type: "secundaria"
+                },
+                {
+                    name: "Valparaíso - Puerto principal",
+                    coords: [-33.0472, -71.6127],
+                    type: "secundaria"
+                },
+                {
+                    name: "Concepción - Región del Biobío",
+                    coords: [-36.8201, -73.0444],
+                    type: "secundaria"
+                },
+                {
+                    name: "Villarrica - Región de la Araucanía",
+                    coords: [-39.2857, -72.2279],
+                    type: "secundaria"
+                },
+                {
+                    name: "Puerto Montt - Región de Los Lagos",
+                    coords: [-41.4687, -72.9429],
+                    type: "secundaria"
+                }
+            ];
+            
+            // Añadir marcadores para cada ubicación
+            locations.forEach((location, index) => {
+                const marker = L.marker(location.coords).addTo(map);
+                
+                // Personalizar el popup
+                marker.bindPopup(`
+                    <div class="text-center">
+                        <h6 class="text-success mb-2">${location.name}</h6>
+                        <span class="badge bg-${location.type === 'principal' ? 'success' : 'secondary'}">
+                            ${location.type === 'principal' ? 'Sede Principal' : 'Sucursal'}
+                        </span>
+                    </div>
+                `);
+            });
+            
+            // Ajustar el zoom para mostrar todos los marcadores
+            const group = new L.featureGroup(locations.map(loc => L.marker(loc.coords)));
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
     </script>
 
 </body>
-
 </html>
