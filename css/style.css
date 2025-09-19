@@ -1035,3 +1035,239 @@ html {
         font-size: 0.8rem;
     }
 }
+css/* ========================================
+   ESTILOS PARA SISTEMA DE BOLETA
+   ======================================== */
+
+/* Modal de boleta */
+.boleta-header {
+    background: linear-gradient(135deg, #2E8B57, #228B22);
+    color: white;
+    padding: 2rem;
+}
+
+.boleta-body {
+    padding: 2rem;
+}
+
+.boleta-footer {
+    padding: 1.5rem 2rem;
+    background-color: #f8f9fa;
+}
+
+/* Secciones de información */
+.info-section {
+    margin-bottom: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.info-item strong {
+    color: #2E8B57;
+    min-width: 80px;
+}
+
+/* Timeline de estados */
+.estado-timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin: 2rem 0;
+}
+
+.estado-timeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.estado-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    background: white;
+    padding: 0 1rem;
+}
+
+.estado-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    border: 3px solid #e9ecef;
+    background: white;
+    color: #6c757d;
+}
+
+.estado-item.active .estado-icon {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+    transform: scale(1.1);
+}
+
+.estado-item.pending .estado-icon {
+    background: #f8f9fa;
+    border-color: #e9ecef;
+    color: #6c757d;
+}
+
+.estado-content h6 {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.estado-content small {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.estado-item.active .estado-content h6 {
+    color: #28a745;
+    font-weight: 700;
+}
+
+/* Tabla de productos */
+.productos-table thead th {
+    border-bottom: 2px solid #2E8B57;
+    color: #2E8B57;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 1rem 0.5rem;
+}
+
+.productos-table tbody td {
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.producto-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Resumen de pago */
+.resumen-pago {
+    margin-top: 2rem;
+}
+
+.resumen-pago .bg-light {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef;
+}
+
+/* Información adicional */
+.info-adicional {
+    border-top: 1px solid #e9ecef;
+    padding-top: 1.5rem;
+}
+
+.info-adicional h6 {
+    color: #2E8B57;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .boleta-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .boleta-body {
+        padding: 1.5rem 1rem;
+    }
+    
+    .boleta-footer {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .boleta-footer .w-100 {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .estado-timeline {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .estado-timeline::before {
+        display: none;
+    }
+    
+    .estado-item {
+        flex-direction: row;
+        justify-content: flex-start;
+        width: 100%;
+        padding: 0.5rem;
+        border-radius: 8px;
+        background: #f8f9fa;
+    }
+    
+    .estado-item.active {
+        background: rgba(40, 167, 69, 0.1);
+    }
+    
+    .estado-icon {
+        margin-right: 1rem;
+        margin-bottom: 0;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .estado-content {
+        text-align: left;
+    }
+    
+    .productos-table {
+        font-size: 0.9rem;
+    }
+    
+    .producto-img {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Estilos para impresión */
+@media print {
+    .modal-header .btn-close,
+    .modal-footer {
+        display: none !important;
+    }
+    
+    .modal-dialog {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    .modal-content {
+        box-shadow: none !important;
+        border: none !important;
+    }
+ }   

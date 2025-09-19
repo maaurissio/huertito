@@ -40,7 +40,7 @@ class CartSystem {
 
         // Verificar si el producto ya está en el carrito
         const existingProduct = this.cart.find(item => item.id === product.id);
-        
+
         if (existingProduct) {
             if (existingProduct.quantity < product.stock) {
                 existingProduct.quantity++;
@@ -63,7 +63,7 @@ class CartSystem {
         const originalContent = button.innerHTML;
         button.innerHTML = '<i class="fas fa-check me-2"></i>Agregado';
         button.classList.add('btn-success-animated');
-        
+
         setTimeout(() => {
             button.innerHTML = originalContent;
             button.classList.remove('btn-success-animated');
@@ -146,7 +146,7 @@ class CartSystem {
 
         // Renderizar footer
         const user = this.getCurrentUser();
-        const checkoutButton = user ? 
+        const checkoutButton = user ?
             '<button class="btn btn-success w-100 mb-2" onclick="cartSystem.checkout()"><i class="fas fa-credit-card me-2"></i>Finalizar Compra</button>' :
             '<button class="btn btn-warning w-100 mb-2" onclick="cartSystem.redirectToLogin()"><i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión para Comprar</button>';
 
@@ -225,25 +225,38 @@ class CartSystem {
             return;
         }
 
-        // Simular proceso de checkout
-        this.showNotification('Procesando pedido...', 'info');
-        
-        // Aquí iría la lógica real del checkout
-        setTimeout(() => {
-            alert(`¡Pedido realizado exitosamente!\n\nUsuario: ${user.nombre}\nEmail: ${user.email}\nTotal: ${this.formatPrice(this.getTotal())}\nProductos: ${this.cart.length}\n\n¡Gracias por tu compra en HuertoHogar!`);
-            this.cart = [];
-            this.saveCart();
-            this.updateCartIcon();
-            this.closeCart();
-            this.showNotification('¡Pedido realizado exitosamente!', 'success');
-        }, 1500);
+        // Guardar la información del pedido en el localStorage
+        const orderData = {
+            user: {
+                nombre: user.nombre,
+                email: user.email
+            },
+            total: this.getTotal(),
+            items: this.cart
+        };
+
+        // Guardar los datos de la compra en el localStorage
+        localStorage.setItem('orderData', JSON.stringify(orderData));
+
+        // Vaciar el carrito
+        this.cart = [];
+        this.saveCart();
+        this.updateCartIcon();
+        this.closeCart();
+
+        // Redirigir a boleta.html
+        window.location.href = '../../../pages/client/tienda/boleta.html';
+
+        this.showNotification('¡Pedido realizado exitosamente!', 'success');
     }
+
+
 
     redirectToLogin() {
         // Guardar la página actual como origen
         localStorage.setItem('paginaOrigen', window.location.pathname);
         this.showNotification('Inicia sesión para finalizar tu compra', 'info');
-        
+
         // Redirigir al login
         setTimeout(() => {
             window.location.href = '../auth/login.html';
@@ -271,7 +284,7 @@ class CartSystem {
         if (typeof obtenerUsuarioLogueado === 'function') {
             return obtenerUsuarioLogueado();
         }
-        
+
         try {
             const userData = localStorage.getItem('usuarioLogueado');
             return userData ? JSON.parse(userData) : null;
@@ -318,13 +331,13 @@ class CartSystem {
                             this.cart.push(guestItem);
                         }
                     });
-                    
+
                     this.saveCart();
                     this.updateCartIcon();
-                    
+
                     // Limpiar carrito de invitado
                     localStorage.removeItem('carrito_guest');
-                    
+
                     this.showNotification('Carrito transferido exitosamente', 'success');
                 }
             } catch (e) {
@@ -336,10 +349,10 @@ class CartSystem {
     listenForUserChanges() {
         // Escuchar cambios en el localStorage para detectar login/logout
         let currentUser = this.getCurrentUser();
-        
+
         setInterval(() => {
             const newUser = this.getCurrentUser();
-            
+
             // Detectar login
             if (!currentUser && newUser) {
                 currentUser = newUser;
@@ -347,7 +360,7 @@ class CartSystem {
                 this.loadCart();
                 this.updateCartIcon();
             }
-            
+
             // Detectar logout
             if (currentUser && !newUser) {
                 currentUser = null;
@@ -361,11 +374,11 @@ class CartSystem {
     updateCartIcon() {
         // Agregar icono del carrito a la navbar si no existe
         this.addCartIconToNavbar();
-        
+
         // Actualizar contador
         const cartBadge = document.querySelector('.cart-badge');
         const totalItems = this.getTotalItems();
-        
+
         if (cartBadge) {
             if (totalItems > 0) {
                 cartBadge.textContent = totalItems > 99 ? '99+' : totalItems;
@@ -381,10 +394,10 @@ class CartSystem {
         setTimeout(() => {
             const navbar = document.querySelector('.navbar-nav');
             if (!navbar) return;
-            
+
             // Verificar si ya existe el icono del carrito
             if (document.querySelector('.cart-icon-container')) return;
-            
+
             // Crear icono del carrito
             const cartIcon = document.createElement('li');
             cartIcon.className = 'nav-item cart-icon-container';
@@ -396,11 +409,11 @@ class CartSystem {
                     </span>
                 </button>
             `;
-            
+
             // Insertar antes del último elemento (botones de login/registro o menú de usuario)
             const lastItem = navbar.lastElementChild;
             navbar.insertBefore(cartIcon, lastItem);
-            
+
         }, 500);
     }
 
@@ -421,7 +434,7 @@ let cartSystem;
 // Función de inicialización del carrito
 function initializeCartSystem() {
     cartSystem = new CartSystem();
-    
+
     // Inicializar navbar dinámico si existe la función
     if (typeof inicializarNavbarDinamico === 'function') {
         inicializarNavbarDinamico();
@@ -431,3 +444,7 @@ function initializeCartSystem() {
 // Exportar para uso global
 window.CartSystem = CartSystem;
 window.initializeCartSystem = initializeCartSystem;
+
+function getCartItems() {
+    return JSON.parse(localStorage.getItem('cart')) || [];
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra Exitosa - HuertoHogar</title>
+
+    <!-- CSS Personalizado -->
+    <link href="../../../css/style.css" rel="stylesheet">
+
+    <!-- CSS BootStrap -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <main class="container my-5">
+        <h1 class="text-center text-success">¡Compra Exitosa!</h1>
+        <p class="text-center">Gracias por tu compra. Tu pedido está siendo procesado.</p>
+
+        <!-- Información del cliente -->
+        <div id="customer-info">
+            <h3>Información del Cliente</h3>
+            <p><strong>Nombre:</strong> <span id="customerName"></span></p>
+            <p><strong>Correo:</strong> <span id="customerEmail"></span></p>
+        </div>
+
+        <h3 class="mt-5">Detalles de la Compra</h3>
+
+        <!-- Lista de productos -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="cartItems">
+                <!-- Aquí se cargarán los productos -->
+            </tbody>
+        </table>
+
+        <!-- Total y estado -->
+        <div class="d-flex justify-content-between">
+            <h4>Total:</h4>
+            <p id="totalAmount">$0</p>
+        </div>
+
+        <div class="alert alert-info mt-4">
+            <strong>Estado del pedido:</strong> En preparación
+        </div>
+
+        <a href="../../../pages/client/tienda/catalogo.html" class="btn btn-primary">Volver al Catálogo</a>
+    </main>
+
+    <script>
+        // Recuperar los datos confirmados
+        const confirmedOrder = JSON.parse(localStorage.getItem('confirmedOrder'));
+
+        if (!confirmedOrder) {
+            window.location.href = "../../../pages/client/tienda/catalogo.html";
+        }
+
+        // Llenar info cliente
+        document.getElementById('customerName').textContent = confirmedOrder.user.nombre;
+        document.getElementById('customerEmail').textContent = confirmedOrder.user.email;
+
+        const cartBody = document.getElementById('cartItems');
+        let total = 0;
+
+        confirmedOrder.items.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>${item.price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
+                <td>${itemTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
+            `;
+            cartBody.appendChild(row);
+        });
+
+        document.getElementById('totalAmount').textContent = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+
+        // Limpiar carrito (opcional)
+        localStorage.removeItem('confirmedOrder');
+    </script>
+</body>
+
+</html>

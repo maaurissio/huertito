@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boleta de Compra - HuertoHogar</title>
+
+    <!-- CSS Personalizado -->
+    <link href="../../../css/style.css" rel="stylesheet">
+
+    <!-- CSS BootStrap -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="../shared/components.js"></script>
+</head>
+
+<body>
+    <!-- Contenedor de la boleta -->
+    <main class="container my-5">
+        <h1 class="text-center text-success">Boleta de Compra</h1>
+
+        <!-- Información del cliente -->
+        <div id="customer-info">
+            <h3>Información del Cliente</h3>
+            <p><strong>Nombre:</strong> <span id="customerName"></span></p>
+            <p><strong>Correo:</strong> <span id="customerEmail"></span></p>
+        </div>
+
+        <h3 class="mt-5">Detalles de la Compra</h3>
+
+        <!-- Lista de productos -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="cartItems">
+                <!-- Aquí se cargarán los productos del carrito -->
+            </tbody>
+        </table>
+
+        <!-- Total de la compra -->
+        <div class="d-flex justify-content-between">
+            <h4>Total:</h4>
+            <p id="totalAmount">$0</p>
+        </div>
+
+        <button id="confirmBtn" class="btn btn-success">Confirmar Compra</button>
+
+        <script>
+            const confirmBtn = document.getElementById('confirmBtn');
+
+            confirmBtn.addEventListener('click', () => {
+                // Guardar los datos de la orden en localStorage antes de redirigir
+                localStorage.setItem('confirmedOrder', JSON.stringify(orderData));
+                window.location.href = "compraexitosa.html";
+            });
+        </script>
+
+    </main>
+
+    <script>
+        // Recuperar los datos de la orden desde localStorage
+        const orderData = JSON.parse(localStorage.getItem('orderData'));
+
+        // Si no hay datos de orden, redirigir al usuario
+        if (!orderData) {
+            window.location.href = "../../../pages/client/tienda/catalogo.html"; // Redirigir a catalogo si no hay orden
+        }
+
+        // Llenar la información del cliente
+        document.getElementById('customerName').textContent = orderData.user.nombre;
+        document.getElementById('customerEmail').textContent = orderData.user.email;
+
+        const cartBody = document.getElementById('cartItems');
+        let total = 0;
+
+        // Renderizar los productos en la boleta
+        orderData.items.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>${item.price}</td>
+                <td>${itemTotal}</td>
+            `;
+            cartBody.appendChild(row);
+        });
+
+        // Mostrar el total de la compra
+        document.getElementById('totalAmount').textContent = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+
+        // Opcional: Limpiar el carrito después de mostrar la boleta
+        localStorage.removeItem('orderData');
+    </script>
+</body>
+
+</html>

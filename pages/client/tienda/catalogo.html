@@ -24,6 +24,14 @@
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
 
+    <style>
+        /* Estilo pequeño para el botón activo de categoría */
+        .category-btn.active {
+            background-color: #2f9e44;
+            color: #fff;
+            border-color: #2f9e44;
+        }
+    </style>
 </head>
 
 <body>
@@ -91,7 +99,9 @@
                 <div class="row justify-content-center mb-4">
                     <div class="col-lg-8">
                         <div class="position-relative">
-                            <input type="text" class="form-control form-control-lg border-0 shadow-sm rounded-pill ps-5" 
+                            <input id="searchInput" 
+                                   type="text" 
+                                   class="form-control form-control-lg border-0 shadow-sm rounded-pill ps-5" 
                                    placeholder="🔍 Buscar productos frescos..." 
                                    style="box-shadow: 0 8px 25px rgba(46, 139, 87, 0.15); height: 60px; font-size: 1.1rem;">
                             <i class="fas fa-search position-absolute start-0 top-50 translate-middle-y ms-4 text-success"></i>
@@ -104,19 +114,19 @@
                     <div class="col-lg-10">
                         <h5 class="text-center text-muted mb-4 fw-medium">Explora por categorías</h5>
                         <div class="d-flex flex-wrap justify-content-center gap-3">
-                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" style="min-width: 160px;">
+                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="frutas" style="min-width: 160px;">
                                 <span class="fs-4 me-2">🍎</span>
                                 <span class="fw-medium">Frutas Frescas</span>
                             </button>
-                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" style="min-width: 160px;">
+                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="verduras" style="min-width: 160px;">
                                 <span class="fs-4 me-2">🥬</span>
                                 <span class="fw-medium">Verduras Orgánicas</span>
                             </button>
-                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" style="min-width: 160px;">
+                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="organicos" style="min-width: 160px;">
                                 <span class="fs-4 me-2">🌱</span>
                                 <span class="fw-medium">Productos Orgánicos</span>
                             </button>
-                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" style="min-width: 160px;">
+                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="lacteos" style="min-width: 160px;">
                                 <span class="fs-4 me-2">🥛</span>
                                 <span class="fw-medium">Productos Lácteos</span>
                             </button>
@@ -127,238 +137,129 @@
         </section>
 
         <!-- Grid de productos -->
-        <section class="py-5 bg-white">
-            <div class="container">
-                <div class="row g-4">
-                    <!-- Producto 1 - Manzanas Fuji -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="product-card bg-white rounded-3 overflow-hidden h-100" style="border: 1px solid #f1f3f4; transition: all 0.3s ease;">
-                            <div class="position-relative overflow-hidden" style="height: 280px;">
-                                <img src="../../../img/manzana.webp" class="w-100 h-100" alt="manzanas" style="object-fit: cover; transition: transform 0.4s ease;">
-                            </div>
-                            <div class="p-4">
-                                <div class="d-flex align-items-start justify-content-between mb-2">
-                                    <h5 class="fw-semibold text-dark mb-0" style="font-family: 'Playfair Display', serif;">Manzanas Fuji</h5>
-                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">FR001</span>
-                                </div>
-                                <p class="text-muted small mb-3 lh-base">Manzanas Fuji frescas y crujientes, cultivadas en el punto óptimo de madurez</p>
-                                
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-baseline">
-                                        <span class="h5 text-success fw-bold mb-0">$1.200</span>
-                                        <span class="text-muted small ms-1">/kg</span>
-                                    </div>
-                                    <span class="badge bg-light text-dark rounded-pill">150 kg disponibles</span>
-                                </div>
-                                
-                                <button class="btn btn-outline-success w-100 rounded-pill py-2 fw-medium add-to-cart-btn" 
-                                        data-id="FR001" 
-                                        data-name="Manzanas Fuji" 
-                                        data-price="1200" 
-                                        data-unit="/kg"
-                                        data-image="../../../img/manzana.webp"
-                                        data-stock="150">
-                                    <i class="fas fa-plus me-2"></i>Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+<div class="container my-5">
+  <h2 class="text-success text-center mb-4">Catálogo de Productos</h2>
+  <div class="row g-4">
 
-                    <!-- Producto 2 - Plátanos -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="product-card bg-white rounded-3 overflow-hidden h-100" style="border: 1px solid #f1f3f4; transition: all 0.3s ease;">
-                            <div class="position-relative overflow-hidden" style="height: 280px;">
-                                <img src="../../../img/platanos.webp" class="w-100 h-100" alt="plátanos" style="object-fit: cover; transition: transform 0.4s ease;">
-                            </div>
-                            <div class="p-4">
-                                <div class="d-flex align-items-start justify-content-between mb-2">
-                                    <h5 class="fw-semibold text-dark mb-0" style="font-family: 'Playfair Display', serif;">Plátanos Cavendish</h5>
-                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">FR003</span>
-                                </div>
-                                <p class="text-muted small mb-3 lh-base">Plátanos Cavendish maduros, ricos en potasio y energía natural</p>
-                                
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-baseline">
-                                        <span class="h5 text-success fw-bold mb-0">$800</span>
-                                        <span class="text-muted small ms-1">/kg</span>
-                                    </div>
-                                    <span class="badge bg-light text-dark rounded-pill">200 kg disponibles</span>
-                                </div>
-                                
-                                <button class="btn btn-outline-success w-100 rounded-pill py-2 fw-medium add-to-cart-btn"
-                                        data-id="FR003" 
-                                        data-name="Plátanos Cavendish" 
-                                        data-price="800" 
-                                        data-unit="/kg"
-                                        data-image="../../../img/platanos.webp"
-                                        data-stock="200">
-                                    <i class="fas fa-plus me-2"></i>Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    <!-- FR001 - Manzanas Fuji -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card product-card shadow-sm h-100">
+        <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Manzanas Fuji">
+        <div class="card-body">
+          <h5 class="card-title">FR001 - Manzanas Fuji</h5>
+          <p class="card-text">Manzanas frescas, jugosas y dulces, perfectas para cualquier ocasión.</p>
+          <p class="text-success fw-bold">$2.500 / Kg</p>
+          <button class="btn btn-success">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
 
-                    <!-- Producto 3 - Naranjas -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="product-card bg-white rounded-3 overflow-hidden h-100" style="border: 1px solid #f1f3f4; transition: all 0.3s ease;">
-                            <div class="position-relative overflow-hidden" style="height: 280px;">
-                                <img src="../../../img/naranja.webp" class="w-100 h-100" alt="naranjas" style="object-fit: cover; transition: transform 0.4s ease;">
-                            </div>
-                            <div class="p-4">
-                                <div class="d-flex align-items-start justify-content-between mb-2">
-                                    <h5 class="fw-semibold text-dark mb-0" style="font-family: 'Playfair Display', serif;">Naranjas Valencia</h5>
-                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">FR002</span>
-                                </div>
-                                <p class="text-muted small mb-3 lh-base">Naranjas Valencia jugosas y ricas en vitamina C, ideales para zumos frescos</p>
-                                
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-baseline">
-                                        <span class="h5 text-success fw-bold mb-0">$1.000</span>
-                                        <span class="text-muted small ms-1">/kg</span>
-                                    </div>
-                                    <span class="badge bg-light text-dark rounded-pill">200 kg disponibles</span>
-                                </div>
-                                
-                                <button class="btn btn-outline-success w-100 rounded-pill py-2 fw-medium add-to-cart-btn"
-                                        data-id="FR002" 
-                                        data-name="Naranjas Valencia" 
-                                        data-price="1000" 
-                                        data-unit="/kg"
-                                        data-image="../../../img/naranja.webp"
-                                        data-stock="200">
-                                    <i class="fas fa-plus me-2"></i>Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    <!-- FR002 - Naranjas Valencia -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card product-card shadow-sm h-100">
+        <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Naranjas Valencia">
+        <div class="card-body">
+          <h5 class="card-title">FR002 - Naranjas Valencia</h5>
+          <p class="card-text">Naranjas frescas, ideales para jugo o consumo directo.</p>
+          <p class="text-success fw-bold">$2.200 / Kg</p>
+          <button class="btn btn-success">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
 
-                    <!-- Producto 4 - Zanahorias -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="product-card bg-white rounded-3 overflow-hidden h-100" style="border: 1px solid #f1f3f4; transition: all 0.3s ease;">
-                            <div class="position-relative overflow-hidden" style="height: 280px;">
-                                <img src="../../../img/zanahorias.webp" class="w-100 h-100" alt="zanahorias" style="object-fit: cover; transition: transform 0.4s ease;">
-                            </div>
-                            <div class="p-4">
-                                <div class="d-flex align-items-start justify-content-between mb-2">
-                                    <h5 class="fw-semibold text-dark mb-0" style="font-family: 'Playfair Display', serif;">Zanahorias Orgánicas</h5>
-                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">VR001</span>
-                                </div>
-                                <p class="text-muted small mb-3 lh-base">Zanahorias orgánicas cultivadas sin químicos, ricas en vitamina A y fibra</p>
-                                
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-baseline">
-                                        <span class="h5 text-success fw-bold mb-0">$900</span>
-                                        <span class="text-muted small ms-1">/kg</span>
-                                    </div>
-                                    <span class="badge bg-light text-dark rounded-pill">100 kg disponibles</span>
-                                </div>
-                                
-                                <button class="btn btn-outline-success w-100 rounded-pill py-2 fw-medium add-to-cart-btn"
-                                        data-id="VR001" 
-                                        data-name="Zanahorias Orgánicas" 
-                                        data-price="900" 
-                                        data-unit="/kg"
-                                        data-image="../../../img/zanahorias.webp"
-                                        data-stock="100">
-                                    <i class="fas fa-plus me-2"></i>Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    <!-- FR003 - Plátanos Cavendish -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card product-card shadow-sm h-100">
+        <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Plátanos Cavendish">
+        <div class="card-body">
+          <h5 class="card-title">FR003 - Plátanos Cavendish</h5>
+          <p class="card-text">Plátanos dulces y nutritivos, perfectos para postres y colaciones.</p>
+          <p class="text-success fw-bold">$1.800 / Kg</p>
+          <button class="btn btn-success">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
 
-                    <!-- Producto 5 - Pimientos -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="product-card bg-white rounded-3 overflow-hidden h-100" style="border: 1px solid #f1f3f4; transition: all 0.3s ease;">
-                            <div class="position-relative overflow-hidden" style="height: 280px;">
-                                <img src="../../../img/pimientos.webp" class="w-100 h-100" alt="pimientos" style="object-fit: cover; transition: transform 0.4s ease;">
-                            </div>
-                            <div class="p-4">
-                                <div class="d-flex align-items-start justify-content-between mb-2">
-                                    <h5 class="fw-semibold text-dark mb-0" style="font-family: 'Playfair Display', serif;">Pimientos Tricolores</h5>
-                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">VR003</span>
-                                </div>
-                                <p class="text-muted small mb-3 lh-base">Pimientos tricolores frescos: rojos, amarillos y verdes, ideales para salteados</p>
-                                
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-baseline">
-                                        <span class="h5 text-success fw-bold mb-0">$1.500</span>
-                                        <span class="text-muted small ms-1">/kg</span>
-                                    </div>
-                                    <span class="badge bg-light text-dark rounded-pill">120 kg disponibles</span>
-                                </div>
-                                
-                                <button class="btn btn-outline-success w-100 rounded-pill py-2 fw-medium add-to-cart-btn"
-                                        data-id="VR003" 
-                                        data-name="Pimientos Tricolores" 
-                                        data-price="1500" 
-                                        data-unit="/kg"
-                                        data-image="../../../img/pimientos.webp"
-                                        data-stock="120">
-                                    <i class="fas fa-plus me-2"></i>Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    <!-- VR001 - Zanahorias Orgánicas -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card product-card shadow-sm h-100">
+        <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Zanahorias Orgánicas">
+        <div class="card-body">
+          <h5 class="card-title">VR001 - Zanahorias Orgánicas</h5>
+          <p class="card-text">Zanahorias crujientes y llenas de vitaminas.</p>
+          <p class="text-success fw-bold">$1.500 / Kg</p>
+          <button class="btn btn-success">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
 
-                    <!-- Producto 6 - Espinacas -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="product-card bg-white rounded-3 overflow-hidden h-100" style="border: 1px solid #f1f3f4; transition: all 0.3s ease;">
-                            <div class="position-relative overflow-hidden" style="height: 280px;">
-                                <img src="../../../img/espinaca.webp" class="w-100 h-100" alt="espinaca" style="object-fit: cover; transition: transform 0.4s ease;">
-                            </div>
-                            <div class="p-4">
-                                <div class="d-flex align-items-start justify-content-between mb-2">
-                                    <h5 class="fw-semibold text-dark mb-0" style="font-family: 'Playfair Display', serif;">Espinacas Frescas</h5>
-                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">VR002</span>
-                                </div>
-                                <p class="text-muted small mb-3 lh-base">Espinacas frescas y nutritivas, perfectas para ensaladas verdes y batidos</p>
-                                
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-baseline">
-                                        <span class="h5 text-success fw-bold mb-0">$700</span>
-                                        <span class="text-muted small ms-1">/bolsa</span>
-                                    </div>
-                                    <span class="badge bg-light text-dark rounded-pill">80 unid disponibles</span>
-                                </div>
-                                
-                                <button class="btn btn-outline-success w-100 rounded-pill py-2 fw-medium add-to-cart-btn"
-                                        data-id="VR002" 
-                                        data-name="Espinacas Frescas" 
-                                        data-price="700" 
-                                        data-unit="/bolsa"
-                                        data-image="../../../img/espinaca.webp"
-                                        data-stock="80">
-                                    <i class="fas fa-plus me-2"></i>Agregar al Carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    <!-- VR002 - Espinacas Frescas -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card product-card shadow-sm h-100">
+        <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Espinacas Frescas">
+        <div class="card-body">
+          <h5 class="card-title">VR002 - Espinacas Frescas</h5>
+          <p class="card-text">Espinacas frescas y saludables, ideales para ensaladas y guisos.</p>
+          <p class="text-success fw-bold">$1.200 / Atado</p>
+          <button class="btn btn-success">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
 
-                </div>
-            </div>
-        </section>
+    <!-- VR003 - Pimientos Tricolores -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card product-card shadow-sm h-100">
+        <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Pimientos Tricolores">
+        <div class="card-body">
+          <h5 class="card-title">VR003 - Pimientos Tricolores</h5>
+          <p class="card-text">Pimientos rojos, verdes y amarillos llenos de sabor y color.</p>
+          <p class="text-success fw-bold">$2.800 / Kg</p>
+          <button class="btn btn-success">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
 
-        <!-- Sección promocional -->
-        <section class="py-5" style="background: linear-gradient(135deg, #f8fffe 0%, #f0f9f5 100%);">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-6">
-                        <h3 class="fw-bold mb-3" style="font-family: 'Playfair Display', serif; color: #2d3748;">
-                            ¿Primera vez comprando con nosotros?
-                        </h3>
-                        <p class="text-muted mb-4">
-                            Obtén un 15% de descuento en tu primera compra registrándote en nuestra comunidad de amantes de los productos frescos.
-                        </p>
-                        <a href="../auth/registro.html" class="btn btn-success btn-lg rounded-pill px-4" onclick="guardarPaginaOrigen()">
-                            <i class="fas fa-user-plus me-2"></i>
-                            Registrarse Ahora
-                        </a>
-                    </div>
-                    <div class="col-lg-6 text-center">
-                        <img src="../../../img/vegetales1.webp" class="img-fluid rounded-3 shadow-sm" alt="Promoción HuertoHogar" style="max-height: 300px;">
-                    </div>
-                </div>
-            </div>
+    <!-- PO001 - Miel Orgánica -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card product-card shadow-sm h-100">
+        <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Miel Orgánica">
+        <div class="card-body">
+          <h5 class="card-title">PO001 - Miel Orgánica</h5>
+          <p class="card-text">Miel 100% natural y sin aditivos, directamente del apicultor.</p>
+          <p class="text-success fw-bold">$4.500 / Frasco 500g</p>
+          <button class="btn btn-success">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PO003 - Quinua Orgánica -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card product-card shadow-sm h-100">
+        <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Quinua Orgánica">
+        <div class="card-body">
+          <h5 class="card-title">PO003 - Quinua Orgánica</h5>
+          <p class="card-text">Quinua natural y rica en proteínas, ideal para comidas saludables.</p>
+          <p class="text-success fw-bold">$3.200 / Kg</p>
+          <button class="btn btn-success">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PL001 - Leche Entera -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card product-card shadow-sm h-100">
+        <img src="../../../img/manzanas1.webp" class="card-img-top" alt="Leche Entera">
+        <div class="card-body">
+          <h5 class="card-title">PL001 - Leche Entera</h5>
+          <p class="card-text">Leche entera fresca y nutritiva para toda la familia.</p>
+          <p class="text-success fw-bold">$1.100 / Litro</p>
+          <button class="btn btn-success">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
         </section>
 
     </main>
@@ -369,19 +270,72 @@
     <!-- Scripts para cargar componentes y carrito -->
     <script src="../../../js/auth.js"></script>
     <script src="../../../js/carrito.js"></script>
+
     <script>
-        // Cargar componentes y sistema de carrito
         document.addEventListener('DOMContentLoaded', function() {
+            // Cargar navbar y footer
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
-            
-            // Inicializar carrito después de cargar navbar
+
+            // Inicializar carrito (si tu script depende de la navbar cargada)
             setTimeout(() => {
                 initializeCartSystem();
             }, 100);
+
+            // --- FILTRO (búsqueda + categorías) ---
+            const searchInput = document.getElementById("searchInput");
+            const categoryButtons = document.querySelectorAll(".category-btn");
+            const productCols = document.querySelectorAll(".product-col");
+
+            // Función que aplica filtro combinado
+            function applyFilter() {
+                const query = (searchInput.value || "").toLowerCase().trim();
+                const activeBtn = document.querySelector(".category-btn.active");
+                const activeCategory = activeBtn ? activeBtn.dataset.category : "";
+
+                productCols.forEach(col => {
+                    const card = col.querySelector(".product-card");
+                    const name = (card.querySelector("h5")?.textContent || "").toLowerCase();
+                    const description = (card.querySelector("p")?.textContent || "").toLowerCase();
+                    const code = (card.querySelector(".product-code")?.textContent || "").toLowerCase();
+                    const matchesQuery = !query || name.includes(query) || description.includes(query) || code.includes(query);
+                    const matchesCategory = !activeCategory || (col.dataset.category === activeCategory);
+
+                    if (matchesQuery && matchesCategory) {
+                        col.classList.remove("d-none");
+                    } else {
+                        col.classList.add("d-none");
+                    }
+                });
+            }
+
+            // Escuchar input de búsqueda
+            searchInput.addEventListener("input", () => {
+                applyFilter();
+            });
+
+            // Escuchar clicks en botones de categoría
+            categoryButtons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    // Toggle active
+                    const alreadyActive = btn.classList.contains("active");
+                    // Quitar active en todos
+                    categoryButtons.forEach(b => b.classList.remove("active"));
+                    // Si no estaba activo, activarlo
+                    if (!alreadyActive) {
+                        btn.classList.add("active");
+                    }
+                    // Aplicar filtro
+                    applyFilter();
+                });
+            });
+
+            // Al cargar, mostrar todos (por si)
+            applyFilter();
         });
     </script>
 
 </body>
 
 </html>
+y
