@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - HuertoHogar</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- CSS Personalizado -->
+    <link href="../../../css/style.css" rel="stylesheet">
+
+    <!-- CSS BootStrap -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- JS BootStrap -->
+    <script src="../../../js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript para componentes compartidos -->
+    <script src="../shared/components.js"></script>
+    
+    <!-- Sistema de autenticación -->
+    <script src="../../../js/auth.js"></script>
+    
+    <!-- Sistema de carrito -->
+    <script src="../../../js/carrito.js"></script>
+
+</head>
+
+<body class="checkout-page">
+    <!-- Contenedor para la navbar (se carga automáticamente) -->
+    <div id="navbar-container"></div>
+
+    <!-- Header del Checkout -->
+    <section class="bg-success text-white py-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="mb-0" style="font-family: 'Playfair Display', serif;">
+                        <i class="fas fa-shopping-cart me-3"></i>Finalizar Compra
+                    </h2>
+                    <p class="mb-0 mt-2">Completa tu pedido de productos frescos y naturales</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex align-items-center justify-content-end">
+                        <i class="fas fa-lock me-2"></i>
+                        <span class="small">Compra segura</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenido principal del checkout -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Columna izquierda - Formularios -->
+                <div class="col-lg-8">
+                    <!-- Paso 1: Tipo de compra -->
+                    <div class="card shadow-sm mb-4" id="user-type-selection">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-circle me-2 text-success"></i>
+                                Paso 1: ¿Cómo deseas realizar tu compra?
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Usuario logueado -->
+                            <div id="logged-user-option" style="display: none;">
+                                <div class="card border-success bg-light">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-check-circle text-success me-3 fs-5"></i>
+                                            <div>
+                                                <h6 class="mb-1 text-success">¡Perfecto! Ya tienes una cuenta</h6>
+                                                <p class="mb-0 small text-muted">Continúa con tus datos guardados: <span id="user-email" class="fw-bold text-dark"></span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-success mt-3" onclick="proceedAsUser()">
+                                    <i class="fas fa-arrow-right me-2"></i>Continuar como usuario registrado
+                                </button>
+                            </div>
+
+                            <!-- Usuario no logueado -->
+                            <div id="guest-user-options" style="display: none;">
+                                <div class="row g-3">
+                                    <!-- Opción 1: Comprar como invitado -->
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border-2 checkout-option" onclick="selectOption('guest')">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-user-clock display-4 text-success mb-3"></i>
+                                                <h6 class="card-title">Comprar como invitado</h6>
+                                                <p class="card-text small text-muted">
+                                                    Realiza tu compra rápidamente sin crear una cuenta
+                                                </p>
+                                                <ul class="list-unstyled small text-muted">
+                                                    <li><i class="fas fa-check text-success me-2"></i>Proceso rápido</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>Sin registro necesario</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Opción 2: Crear cuenta -->
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border-2 checkout-option" onclick="selectOption('register')">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-user-plus display-4 text-success mb-3"></i>
+                                                <h6 class="card-title">Crear cuenta nueva</h6>
+                                                <p class="card-text small text-muted">
+                                                    Crea una cuenta para guardar tus datos y pedidos
+                                                </p>
+                                                <ul class="list-unstyled small text-muted">
+                                                    <li><i class="fas fa-check text-success me-2"></i>Historial de pedidos</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>Datos guardados</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>Ofertas exclusivas</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3 text-center">
+                                    <p class="small text-muted">
+                                        ¿Ya tienes cuenta? 
+                                        <a href="../auth/login.html" class="text-success text-decoration-none" onclick="saveCartForLogin()">
+                                            <i class="fas fa-sign-in-alt me-1"></i>Inicia sesión aquí
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2: Datos de contacto y envío -->
+                    <div class="card shadow-sm mb-4" id="contact-form" style="display: none;">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-address-card me-2 text-success"></i>
+                                Paso 2: Datos de contacto y envío
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="checkout-form">
+                                <div class="row g-3">
+                                    <!-- Datos personales -->
+                                    <div class="col-12">
+                                        <h6 class="text-success mb-3">
+                                            <i class="fas fa-user me-2"></i>Información personal
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="firstName" class="form-label">Nombre *</label>
+                                        <input type="text" class="form-control" id="firstName" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="lastName" class="form-label">Apellido *</label>
+                                        <input type="text" class="form-control" id="lastName" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Correo electrónico *</label>
+                                        <input type="email" class="form-control" id="email" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="phone" class="form-label">Teléfono *</label>
+                                        <input type="tel" class="form-control" id="phone" required>
+                                    </div>
+
+                                    <!-- Datos de envío -->
+                                    <div class="col-12 mt-4">
+                                        <h6 class="text-success mb-3">
+                                            <i class="fas fa-truck me-2"></i>Dirección de envío
+                                        </h6>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="address" class="form-label">Dirección completa *</label>
+                                        <input type="text" class="form-control" id="address" placeholder="Calle, número, piso, departamento" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="city" class="form-label">Ciudad *</label>
+                                        <input type="text" class="form-control" id="city" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="region" class="form-label">Región *</label>
+                                        <select class="form-select" id="region" required>
+                                            <option value="">Seleccionar región</option>
+                                            <option value="metropolitana">Región Metropolitana</option>
+                                            <option value="valparaiso">Valparaíso</option>
+                                            <option value="bio-bio">Biobío</option>
+                                            <option value="araucania">La Araucanía</option>
+                                            <option value="maule">Maule</option>
+                                            <option value="los-lagos">Los Lagos</option>
+                                            <option value="other">Otra región</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="zipCode" class="form-label">Código postal</label>
+                                        <input type="text" class="form-control" id="zipCode">
+                                    </div>
+
+                                    <!-- Notas adicionales -->
+                                    <div class="col-12">
+                                        <label for="notes" class="form-label">Notas de entrega (opcional)</label>
+                                        <textarea class="form-control" id="notes" rows="3" placeholder="Instrucciones especiales para la entrega..."></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Crear cuenta (solo para invitados) -->
+                                <div id="create-account-section" style="display: none;">
+                                    <hr class="my-4">
+                                    <h6 class="text-success mb-3">
+                                        <i class="fas fa-user-plus me-2"></i>Crear cuenta (opcional)
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="password" class="form-label">Contraseña</label>
+                                            <input type="password" class="form-control" id="password">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+                                            <input type="password" class="form-control" id="confirmPassword">
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="createAccount">
+                                                <label class="form-check-label" for="createAccount">
+                                                    Crear cuenta con estos datos para futuras compras
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <button type="button" class="btn btn-success btn-lg" onclick="proceedToPayment()">
+                                        <i class="fas fa-credit-card me-2"></i>Continuar al pago
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-lg ms-2" onclick="goBack()">
+                                        <i class="fas fa-arrow-left me-2"></i>Volver
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna derecha - Resumen del pedido -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm sticky-top" style="top: 20px;">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-receipt me-2"></i>Resumen del pedido
+                            </h5>
+                        </div>
+                        <div class="card-body" id="order-summary">
+                            <!-- Contenido dinámico del resumen -->
+                        </div>
+                        <div class="card-footer bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong class="text-success">Total a pagar:</strong>
+                                <strong class="fs-5 text-success" id="final-total">$0</strong>
+                            </div>
+                            <small class="text-muted">
+                                <i class="fas fa-truck me-1"></i>Envío incluido
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Información de seguridad -->
+                    <div class="card shadow-sm mt-3">
+                        <div class="card-body text-center">
+                            <i class="fas fa-shield-alt text-success fs-2 mb-2"></i>
+                            <h6 class="text-success">Compra segura</h6>
+                            <p class="small text-muted mb-0">
+                                Tus datos están protegidos por mauricio
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenedor para el footer (se carga automáticamente) -->
+    <div id="footer-container"></div>
+
+    <script>
+        let checkoutType = null;
+        let cartItems = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../shared/navbar.html');
+            loadComponent('footer-container', '../shared/footer.html');
+            
+            // Inicializar carrito y verificar usuario
+            setTimeout(() => {
+                initializeCartSystem();
+                loadCartItems();
+                checkUserStatus();
+                renderOrderSummary();
+            }, 300);
+        });
+
+        function checkUserStatus() {
+            const user = obtenerUsuarioLogueado();
+            
+            if (user) {
+                // Usuario logueado
+                document.getElementById('logged-user-option').style.display = 'block';
+                document.getElementById('guest-user-options').style.display = 'none';
+                document.getElementById('user-email').textContent = user.email;
+                
+                // Pre-llenar datos del usuario
+                document.getElementById('firstName').value = user.nombre.split(' ')[0] || '';
+                document.getElementById('lastName').value = user.nombre.split(' ').slice(1).join(' ') || '';
+                document.getElementById('email').value = user.email || '';
+            } else {
+                // Usuario no logueado
+                document.getElementById('logged-user-option').style.display = 'none';
+                document.getElementById('guest-user-options').style.display = 'block';
+            }
+        }
+
+        function loadCartItems() {
+            cartItems = getCartItems();
+            if (cartItems.length === 0) {
+                // Redirigir al catálogo si no hay items
+                console.log('Carrito vacío, redirigiendo al catálogo...');
+                window.location.href = 'catalogo.html';
+            }
+        }
+
+        function selectOption(type) {
+            checkoutType = type;
+            
+            // Remover selección anterior
+            document.querySelectorAll('.checkout-option').forEach(option => {
+                option.classList.remove('border-success', 'bg-light');
+            });
+            
+            // Agregar selección actual
+            event.currentTarget.classList.add('border-success', 'bg-light');
+            
+            setTimeout(() => {
+                document.getElementById('user-type-selection').style.display = 'none';
+                document.getElementById('contact-form').style.display = 'block';
+                
+                if (type === 'register') {
+                    document.getElementById('create-account-section').style.display = 'block';
+                }
+                
+                // Scroll al formulario
+                document.getElementById('contact-form').scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+        }
+
+        function proceedAsUser() {
+            checkoutType = 'user';
+            document.getElementById('user-type-selection').style.display = 'none';
+            document.getElementById('contact-form').style.display = 'block';
+            document.getElementById('contact-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderOrderSummary() {
+            const summaryContainer = document.getElementById('order-summary');
+            const finalTotal = document.getElementById('final-total');
+            
+            if (cartItems.length === 0) {
+                summaryContainer.innerHTML = '<p class="text-muted">No hay productos en el carrito</p>';
+                finalTotal.textContent = '$0';
+                return;
+            }
+            
+            let total = 0;
+            const itemsHTML = cartItems.map(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                return `
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 small">${item.name}</h6>
+                            <small class="text-muted">${item.quantity} x $${item.price.toLocaleString()}</small>
+                        </div>
+                        <div class="text-end">
+                            <strong class="small">$${itemTotal.toLocaleString()}</strong>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            summaryContainer.innerHTML = itemsHTML;
+            finalTotal.textContent = `$${total.toLocaleString()}`;
+        }
+
+        function proceedToPayment() {
+            // Validar formulario
+            const form = document.getElementById('checkout-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Recopilar datos del formulario
+            const orderData = {
+                type: checkoutType,
+                contact: {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                },
+                shipping: {
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    region: document.getElementById('region').value,
+                    zipCode: document.getElementById('zipCode').value,
+                    notes: document.getElementById('notes').value
+                },
+                items: cartItems,
+                total: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+            };
+            
+            // Si quiere crear cuenta
+            if (checkoutType === 'register' && document.getElementById('createAccount').checked) {
+                orderData.createAccount = {
+                    password: document.getElementById('password').value,
+                    confirmPassword: document.getElementById('confirmPassword').value
+                };
+            }
+            
+            // Guardar datos y proceder
+            localStorage.setItem('checkoutData', JSON.stringify(orderData));
+            
+            // Aquí podrías redirigir a una página de pago o procesar directamente
+            console.log('Datos guardados correctamente, procesando pedido...');
+            
+            // Por ahora, simular compra exitosa
+            processOrder(orderData);
+        }
+
+        function processOrder(orderData) {
+            // Simular procesamiento
+            setTimeout(() => {
+                // Limpiar carrito
+                if (window.cartSystem) {
+                    window.cartSystem.cart = [];
+                    window.cartSystem.saveCart();
+                    window.cartSystem.updateCartIcon();
+                }
+                
+                // Guardar orden para página de confirmación
+                localStorage.setItem('confirmedOrder', JSON.stringify(orderData));
+                
+                // Redirigir a página de éxito
+                window.location.href = 'compraexitosa.html';
+            }, 1500);
+        }
+
+        function goBack() {
+            document.getElementById('contact-form').style.display = 'none';
+            document.getElementById('user-type-selection').style.display = 'block';
+            document.getElementById('user-type-selection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function saveCartForLogin() {
+            localStorage.setItem('pendingCheckout', 'true');
+        }
+    </script>
+
+    <style>
+        .checkout-option {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkout-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+        }
+        
+        .checkout-page {
+            background-color: #f8f9fa;
+        }
+        
+        .sticky-top {
+            position: sticky;
+            top: 20px;
+            z-index: 1020;
+        }
+        
+        @media (max-width: 991px) {
+            .sticky-top {
+                position: relative;
+                top: auto;
+            }
+        }
+    </style>
+
+</body>
+</html>

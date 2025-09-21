@@ -273,11 +273,21 @@
 
     <!-- Scripts para cargar componentes y autenticación -->
     <script src="../../../js/auth.js"></script>
+    <script src="../../../js/carrito.js"></script>
     <script>
         // Cargar componentes al inicializar la página
         document.addEventListener('DOMContentLoaded', function() {
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
+            loadFloatingCart();
+            
+            // Inicializar sistema de carrito
+            setTimeout(() => {
+                initializeCartSystem();
+                if (typeof updateFloatingCartBadge === 'function') {
+                    updateFloatingCartBadge();
+                }
+            }, 300);
         });
     </script>
 

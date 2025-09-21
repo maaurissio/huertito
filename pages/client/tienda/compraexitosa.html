@@ -6,66 +6,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compra Exitosa - HuertoHogar</title>
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <!-- CSS Personalizado -->
     <link href="../../../css/style.css" rel="stylesheet">
 
     <!-- CSS BootStrap -->
     <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- JS BootStrap -->
+    <script src="../../../js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript para componentes compartidos -->
+    <script src="../shared/components.js"></script>
+    
+    <!-- Sistema de autenticación -->
+    <script src="../../../js/auth.js"></script>
+    
+    <!-- Sistema de carrito -->
+    <script src="../../../js/carrito.js"></script>
 </head>
 
 <body>
+    <!-- Contenedor para la navbar (se carga automáticamente) -->
+    <div id="navbar-container"></div>
+    <!-- Contenedor para la navbar (se carga automáticamente) -->
+    <div id="navbar-container"></div>
+
+    <!-- Header de confirmación -->
+    <section class="bg-success text-white py-5">
+        <div class="container text-center">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <i class="fas fa-check-circle fa-4x mb-4"></i>
+                    <h1 class="display-4 mb-3" style="font-family: 'Playfair Display', serif;">¡Compra Exitosa!</h1>
+                    <p class="lead">Gracias por confiar en HuertoHogar. Tu pedido está siendo procesado y recibirás una confirmación por correo electrónico.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <main class="container my-5">
-        <h1 class="text-center text-success">¡Compra Exitosa!</h1>
-        <p class="text-center">Gracias por tu compra. Tu pedido está siendo procesado.</p>
-
         <!-- Información del cliente -->
-        <div id="customer-info">
-            <h3>Información del Cliente</h3>
-            <p><strong>Nombre:</strong> <span id="customerName"></span></p>
-            <p><strong>Correo:</strong> <span id="customerEmail"></span></p>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-0"><i class="fas fa-user me-2"></i>Información del Cliente</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Nombre:</strong> <span id="customerName" class="text-muted"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Correo:</strong> <span id="customerEmail" class="text-muted"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalles del pedido -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-0"><i class="fas fa-shopping-bag me-2"></i>Detalles del Pedido</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Lista de productos -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio Unitario</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartItems">
+                                    <!-- Aquí se cargarán los productos -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Total -->
+                        <div class="border-top pt-3 mt-3">
+                            <div class="row">
+                                <div class="col-md-6 offset-md-6">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h4 class="mb-0">Total:</h4>
+                                        <h4 class="mb-0 text-success" id="totalAmount">$0</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado del pedido -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-clock text-warning me-3 fs-4"></i>
+                            <div>
+                                <h5 class="mb-1">Estado del pedido: <span class="badge bg-warning text-dark">En preparación</span></h5>
+                                <p class="mb-0 text-muted">Te notificaremos cuando tu pedido esté listo para entrega.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="text-center" id="action-buttons">
+                    <!-- Los botones se generan dinámicamente según el tipo de usuario -->
+                </div>
+            </div>
         </div>
-
-        <h3 class="mt-5">Detalles de la Compra</h3>
-
-        <!-- Lista de productos -->
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio Unitario</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody id="cartItems">
-                <!-- Aquí se cargarán los productos -->
-            </tbody>
-        </table>
-
-        <!-- Total y estado -->
-        <div class="d-flex justify-content-between">
-            <h4>Total:</h4>
-            <p id="totalAmount">$0</p>
-        </div>
-
-        <div class="alert alert-info mt-4">
-            <strong>Estado del pedido:</strong> En preparación
-        </div>
-
-        <a href="../../../pages/client/tienda/catalogo.html" class="btn btn-primary">Volver al Catálogo</a>
     </main>
 
+    <!-- Contenedor para el footer (se carga automáticamente) -->
+    <div id="footer-container"></div>
+
     <script>
-        // Recuperar los datos confirmados
+        // Cargar componentes
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../shared/navbar.html');
+            loadComponent('footer-container', '../shared/footer.html');
+            
+            // Inicializar el carrito flotante después de cargar los componentes
+            setTimeout(() => {
+                loadFloatingCart();
+                initializeCartSystem();
+            }, 100);
+        });
+
+        // Recuperar los datos confirmados del nuevo checkout
         const confirmedOrder = JSON.parse(localStorage.getItem('confirmedOrder'));
 
         if (!confirmedOrder) {
-            window.location.href = "../../../pages/client/tienda/catalogo.html";
+            window.location.href = "catalogo.html";
         }
 
-        // Llenar info cliente
-        document.getElementById('customerName').textContent = confirmedOrder.user.nombre;
-        document.getElementById('customerEmail').textContent = confirmedOrder.user.email;
+        // Llenar info cliente - adaptado al nuevo formato
+        const customerName = confirmedOrder.contact 
+            ? `${confirmedOrder.contact.firstName} ${confirmedOrder.contact.lastName}`
+            : confirmedOrder.user?.nombre || 'Cliente';
+        
+        const customerEmail = confirmedOrder.contact?.email || confirmedOrder.user?.email || '';
+
+        document.getElementById('customerName').textContent = customerName;
+        document.getElementById('customerEmail').textContent = customerEmail;
 
         const cartBody = document.getElementById('cartItems');
         let total = 0;
@@ -76,18 +167,58 @@
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.name}</td>
-                <td>${item.quantity}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-seedling text-success me-2"></i>
+                        <strong>${item.name}</strong>
+                    </div>
+                </td>
+                <td><span class="badge bg-light text-dark">${item.quantity}</span></td>
                 <td>${item.price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
-                <td>${itemTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
+                <td class="text-end"><strong>${itemTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</strong></td>
             `;
             cartBody.appendChild(row);
         });
 
         document.getElementById('totalAmount').textContent = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
 
-        // Limpiar carrito (opcional)
+        // Generar botones según el tipo de usuario
+        generateActionButtons(confirmedOrder);
+
+        // Limpiar datos del checkout
         localStorage.removeItem('confirmedOrder');
+        localStorage.removeItem('checkoutData');
+
+        function generateActionButtons(order) {
+            const actionButtonsContainer = document.getElementById('action-buttons');
+            
+            // Verificar si es usuario registrado o invitado
+            const isRegisteredUser = order.user && order.user.email;
+            
+            let buttonsHTML = `
+                <a href="catalogo.html" class="btn btn-success btn-lg me-3">
+                    <i class="fas fa-shopping-cart me-2"></i>Seguir Comprando
+                </a>
+            `;
+            
+            if (isRegisteredUser) {
+                // Botones para usuario registrado
+                buttonsHTML += `
+                    <a href="../perfil.html" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-user me-2"></i>Ver Mi Perfil
+                    </a>
+                `;
+            } else {
+                // Botones para invitado
+                buttonsHTML += `
+                    <a href="../auth/registro.html" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Crear Cuenta
+                    </a>
+                `;
+            }
+            
+            actionButtonsContainer.innerHTML = buttonsHTML;
+        }
     </script>
 </body>
 

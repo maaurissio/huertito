@@ -20,11 +20,14 @@
 
     <!-- JavaScript para componentes compartidos -->
     <script src="pages/client/shared/components.js"></script>
+    
+    <!-- Sistema de carrito -->
+    <script src="js/carrito.js"></script>
 
 </head>
 
 <body>
-    <!-- Contenedor para la navbar (se carga automáticamente) -->
+    <!-- Contenedor para la navbar -->
     <div id="navbar-container"></div>
 
     <main>
@@ -57,7 +60,7 @@
             </div>
         </section>
 
-        <!-- ¿Qué es HuertoHogar? - Simplificado -->
+        <!-- ¿Qué es HuertoHogar? -->
         <section class="py-5 my-5">
             <div class="container">
                 <div class="row align-items-center g-5">
@@ -406,18 +409,8 @@
                                 Únete a miles de familias que ya disfrutan de productos frescos, 
                                 orgánicos y de la más alta calidad directamente en su mesa.
                             </p>
-                            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                                <a href="pages/client/tienda/catalogo.html" 
-                                   class="btn btn-success btn-lg px-5 py-3 rounded-3">
-                                    <i class="fas fa-shopping-cart me-2"></i>
-                                    Hacer mi Primer Pedido
-                                </a>
-                                <a href="pages/client/auth/registro.html" 
-                                   class="btn btn-outline-success btn-lg px-5 py-3 rounded-3"
-                                   onclick="guardarPaginaOrigen()">
-                                    <i class="fas fa-user-plus me-2"></i>
-                                    Crear Cuenta Gratis
-                                </a>
+                            <div class="d-flex gap-3 justify-content-center flex-wrap" id="cta-buttons">
+                                <!-- Los botones se generan dinámicamente según el estado de autenticación -->
                             </div>
                         </div>
                     </div>
@@ -435,8 +428,62 @@
         // Cargar componentes al inicializar la página
         document.addEventListener('DOMContentLoaded', function() {
             loadComponent('navbar-container', 'pages/client/shared/navbar.html');
-            loadComponent('footer-container', 'pages/client/shared/footer.html');
+            loadComponent('footer-container', 'footer-index.html');
+            
+            // Cargar carrito flotante
+            loadFloatingCart();
+            
+            // Inicializar sistema de carrito
+            setTimeout(() => {
+                initializeCartSystem();
+                if (typeof updateFloatingCartBadge === 'function') {
+                    updateFloatingCartBadge();
+                }
+            }, 300);
+            
+            // Actualizar botones según estado de autenticación
+            updateCTAButtons();
         });
+
+        function guardarPaginaOrigen() {
+            localStorage.setItem('paginaOrigen', window.location.pathname);
+        }
+
+        function updateCTAButtons() {
+            const ctaContainer = document.getElementById('cta-buttons');
+            const usuario = obtenerUsuarioLogueado();
+            
+            if (usuario) {
+                // Usuario logueado - mostrar botones para usuario autenticado
+                ctaContainer.innerHTML = `
+                    <a href="pages/client/tienda/catalogo.html" 
+                       class="btn btn-success btn-lg px-5 py-3 rounded-3">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Ver Catálogo
+                    </a>
+                    <a href="pages/client/tienda/perfil.html" 
+                       class="btn btn-outline-success btn-lg px-5 py-3 rounded-3">
+                        <i class="fas fa-user me-2"></i>
+                        Mi Perfil
+                    </a>
+                `;
+            } else {
+                // Usuario sin loguear - mostrar botones de registro
+                ctaContainer.innerHTML = `
+                    <a href="pages/client/tienda/catalogo.html" 
+                       class="btn btn-success btn-lg px-5 py-3 rounded-3">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Hacer mi Primer Pedido
+                    </a>
+                    <a href="pages/client/auth/registro.html" 
+                       class="btn btn-outline-success btn-lg px-5 py-3 rounded-3"
+                       onclick="guardarPaginaOrigen()">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Crear Cuenta Gratis
+                    </a>
+                `;
+            }
+        }
     </script>
 
 </body>

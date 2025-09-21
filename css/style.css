@@ -62,11 +62,42 @@ html {
 }
 
 html::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+    width: 0px;
+    background: transparent;
 }
 
-/* Fuente de Encabezado: Playfair Display*/
+/* ==========================================
+   PÁGINAS DE AUTENTICACIÓN - FOOTER STICKY
+   ========================================== */
+
+/* Layout para páginas de login/registro */
+.login-page,
+.register-page,
+.registro-page,
+.forgot-password-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* El main toma todo el espacio disponible */
+.login-page section,
+.register-page section,
+.registro-page section,
+.forgot-password-page section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 140px); /* Altura navbar + footer aprox */
+}
+
+/* Footer siempre al final */
+.login-page #footer-container,
+.register-page #footer-container,
+.registro-page #footer-container,
+.forgot-password-page #footer-container {
+    margin-top: auto;
+}/* Fuente de Encabezado: Playfair Display*/
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Playfair Display', serif;
   color: #2E8B57;

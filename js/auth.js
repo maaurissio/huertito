@@ -207,6 +207,11 @@ function cerrarSesion() {
     localStorage.removeItem('usuarioLogueado');
     actualizarNavbar(); // Actualizar navbar inmediatamente
     
+    // Actualizar botones CTA si existen en la página
+    if (typeof updateCTAButtons === 'function') {
+        updateCTAButtons();
+    }
+    
     // Mostrar notificación elegante
     mostrarNotificacion('Sesión cerrada exitosamente', 'success', 3000);
     
