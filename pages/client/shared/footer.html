@@ -33,17 +33,17 @@
                 </h6>
                 <ul class="list-unstyled">
                     <li class="mb-2">
-                        <a href="../info/nosotros.html" class="text-light text-decoration-none footer-link">
+                        <a href="nosotros.html" class="text-light text-decoration-none footer-link" data-page="nosotros">
                             <i class="fas fa-info-circle me-1 text-success"></i>Nosotros
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="../tienda/catalogo.html" class="text-light text-decoration-none footer-link">
+                        <a href="catalogo.html" class="text-light text-decoration-none footer-link" data-page="catalogo">
                             <i class="fas fa-shopping-basket me-1 text-success"></i>Catálogo
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="../blog/blog.html" class="text-light text-decoration-none footer-link">
+                        <a href="blog.html" class="text-light text-decoration-none footer-link" data-page="blog">
                             <i class="fas fa-blog me-1 text-success"></i>Blog
                         </a>
                     </li>
@@ -122,13 +122,13 @@
             </div>
             <div class="col-md-6">
                 <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                    <a href="../info/terminos.html" class="text-light text-decoration-none footer-link small">
+                    <a href="terminos.html" class="text-light text-decoration-none footer-link small" data-page="terminos">
                         <i class="fas fa-file-contract me-1 text-success"></i>Términos de Uso
                     </a>
-                    <a href="../info/privacidad.html" class="text-light text-decoration-none footer-link small">
+                    <a href="privacidad.html" class="text-light text-decoration-none footer-link small" data-page="privacidad">
                         <i class="fas fa-user-shield me-1 text-success"></i>Privacidad
                     </a>
-                    <a href="../info/cookies.html" class="text-light text-decoration-none footer-link small">
+                    <a href="cookies.html" class="text-light text-decoration-none footer-link small" data-page="cookies">
                         <i class="fas fa-cookie-bite me-1 text-success"></i>Cookies
                     </a>
                 </div>
@@ -181,3 +181,69 @@ footer {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
 }
 </style>
+
+<script>
+// Ajustar rutas del footer según la ubicación actual
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const isInRoot = currentPath === '/' || currentPath.endsWith('/index.html') || !currentPath.includes('/pages/');
+    
+    // Obtener todos los enlaces con data-page
+    const footerLinks = document.querySelectorAll('[data-page]');
+    
+    footerLinks.forEach(link => {
+        const page = link.getAttribute('data-page');
+        let newHref = '';
+        
+        if (isInRoot) {
+            // Desde la raíz (index.html)
+            switch(page) {
+                case 'nosotros':
+                    newHref = 'pages/client/info/nosotros.html';
+                    break;
+                case 'catalogo':
+                    newHref = 'pages/client/tienda/catalogo.html';
+                    break;
+                case 'blog':
+                    newHref = 'pages/client/blog/blog.html';
+                    break;
+                case 'terminos':
+                    newHref = 'pages/client/info/terminos.html';
+                    break;
+                case 'privacidad':
+                    newHref = 'pages/client/info/privacidad.html';
+                    break;
+                case 'cookies':
+                    newHref = 'pages/client/info/cookies.html';
+                    break;
+            }
+        } else {
+            // Desde otras páginas
+            switch(page) {
+                case 'nosotros':
+                    newHref = '../info/nosotros.html';
+                    break;
+                case 'catalogo':
+                    newHref = '../tienda/catalogo.html';
+                    break;
+                case 'blog':
+                    newHref = '../blog/blog.html';
+                    break;
+                case 'terminos':
+                    newHref = '../info/terminos.html';
+                    break;
+                case 'privacidad':
+                    newHref = '../info/privacidad.html';
+                    break;
+                case 'cookies':
+                    newHref = '../info/cookies.html';
+                    break;
+            }
+        }
+        
+        if (newHref) {
+            link.setAttribute('href', newHref);
+        }
+    });
+});
+</script>

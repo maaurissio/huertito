@@ -319,6 +319,22 @@ function mostrarMenuUsuario(navbarMenu, usuario) {
         perfilPath = '../tienda/perfil.html';
     }
     
+    // Calcular ruta al dashboard según la ubicación actual
+    const pathForDashboard = window.location.pathname;
+    let dashboardPath;
+    
+    if (pathForDashboard.includes('/pages/')) {
+        // Estamos en una subcarpeta de pages
+        if (pathForDashboard.includes('/client/')) {
+            dashboardPath = '../../admin/dashboard.html';
+        } else {
+            dashboardPath = '../admin/dashboard.html';
+        }
+    } else {
+        // Estamos en la raíz
+        dashboardPath = 'pages/admin/dashboard.html';
+    }
+    
     userDropdown.innerHTML = `
         <a class="nav-link dropdown-toggle text-success fw-semibold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fas fa-user-circle me-1"></i>
@@ -329,7 +345,7 @@ function mostrarMenuUsuario(navbarMenu, usuario) {
             <li><a class="dropdown-item" href="${perfilPath}?section=pedidos"><i class="fas fa-shopping-bag me-2"></i>Mis Pedidos</a></li>
             <li><a class="dropdown-item" href="${perfilPath}?section=favoritos"><i class="fas fa-heart me-2"></i>Favoritos</a></li>
             <li><a class="dropdown-item" href="${perfilPath}?section=configuracion"><i class="fas fa-cog me-2"></i>Configuración</a></li>
-            ${usuario.rol === 'superusuario' ? '<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-primary" href="../../admin/dashboard.html"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</a></li>' : ''}
+            ${usuario.rol === 'superusuario' ? `<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-primary" href="${dashboardPath}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</a></li>` : ''}
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item text-danger" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
         </ul>
