@@ -108,11 +108,11 @@ function validarLogin(email, password) {
     const usuario = usuarios[email.toLowerCase()];
     
     if (!usuario) {
-        return { valido: false, mensaje: 'Usuario no encontrado' };
+        return { valido: false, mensaje: '❌ Usuario no encontrado. Verifica tu email.' };
     }
     
     if (usuario.password !== password) {
-        return { valido: false, mensaje: 'Contraseña incorrecta' };
+        return { valido: false, mensaje: '🔐 Contraseña incorrecta. Intenta de nuevo.' };
     }
     
     return { 
@@ -174,21 +174,60 @@ function mostrarError(mensaje) {
     // Crear nuevo mensaje de error
     errorDiv = document.createElement('div');
     errorDiv.className = 'alert alert-danger error-message mt-3';
+    errorDiv.style.cssText = `
+        border-left: 4px solid #dc3545 !important;
+        border-radius: 8px !important;
+        background-color: #f8d7da !important;
+        color: #721c24 !important;
+        padding: 15px !important;
+        margin: 15px 0 !important;
+        display: block !important;
+        animation: shake 0.5s ease-in-out;
+    `;
     errorDiv.innerHTML = `
         <i class="fas fa-exclamation-triangle me-2"></i>
-        ${mensaje}
+        <strong>${mensaje}</strong>
     `;
     
-    // Insertar antes del botón de submit
+    // Buscar el formulario y agregar el error ahí
+    const loginForm = document.getElementById('loginForm');
     const submitBtn = document.querySelector('button[type="submit"]');
-    submitBtn.parentNode.insertBefore(errorDiv, submitBtn);
     
-    // Auto-remover después de 5 segundos
+    if (submitBtn && submitBtn.parentNode) {
+        submitBtn.parentNode.insertBefore(errorDiv, submitBtn);
+    } else if (loginForm) {
+        loginForm.appendChild(errorDiv);
+    } else {
+        // Último recurso: agregar al body
+        document.body.appendChild(errorDiv);
+    }
+    
+    // Añadir animación de shake si no existe
+    if (!document.querySelector('#shake-keyframes')) {
+        const style = document.createElement('style');
+        style.id = 'shake-keyframes';
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Auto-remover después de 6 segundos
     setTimeout(() => {
-        if (errorDiv) {
-            errorDiv.remove();
+        if (errorDiv && errorDiv.parentNode) {
+            errorDiv.style.opacity = '0';
+            errorDiv.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => {
+                if (errorDiv && errorDiv.parentNode) {
+                    errorDiv.remove();
+                }
+            }, 300);
         }
-    }, 5000);
+    }, 6000);
 }
 
 /**
@@ -468,7 +507,6 @@ function inicializarLogin() {
     const loginForm = document.getElementById('loginForm');
     
     if (!loginForm) {
-        console.warn('Formulario de login no encontrado');
         return;
     }
     
