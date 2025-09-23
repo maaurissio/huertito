@@ -23,9 +23,8 @@ class UserManager {
         return simpleUrl;
     }
 
-    /**
-     * Cargar usuarios desde el archivo JSON
-     */
+
+     // Cargar usuarios desde localStorage o JSON
     async cargarUsuarios() {
         try {
             if (this.usuariosCache) {
@@ -33,21 +32,42 @@ class UserManager {
                 return this.usuariosCache;
             }
 
-            console.log('UserManager: Cargando usuarios desde:', this.rutaJSON);
+            // Primero intentar cargar desde localStorage (usuarios creados por dashboard)
+            const usuariosLocal = localStorage.getItem('usuariosJSON');
+            if (usuariosLocal) {
+                try {
+                    const data = JSON.parse(usuariosLocal);
+                    if (data && data.usuarios && Array.isArray(data.usuarios)) {
+                        console.log('UserManager: Usuarios cargados desde localStorage:', data.usuarios.length, 'usuarios');
+                        this.usuariosCache = data;
+                        return data;
+                    }
+                } catch (error) {
+                    console.warn('UserManager: Error parseando usuarios de localStorage:', error);
+                }
+            }
+
+            // Si no hay en localStorage, intentar cargar desde JSON
+            console.log('UserManager: Intentando cargar usuarios desde:', this.rutaJSON);
             const response = await fetch(this.rutaJSON);
             if (!response.ok) {
                 throw new Error(`Error al cargar usuarios: ${response.status} ${response.statusText}`);
             }
             
             const data = await response.json();
+            // Sincronizar con localStorage para futuras creaciones
+            localStorage.setItem('usuariosJSON', JSON.stringify(data));
             this.usuariosCache = data;
-            console.log('UserManager: Usuarios cargados exitosamente:', data.usuarios.length, 'usuarios');
+            console.log('UserManager: Usuarios cargados desde JSON y sincronizados:', data.usuarios.length, 'usuarios');
             return data;
         } catch (error) {
             console.error('UserManager: Error cargando usuarios:', error);
-            // Fallback a usuarios por defecto si no se puede cargar el JSON
-            console.log('UserManager: Usando usuarios por defecto');
-            return this.getUsuariosPorDefecto();
+            // Fallback a usuarios por defecto
+            console.log('UserManager: Usando usuarios por defecto e inicializando localStorage');
+            const usuariosPorDefecto = this.getUsuariosPorDefecto();
+            localStorage.setItem('usuariosJSON', JSON.stringify(usuariosPorDefecto));
+            this.usuariosCache = usuariosPorDefecto;
+            return usuariosPorDefecto;
         }
     }
 
@@ -195,17 +215,16 @@ class UserManager {
     }
 
     /**
-     * Guardar usuarios en JSON (simulado con localStorage)
-     * En un entorno real, esto sería una llamada al servidor
+     * Guardar usuarios en localStorage
      */
     async guardarUsuarios(data) {
         try {
-            // Como no podemos escribir archivos desde el navegador,
-            // guardamos en localStorage como backup
+            // Guardar en localStorage como fuente principal
             localStorage.setItem('usuariosJSON', JSON.stringify(data));
             this.usuariosCache = data;
             
-            console.log('Usuarios guardados en caché local');
+            console.log('UserManager: Usuarios guardados exitosamente en localStorage');
+            console.log('UserManager: Total de usuarios:', data.usuarios.length);
             return { success: true };
         } catch (error) {
             console.error('Error guardando usuarios:', error);
@@ -298,6 +317,62 @@ class UserManager {
             return { 
                 exito: false, 
                 mensaje: 'Error al actualizar usuario: ' + error.message 
+            };
+        }
+    }
+
+    /**
+     * Obtener todos los usuarios para el dashboard
+     */
+    async obtenerUsuarios() {
+        try {
+            const data = await this.cargarUsuarios();
+            return {
+                success: true,
+                usuarios: data.usuarios || []
+            };
+        } catch (error) {
+            console.error('UserManager: Error al obtener usuarios:', error);
+            return {
+                success: false,
+                mensaje: 'Error al cargar usuarios',
+                usuarios: []
+            };
+        }
+    }
+
+    /**
+     * Eliminar usuario
+     */
+    async eliminarUsuario(usuarioId) {
+        try {
+            const data = await this.cargarUsuarios();
+            const indice = data.usuarios.findIndex(u => u.id === parseInt(usuarioId));
+            
+            if (indice === -1) {
+                return {
+                    success: false,
+                    mensaje: 'Usuario no encontrado'
+                };
+            }
+
+            // Eliminar usuario
+            const usuarioEliminado = data.usuarios.splice(indice, 1)[0];
+            data.configuracion.ultimaActualizacion = new Date().toISOString();
+
+            // Guardar cambios
+            await this.guardarUsuarios(data);
+            
+            return {
+                success: true,
+                mensaje: `Usuario ${usuarioEliminado.nombre} eliminado exitosamente`
+            };
+            
+        } catch (error) {
+            console.error('UserManager: Error al eliminar usuario:', error);
+            return {
+                success: false,
+                mensaje: 'Error interno al eliminar usuario'
             };
         }
     }

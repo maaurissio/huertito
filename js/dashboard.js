@@ -75,6 +75,7 @@ function initializeDashboard() {
     
     // Cargar datos iniciales
     console.log('Cargando datos del dashboard...');
+    loadStats();
     
     // Mostrar bienvenida
     setTimeout(() => {
@@ -84,12 +85,14 @@ function initializeDashboard() {
     console.log('✅ Dashboard inicializado correctamente');
 }
 
-function loadStats() {
-    // Animar contadores
+async function loadStats() {
+    // Animar contadores con datos simulados
     animateCounter('totalSales', 2847320, '$', true);
     animateCounter('totalOrders', 1247);
-    animateCounter('totalUsers', mockData.stats.users);
     animateCounter('totalProducts', mockData.stats.products);
+    
+    // Actualizar usuarios con datos reales
+    await updateDashboardStats();
 }
 
 function animateCounter(elementId, targetValue, prefix = '', isCurrency = false) {
@@ -244,13 +247,18 @@ function showSection(sectionName) {
     
     // Cargar datos específicos de cada sección
     switch(sectionName) {
+        case 'dashboard':
+            console.log('� Cargando dashboard...');
+            updateDashboardStats();
+            break;
         case 'products':
-            console.log('🛍️ Cargando productos...');
+            console.log('�️ Cargando productos...');
             loadProductsTable();
             break;
         case 'users':
-            console.log('👥 Cargando usuarios...');
+            console.log('� Cargando usuarios...');
             loadUsersTable();
+            updateDashboardStats(); // Actualizar también las estadísticas
             break;
         case 'orders':
             console.log('📦 Cargando pedidos...');
@@ -259,22 +267,6 @@ function showSection(sectionName) {
         case 'analytics':
             console.log('📊 Cargando analytics...');
             initializeAnalyticsCharts();
-            break;
-    }
-    
-    // Cargar datos específicos de la sección
-    switch(sectionName) {
-        case 'products':
-            loadProductsTable();
-            break;
-        case 'users':
-            loadUsersTable();
-            break;
-        case 'orders':
-            loadOrdersTable();
-            break;
-        case 'analytics':
-            loadAnalyticsCharts();
             break;
     }
 }
@@ -574,6 +566,30 @@ function updateNotificationCount() {
     document.getElementById('notificationCount').textContent = count;
 }
 
+/**
+ * Actualizar estadísticas del dashboard con datos reales
+ */
+async function updateDashboardStats() {
+    try {
+        // Obtener usuarios reales
+        const resultado = await userManager.obtenerUsuarios();
+        if (resultado.success) {
+            const totalUsers = resultado.usuarios.length;
+            const activeUsers = resultado.usuarios.filter(u => u.estado === 'activo').length;
+            
+            // Actualizar contador de usuarios totales
+            const totalUsersElement = document.getElementById('totalUsers');
+            if (totalUsersElement) {
+                totalUsersElement.textContent = totalUsers.toLocaleString();
+            }
+            
+            console.log('Dashboard: Estadísticas actualizadas -', totalUsers, 'usuarios totales,', activeUsers, 'activos');
+        }
+    } catch (error) {
+        console.error('Dashboard: Error actualizando estadísticas:', error);
+    }
+}
+
 function showNotifications() {
     // Mostrar las notificaciones
     showToast('Notificaciones', 'Sistema iniciado correctamente<br>Base de datos conectada<br>Dashboard cargado', 'info', 4000);
@@ -630,19 +646,21 @@ function deleteProduct(id) {
 }
 
 function addUser() {
-    showToast('Agregar Usuario', 'Función en desarrollo. Próximamente disponible.', 'info');
+    showAddUserModal();
 }
 
 function editUser(id) {
-    showToast('Editar Usuario', `Editando usuario con ID: ${id}`, 'info');
+    showToast('Editar Usuario', `Función de edición en desarrollo para usuario ID: ${id}`, 'info');
+}
+
+function viewUser(id) {
+    // Función deshabilitada - no hacer nada
+    console.log('Ver usuario:', id);
 }
 
 function deleteUser(id) {
-    showToast('Confirmar Eliminación', `¿Eliminar usuario ${id}?`, 'warning');
-    setTimeout(() => {
-        showToast('Usuario Eliminado', `Usuario ${id} eliminado correctamente`, 'success');
-        loadUsersTable();
-    }, 2000);
+    // Función deshabilitada - no hacer nada
+    console.log('Eliminar usuario:', id);
 }
 
 // Analytics Charts Initialization
@@ -806,23 +824,42 @@ function showAddUserModal() {
  */
 async function loadUsersTable() {
     try {
-        const usuarios = await userManager.listarUsuarios();
+        console.log('Dashboard: Cargando tabla de usuarios...');
+        const resultado = await userManager.obtenerUsuarios();
         const tableBody = document.getElementById('usersTableBody');
         
         if (!tableBody) {
-            console.error('No se encontró usersTableBody');
+            console.error('Dashboard: No se encontró usersTableBody');
             return;
         }
         
         tableBody.innerHTML = '';
         
-        usuarios.forEach(usuario => {
+        if (!resultado.success || resultado.usuarios.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        <i class="fas fa-users fa-3x mb-3 d-block"></i>
+                        No hay usuarios registrados
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        console.log('Dashboard: Mostrando', resultado.usuarios.length, 'usuarios');
+        
+        resultado.usuarios.forEach(usuario => {
             const row = `
                 <tr>
                     <td>${usuario.id}</td>
                     <td>${usuario.nombre} ${usuario.apellido || ''}</td>
                     <td>${usuario.email}</td>
-                    <td>${usuario.usuario}</td>
+                    <td>
+                        <span class="badge ${usuario.rol === 'administrador' ? 'bg-danger' : 'bg-primary'}">
+                            ${usuario.rol}
+                        </span>
+                    </td>
                     <td>${usuario.fechaRegistro}</td>
                     <td>
                         <span class="badge ${usuario.estado === 'activo' ? 'bg-success' : 'bg-danger'}">
@@ -831,13 +868,12 @@ async function loadUsersTable() {
                     </td>
                     <td>
                         <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(${usuario.id})" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-info" onclick="viewUser(${usuario.id})" title="Ver">
+                            <button class="btn btn-sm btn-outline-info" onclick="viewUser(${usuario.id})" title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${usuario.id})" title="Eliminar">
+                            <button class="btn btn-sm btn-outline-danger ${usuario.rol === 'administrador' ? 'disabled' : ''}" 
+                                    onclick="deleteUser(${usuario.id})" title="Eliminar"
+                                    ${usuario.rol === 'administrador' ? 'disabled' : ''}>
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>

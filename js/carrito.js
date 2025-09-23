@@ -141,6 +141,14 @@ class CartSystem {
         }
     }
 
+    // Función para limpiar carrito sin confirmación (para checkout exitoso)
+    clearCartSilent() {
+        this.cart = [];
+        this.saveCart();
+        this.updateCartIcon();
+        this.renderCart();
+    }
+
     checkout() {
         if (this.cart.length === 0) {
             this.showNotification('El carrito está vacío', 'warning');

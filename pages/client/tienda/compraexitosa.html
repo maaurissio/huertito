@@ -21,6 +21,9 @@
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
     
+    <!-- Sistema de gestión de usuarios -->
+    <script src="../../../js/userManager.js"></script>
+    
     <!-- Sistema de autenticación -->
     <script src="../../../js/auth.js"></script>
     
@@ -29,8 +32,6 @@
 </head>
 
 <body>
-    <!-- Contenedor para la navbar (se carga automáticamente) -->
-    <div id="navbar-container"></div>
     <!-- Contenedor para la navbar (se carga automáticamente) -->
     <div id="navbar-container"></div>
 
@@ -134,66 +135,71 @@
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
             
-            // Inicializar el carrito flotante después de cargar los componentes
+            // Inicializar sistemas después de cargar los componentes
             setTimeout(() => {
-                loadFloatingCart();
                 initializeCartSystem();
+                loadOrderData();
             }, 100);
         });
 
-        // Recuperar los datos confirmados del nuevo checkout
-        const confirmedOrder = JSON.parse(localStorage.getItem('confirmedOrder'));
+        function loadOrderData() {
+            // Recuperar los datos confirmados del nuevo checkout
+            const confirmedOrder = JSON.parse(localStorage.getItem('confirmedOrder'));
 
-        if (!confirmedOrder) {
-            window.location.href = "catalogo.html";
+            if (!confirmedOrder) {
+                window.location.href = "catalogo.html";
+                return;
+            }
+
+            // Llenar info cliente - adaptado al nuevo formato
+            const customerName = confirmedOrder.contact 
+                ? `${confirmedOrder.contact.firstName} ${confirmedOrder.contact.lastName}`
+                : confirmedOrder.user?.nombre || 'Cliente';
+            
+            const customerEmail = confirmedOrder.contact?.email || confirmedOrder.user?.email || '';
+
+            document.getElementById('customerName').textContent = customerName;
+            document.getElementById('customerEmail').textContent = customerEmail;
+
+            const cartBody = document.getElementById('cartItems');
+            let total = 0;
+
+            confirmedOrder.items.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-seedling text-success me-2"></i>
+                            <strong>${item.name}</strong>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-light text-dark">${item.quantity}</span></td>
+                    <td>${item.price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
+                    <td class="text-end"><strong>${itemTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</strong></td>
+                `;
+                cartBody.appendChild(row);
+            });
+
+            document.getElementById('totalAmount').textContent = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+
+            // Generar botones según el estado ACTUAL del usuario (no de la orden)
+            generateActionButtons();
+
+            // Limpiar datos del checkout
+            localStorage.removeItem('confirmedOrder');
+            localStorage.removeItem('checkoutData');
         }
 
-        // Llenar info cliente - adaptado al nuevo formato
-        const customerName = confirmedOrder.contact 
-            ? `${confirmedOrder.contact.firstName} ${confirmedOrder.contact.lastName}`
-            : confirmedOrder.user?.nombre || 'Cliente';
-        
-        const customerEmail = confirmedOrder.contact?.email || confirmedOrder.user?.email || '';
-
-        document.getElementById('customerName').textContent = customerName;
-        document.getElementById('customerEmail').textContent = customerEmail;
-
-        const cartBody = document.getElementById('cartItems');
-        let total = 0;
-
-        confirmedOrder.items.forEach(item => {
-            const itemTotal = item.price * item.quantity;
-            total += itemTotal;
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-seedling text-success me-2"></i>
-                        <strong>${item.name}</strong>
-                    </div>
-                </td>
-                <td><span class="badge bg-light text-dark">${item.quantity}</span></td>
-                <td>${item.price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
-                <td class="text-end"><strong>${itemTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</strong></td>
-            `;
-            cartBody.appendChild(row);
-        });
-
-        document.getElementById('totalAmount').textContent = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
-
-        // Generar botones según el tipo de usuario
-        generateActionButtons(confirmedOrder);
-
-        // Limpiar datos del checkout
-        localStorage.removeItem('confirmedOrder');
-        localStorage.removeItem('checkoutData');
-
-        function generateActionButtons(order) {
+        function generateActionButtons() {
             const actionButtonsContainer = document.getElementById('action-buttons');
             
-            // Verificar si es usuario registrado o invitado
-            const isRegisteredUser = order.user && order.user.email;
+            // Verificar el estado ACTUAL del usuario (no de la orden)
+            const currentUser = typeof obtenerUsuarioLogueado === 'function' ? obtenerUsuarioLogueado() : null;
+            
+            console.log('CompraExitosa: Usuario actual:', currentUser);
             
             let buttonsHTML = `
                 <a href="catalogo.html" class="btn btn-success btn-lg me-3">
@@ -201,13 +207,15 @@
                 </a>
             `;
             
-            if (isRegisteredUser) {
+            if (currentUser) {
                 // Botones para usuario registrado
                 buttonsHTML += `
-                    <a href="../perfil.html" class="btn btn-outline-primary btn-lg">
+                    <a href="perfil.html" class="btn btn-outline-primary btn-lg">
                         <i class="fas fa-user me-2"></i>Ver Mi Perfil
                     </a>
                 `;
+                
+                console.log('CompraExitosa: Mostrando botones de usuario registrado');
             } else {
                 // Botones para invitado
                 buttonsHTML += `
@@ -215,6 +223,8 @@
                         <i class="fas fa-user-plus me-2"></i>Crear Cuenta
                     </a>
                 `;
+                
+                console.log('CompraExitosa: Mostrando botones de invitado');
             }
             
             actionButtonsContainer.innerHTML = buttonsHTML;

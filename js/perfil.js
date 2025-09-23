@@ -10,6 +10,8 @@ let currentUser = null;
 
 // Inicialización cuando se carga la página
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Perfil: DOM cargado, iniciando...');
+    
     // Cargar componentes compartidos
     if (typeof loadComponent === 'function') {
         loadComponent('navbar-container', '../shared/navbar.html');
@@ -18,9 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar después de un breve delay para que los componentes se carguen
     setTimeout(() => {
+        console.log('Perfil: Iniciando configuración...');
+        
         // Verificar autenticación
         if (!verificarAutenticacion()) {
-            window.location.href = '../../index.html';
+            console.warn('Perfil: Usuario no autenticado, redirigiendo...');
+            window.location.href = '../../../index.html';
             return;
         }
 
@@ -33,10 +38,37 @@ document.addEventListener('DOMContentLoaded', function() {
         // Configurar listeners de eventos
         configurarEventListeners();
         
-        // Mostrar sección inicial
-        mostrarSeccionInicial();
-    }, 100);
+        // Inicializar carrito flotante
+        if (typeof loadFloatingCart === 'function') {
+            loadFloatingCart();
+        }
+        
+        // Inicializar sistema de carrito después de un delay
+        setTimeout(() => {
+            if (typeof initializeCartSystem === 'function') {
+                initializeCartSystem();
+            }
+            if (typeof updateFloatingCartBadge === 'function') {
+                updateFloatingCartBadge();
+            }
+        }, 200);
+        
+        // Mostrar sección inicial con timeout adicional para asegurar que el DOM esté listo
+        setTimeout(() => {
+            mostrarSeccionInicial();
+        }, 100);
+    }, 150);
 });
+
+// También asegurar que funcione si la página ya está completamente cargada
+if (document.readyState === 'complete') {
+    console.log('Perfil: Página ya cargada, iniciando inmediatamente...');
+    setTimeout(() => {
+        if (!document.querySelector('.profile-section.active')) {
+            mostrarSeccionInicial();
+        }
+    }, 100);
+}
 
 /**
  * Verificar si el usuario está autenticado
@@ -118,10 +150,17 @@ function cargarInformacionUsuario() {
         joinDateElemento.textContent = fecha.getFullYear();
     }
 
-    // Actualizar avatar
+    // Actualizar avatar - usar avatar por defecto si no tiene imagen personalizada
     const avatarElemento = document.getElementById('profileImage');
     if (avatarElemento) {
-        avatarElemento.src = currentUser.avatar || '../../../img/usuario-avatar.webp';
+        // Usar una imagen por defecto o generar un avatar con iniciales
+        if (currentUser.avatar) {
+            avatarElemento.src = currentUser.avatar;
+        } else {
+            // Generar avatar con iniciales
+            const iniciales = (currentUser.nombre?.charAt(0) || '') + (currentUser.apellido?.charAt(0) || '');
+            avatarElemento.src = `https://ui-avatars.com/api/?name=${iniciales}&background=28a745&color=fff&size=128&rounded=true`;
+        }
     }
 }
 
@@ -129,8 +168,19 @@ function cargarInformacionUsuario() {
  * Configurar navegación basada en URL
  */
 function configurarNavegacionURL() {
-    // Escuchar cambios en la URL
-    window.addEventListener('popstate', function() {
+    // Escuchar cambios en la URL (botón atrás/adelante)
+    window.addEventListener('popstate', function(event) {
+        console.log('Perfil: Navegación con popstate detectada');
+        if (event.state && event.state.section) {
+            mostrarSeccion(event.state.section);
+        } else {
+            mostrarSeccionActual();
+        }
+    });
+    
+    // También escuchar cambios de hash por si acaso
+    window.addEventListener('hashchange', function() {
+        console.log('Perfil: Cambio de hash detectado');
         mostrarSeccionActual();
     });
 }
@@ -139,14 +189,25 @@ function configurarNavegacionURL() {
  * Mostrar sección inicial basada en URL o por defecto
  */
 function mostrarSeccionInicial() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const seccion = urlParams.get('section');
-    
-    if (seccion) {
-        mostrarSeccion(seccion);
-    } else {
-        mostrarSeccion('general');
-    }
+    // Esperar a que el DOM esté completamente cargado
+    setTimeout(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const seccion = urlParams.get('section') || 'general';
+        
+        console.log('Perfil: Inicializando con sección:', seccion);
+        console.log('Perfil: URL actual:', window.location.href);
+        
+        // Verificar que los elementos existan antes de proceder
+        const sidebar = document.querySelector('.sidebar');
+        const secciones = document.querySelectorAll('.profile-section');
+        
+        if (sidebar && secciones.length > 0) {
+            mostrarSeccion(seccion);
+        } else {
+            console.warn('Perfil: Elementos del DOM no están listos, reintentando...');
+            setTimeout(() => mostrarSeccionInicial(), 200);
+        }
+    }, 100);
 }
 
 /**
@@ -155,6 +216,7 @@ function mostrarSeccionInicial() {
 function mostrarSeccionActual() {
     const urlParams = new URLSearchParams(window.location.search);
     const seccion = urlParams.get('section') || 'general';
+    console.log('Perfil: Mostrando sección actual desde URL:', seccion);
     mostrarSeccion(seccion);
 }
 
@@ -162,6 +224,8 @@ function mostrarSeccionActual() {
  * Mostrar una sección específica del perfil
  */
 function mostrarSeccion(seccionId) {
+    console.log('Perfil: Mostrando sección:', seccionId);
+    
     // Ocultar todas las secciones
     const secciones = document.querySelectorAll('.profile-section');
     secciones.forEach(seccion => {
@@ -172,14 +236,19 @@ function mostrarSeccion(seccionId) {
     const seccionActiva = document.getElementById(seccionId);
     if (seccionActiva) {
         seccionActiva.classList.add('active');
+        console.log('Perfil: Sección activada:', seccionId);
+    } else {
+        console.warn('Perfil: No se encontró la sección:', seccionId);
     }
 
     // Actualizar navegación activa
     actualizarNavegacionActiva(seccionId);
 
-    // Actualizar URL sin recargar la página
-    const nuevaURL = `${window.location.pathname}?section=${seccionId}`;
-    window.history.pushState({ section: seccionId }, '', nuevaURL);
+    // Actualizar URL sin recargar la página (solo si no es la carga inicial)
+    if (document.readyState === 'complete') {
+        const nuevaURL = `${window.location.pathname}?section=${seccionId}`;
+        window.history.pushState({ section: seccionId }, '', nuevaURL);
+    }
 
     // Cargar contenido específico de la sección
     cargarContenidoSeccion(seccionId);
@@ -189,17 +258,40 @@ function mostrarSeccion(seccionId) {
  * Actualizar el estado activo de la navegación
  */
 function actualizarNavegacionActiva(seccionId) {
-    // Remover active de todos los enlaces
-    const enlaces = document.querySelectorAll('.sidebar .nav-link');
-    enlaces.forEach(enlace => {
-        enlace.classList.remove('active');
-    });
+    console.log('Perfil: Actualizando navegación para:', seccionId);
+    
+    // Esperar un poco si los elementos no están listos
+    setTimeout(() => {
+        // Remover active de todos los enlaces
+        const enlaces = document.querySelectorAll('.sidebar .nav-link');
+        console.log('Perfil: Enlaces encontrados:', enlaces.length);
+        
+        enlaces.forEach(enlace => {
+            enlace.classList.remove('active');
+        });
 
-    // Agregar active al enlace correspondiente
-    const enlaceActivo = document.querySelector(`[onclick="mostrarSeccion('${seccionId}')"]`);
-    if (enlaceActivo) {
-        enlaceActivo.classList.add('active');
-    }
+        // Agregar active al enlace correspondiente
+        const enlaceActivo = document.querySelector(`[onclick="mostrarSeccion('${seccionId}')"]`);
+        if (enlaceActivo) {
+            enlaceActivo.classList.add('active');
+            console.log('Perfil: Enlace activado para:', seccionId);
+        } else {
+            console.warn('Perfil: No se encontró enlace para:', seccionId);
+            
+            // Fallback: buscar por texto del enlace
+            const enlaces = document.querySelectorAll('.sidebar .nav-link');
+            enlaces.forEach(enlace => {
+                const texto = enlace.textContent.toLowerCase();
+                if ((seccionId === 'general' && texto.includes('perfil')) ||
+                    (seccionId === 'pedidos' && texto.includes('pedidos')) ||
+                    (seccionId === 'favoritos' && texto.includes('favoritos')) ||
+                    (seccionId === 'configuracion' && texto.includes('configuración'))) {
+                    enlace.classList.add('active');
+                    console.log('Perfil: Enlace activado por fallback para:', seccionId);
+                }
+            });
+        }
+    }, 50);
 }
 
 /**
@@ -330,6 +422,32 @@ function cargarFavoritos() {
  * Configurar todos los event listeners
  */
 function configurarEventListeners() {
+    console.log('Perfil: Configurando event listeners...');
+    
+    // Event delegation para botones de navegación (más confiable)
+    document.addEventListener('click', function(event) {
+        // Detectar clicks en botones de navegación del perfil
+        if (event.target.matches('.sidebar .nav-link') || event.target.closest('.sidebar .nav-link')) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const button = event.target.matches('.sidebar .nav-link') ? event.target : event.target.closest('.sidebar .nav-link');
+            const onclick = button.getAttribute('onclick');
+            
+            console.log('Perfil: Click detectado en botón navegación:', onclick);
+            
+            if (onclick && onclick.includes('mostrarSeccion')) {
+                // Extraer el nombre de la sección del onclick
+                const match = onclick.match(/mostrarSeccion\('([^']+)'\)/);
+                if (match) {
+                    const seccion = match[1];
+                    console.log('Perfil: Navegando a sección:', seccion);
+                    mostrarSeccion(seccion);
+                }
+            }
+        }
+    });
+
     // Formulario de perfil
     const formPerfil = document.getElementById('profileForm');
     if (formPerfil) {
@@ -559,9 +677,21 @@ function cambiarImagenPerfil(event) {
  * Cerrar sesión del usuario
  */
 function cerrarSesion() {
+    console.log('Perfil: Cerrando sesión...');
     localStorage.removeItem('sesionActiva');
     localStorage.removeItem('isLoggedIn');
-    window.location.href = '../../index.html';
+    
+    // Calcular ruta correcta desde perfil.html hacia index.html
+    const currentPath = window.location.pathname;
+    let redirectPath = '../../../index.html';
+    
+    // Si estamos en una subcarpeta, ajustar la ruta
+    if (currentPath.includes('/tienda/')) {
+        redirectPath = '../../../index.html';
+    }
+    
+    console.log('Perfil: Redirigiendo a:', redirectPath);
+    window.location.href = redirectPath;
 }
 
 /**
@@ -580,7 +710,7 @@ function eliminarCuenta() {
     
     // Redirigir con mensaje
     alert('Tu cuenta ha sido eliminada exitosamente.');
-    window.location.href = '../../index.html';
+    window.location.href = '../../../index.html';
 }
 
 /**

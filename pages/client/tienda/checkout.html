@@ -21,6 +21,9 @@
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
     
+    <!-- Sistema de gestión de usuarios -->
+    <script src="../../../js/userManager.js"></script>
+    
     <!-- Sistema de autenticación -->
     <script src="../../../js/auth.js"></script>
     
@@ -303,22 +306,35 @@
                 loadCartItems();
                 checkUserStatus();
                 renderOrderSummary();
-            }, 300);
+            }, 100);
         });
 
         function checkUserStatus() {
-            const user = obtenerUsuarioLogueado();
+            // Verificar si las funciones están disponibles
+            if (typeof obtenerUsuarioLogueado !== 'function') {
+                console.warn('Checkout: obtenerUsuarioLogueado no está disponible, usando fallback');
+            }
+            
+            const user = typeof obtenerUsuarioLogueado === 'function' ? obtenerUsuarioLogueado() : null;
+            
+            console.log('Checkout: Estado del usuario:', user);
             
             if (user) {
                 // Usuario logueado
                 document.getElementById('logged-user-option').style.display = 'block';
                 document.getElementById('guest-user-options').style.display = 'none';
-                document.getElementById('user-email').textContent = user.email;
+                document.getElementById('user-email').textContent = user.email || user.usuario || 'Usuario';
                 
-                // Pre-llenar datos del usuario
-                document.getElementById('firstName').value = user.nombre.split(' ')[0] || '';
-                document.getElementById('lastName').value = user.nombre.split(' ').slice(1).join(' ') || '';
+                // Pre-llenar datos del usuario con manejo seguro
+                const nombres = user.nombre ? user.nombre.split(' ') : [];
+                document.getElementById('firstName').value = nombres[0] || '';
+                document.getElementById('lastName').value = nombres.slice(1).join(' ') || user.apellido || '';
                 document.getElementById('email').value = user.email || '';
+                
+                // Si hay teléfono guardado
+                if (user.telefono) {
+                    document.getElementById('phone').value = user.telefono;
+                }
             } else {
                 // Usuario no logueado
                 document.getElementById('logged-user-option').style.display = 'none';
@@ -327,13 +343,26 @@
         }
 
         function loadCartItems() {
-            cartItems = getCartItems();
+            // Usar el CartSystem global o función de fallback
+            if (window.cartSystem) {
+                cartItems = window.cartSystem.cart || [];
+            } else if (typeof getCartItems === 'function') {
+                cartItems = getCartItems();
+            } else {
+                // Fallback: leer directamente del localStorage
+                const user = obtenerUsuarioLogueado ? obtenerUsuarioLogueado() : null;
+                const cartKey = user ? `carrito_${user.email}` : 'carrito_guest';
+                cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
+            }
+            
+            console.log('Checkout: Items cargados del carrito:', cartItems);
+            
             if (cartItems.length === 0) {
-                // Redirigir al catálogo si no hay items
-                console.log('Carrito vacío, redirigiendo al catálogo...');
+                // Redirigir directamente al catálogo sin mostrar mensaje
                 window.location.href = 'catalogo.html';
             }
         }
+
 
         function selectOption(type) {
             checkoutType = type;
@@ -370,40 +399,118 @@
             const summaryContainer = document.getElementById('order-summary');
             const finalTotal = document.getElementById('final-total');
             
-            if (cartItems.length === 0) {
-                summaryContainer.innerHTML = '<p class="text-muted">No hay productos en el carrito</p>';
+            console.log('Checkout: Renderizando resumen con items:', cartItems);
+            
+            if (!cartItems || cartItems.length === 0) {
+                summaryContainer.innerHTML = `
+                    <div class="text-center py-3">
+                        <i class="fas fa-shopping-cart text-muted fs-3"></i>
+                        <p class="text-muted mb-0 mt-2">No hay productos en el carrito</p>
+                    </div>
+                `;
                 finalTotal.textContent = '$0';
                 return;
             }
             
             let total = 0;
             const itemsHTML = cartItems.map(item => {
-                const itemTotal = item.price * item.quantity;
+                // Manejo seguro de propiedades
+                const name = item.name || item.nombre || 'Producto sin nombre';
+                const price = parseFloat(item.price || item.precio || 0);
+                const quantity = parseInt(item.quantity || item.cantidad || 1);
+                const itemTotal = price * quantity;
                 total += itemTotal;
                 
                 return `
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="flex-grow-1">
-                            <h6 class="mb-0 small">${item.name}</h6>
-                            <small class="text-muted">${item.quantity} x $${item.price.toLocaleString()}</small>
+                            <h6 class="mb-0 small">${name}</h6>
+                            <small class="text-muted">${quantity} x ${formatPrice(price)}</small>
                         </div>
                         <div class="text-end">
-                            <strong class="small">$${itemTotal.toLocaleString()}</strong>
+                            <strong class="small">${formatPrice(itemTotal)}</strong>
                         </div>
                     </div>
                 `;
             }).join('');
             
-            summaryContainer.innerHTML = itemsHTML;
-            finalTotal.textContent = `$${total.toLocaleString()}`;
+            // Agregar información de envío
+            const shippingHTML = `
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0 small text-success">
+                            <i class="fas fa-truck me-1"></i>Envío
+                        </h6>
+                        <small class="text-muted">Gratis en pedidos sobre $30.000</small>
+                    </div>
+                    <div class="text-end">
+                        <strong class="small text-success">Gratis</strong>
+                    </div>
+                </div>
+            `;
+            
+            summaryContainer.innerHTML = itemsHTML + shippingHTML;
+            finalTotal.textContent = formatPrice(total);
+            
+            console.log('Checkout: Total calculado:', total);
+        }
+        
+        function formatPrice(price) {
+            return new Intl.NumberFormat('es-CL', {
+                style: 'currency',
+                currency: 'CLP',
+                minimumFractionDigits: 0
+            }).format(price);
         }
 
         function proceedToPayment() {
+            console.log('Checkout: Iniciando proceso de pago');
+            
+            // Validar que hay items en el carrito
+            if (!cartItems || cartItems.length === 0) {
+                window.location.href = 'catalogo.html';
+                return;
+            }
+            
             // Validar formulario
             const form = document.getElementById('checkout-form');
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
+            }
+            
+            // Validaciones adicionales
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            
+            if (!isValidEmail(email)) {
+                document.getElementById('email').setCustomValidity('Por favor ingresa un email válido.');
+                form.reportValidity();
+                return;
+            }
+            
+            if (phone.length < 8) {
+                document.getElementById('phone').setCustomValidity('Por favor ingresa un número de teléfono válido.');
+                form.reportValidity();
+                return;
+            }
+            
+            // Validar contraseñas si se va a crear cuenta
+            if (checkoutType === 'register' && document.getElementById('createAccount').checked) {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    document.getElementById('confirmPassword').setCustomValidity('Las contraseñas no coinciden.');
+                    form.reportValidity();
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    document.getElementById('password').setCustomValidity('La contraseña debe tener al menos 6 caracteres.');
+                    form.reportValidity();
+                    return;
+                }
             }
             
             // Recopilar datos del formulario
@@ -412,8 +519,8 @@
                 contact: {
                     firstName: document.getElementById('firstName').value,
                     lastName: document.getElementById('lastName').value,
-                    email: document.getElementById('email').value,
-                    phone: document.getElementById('phone').value
+                    email: email,
+                    phone: phone
                 },
                 shipping: {
                     address: document.getElementById('address').value,
@@ -423,7 +530,7 @@
                     notes: document.getElementById('notes').value
                 },
                 items: cartItems,
-                total: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+                total: calculateTotal()
             };
             
             // Si quiere crear cuenta
@@ -437,28 +544,85 @@
             // Guardar datos y proceder
             localStorage.setItem('checkoutData', JSON.stringify(orderData));
             
-            // Aquí podrías redirigir a una página de pago o procesar directamente
-            console.log('Datos guardados correctamente, procesando pedido...');
+            console.log('Checkout: Datos validados correctamente, procesando pedido...');
             
-            // Por ahora, simular compra exitosa
+            // Procesar orden
             processOrder(orderData);
+        }
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function calculateTotal() {
+            return cartItems.reduce((sum, item) => {
+                const price = parseFloat(item.price || item.precio || 0);
+                const quantity = parseInt(item.quantity || item.cantidad || 1);
+                return sum + (price * quantity);
+            }, 0);
         }
 
         function processOrder(orderData) {
+            console.log('Checkout: Procesando orden:', orderData);
+            
+            // Mostrar indicador de procesamiento
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando pedido...';
+            btn.disabled = true;
+            
             // Simular procesamiento
             setTimeout(() => {
-                // Limpiar carrito
-                if (window.cartSystem) {
-                    window.cartSystem.cart = [];
-                    window.cartSystem.saveCart();
-                    window.cartSystem.updateCartIcon();
+                try {
+                    // Limpiar carrito usando el sistema correcto
+                    if (window.cartSystem) {
+                        console.log('Checkout: Limpiando carrito con CartSystem');
+                        window.cartSystem.clearCartSilent();
+                    } else {
+                        console.log('Checkout: Limpiando carrito manualmente');
+                        // Fallback: limpiar manualmente
+                        const user = typeof obtenerUsuarioLogueado === 'function' ? obtenerUsuarioLogueado() : null;
+                        const cartKey = user ? `carrito_${user.email}` : 'carrito_guest';
+                        localStorage.removeItem(cartKey);
+                    }
+                    
+                    // Actualizar badge del carrito flotante si existe
+                    if (typeof updateFloatingCartBadge === 'function') {
+                        updateFloatingCartBadge();
+                    }
+                    
+                    // Guardar orden para página de confirmación con timestamp
+                    const orderWithId = {
+                        ...orderData,
+                        id: 'ORD-' + Date.now(),
+                        fecha: new Date().toISOString(),
+                        estado: 'confirmado'
+                    };
+                    
+                    localStorage.setItem('confirmedOrder', JSON.stringify(orderWithId));
+                    
+                    console.log('Checkout: Orden procesada exitosamente');
+                    
+                    // Redirigir a página de éxito
+                    window.location.href = 'compraexitosa.html';
+                    
+                } catch (error) {
+                    console.error('Error procesando orden:', error);
+                    
+                    // Mostrar error en la página sin usar alert
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'alert alert-danger mt-3';
+                    errorDiv.innerHTML = `
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Hubo un error procesando tu pedido. Por favor intenta nuevamente.
+                    `;
+                    btn.parentNode.insertBefore(errorDiv, btn.nextSibling);
+                    
+                    // Restaurar botón
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
                 }
-                
-                // Guardar orden para página de confirmación
-                localStorage.setItem('confirmedOrder', JSON.stringify(orderData));
-                
-                // Redirigir a página de éxito
-                window.location.href = 'compraexitosa.html';
             }, 1500);
         }
 
