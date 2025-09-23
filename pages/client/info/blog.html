@@ -20,6 +20,9 @@
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
 
+    <!-- Sistema de gestión de usuarios -->
+    <script src="../../../js/userManager.js"></script>
+
 </head>
 <body>
     <!-- Contenedor para la navbar (se carga automáticamente) -->
@@ -279,15 +282,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
-            loadFloatingCart();
             
-            // Inicializar sistema de carrito
+            // Inicializar sistema de carrito con delay mínimo
             setTimeout(() => {
                 initializeCartSystem();
                 if (typeof updateFloatingCartBadge === 'function') {
                     updateFloatingCartBadge();
                 }
-            }, 300);
+            }, 100);
         });
     </script>
 

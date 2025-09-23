@@ -378,11 +378,6 @@ function initializeCartSystem() {
     
     console.log('CartSystem inicializado:', window.cartSystem);
 
-    // Inicializar navbar dinámico si existe la función
-    if (typeof inicializarNavbarDinamico === 'function') {
-        inicializarNavbarDinamico();
-    }
-    
     // Verificar que las funciones globales estén disponibles
     console.log('Funciones globales disponibles:', {
         updateCartQuantity: typeof window.updateCartQuantity,
@@ -408,15 +403,6 @@ window.testCartFunctions = function() {
         console.log('Total items:', window.cartSystem.getTotalItems());
     }
 };
-
-// Debugging de inicialización - solo logs en consola
-console.log('=== CARRITO.JS CARGADO ===');
-console.log('Funciones definidas:', {
-    updateCartQuantity: typeof window.updateCartQuantity,
-    removeFromCart: typeof window.removeFromCart,
-    proceedToCheckout: typeof window.proceedToCheckout,
-    testCartFunctions: typeof window.testCartFunctions
-});
 
 function getCartItems() {
     // Usar la misma lógica que CartSystem para obtener los items del carrito
@@ -688,3 +674,14 @@ if (!window.proceedToCheckout) {
         }
     };
 }
+
+// Debugging de inicialización - DESPUÉS de definir todas las funciones
+console.log('=== CARRITO.JS CARGADO ===');
+setTimeout(() => {
+    console.log('Funciones definidas:', {
+        updateCartQuantity: typeof window.updateCartQuantity,
+        removeFromCart: typeof window.removeFromCart,
+        proceedToCheckout: typeof window.proceedToCheckout,
+        testCartFunctions: typeof window.testCartFunctions
+    });
+}, 100);

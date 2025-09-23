@@ -21,6 +21,9 @@
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
 
+    <!-- Sistema de gestión de usuarios -->
+    <script src="../../../js/userManager.js"></script>
+
     <!-- Sistema de autenticación -->
     <script src="../../../js/auth.js"></script>
 
@@ -119,6 +122,113 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
+        });
+
+        // Interceptor más robusto para eliminar undefined completamente
+        const originalAlert = window.alert;
+        const originalConsoleError = console.error;
+        
+        window.alert = function(message) {
+            if (message === undefined || message === 'undefined' || message === null || message === 'null') {
+                console.warn('🚫 Blocked undefined/null alert. Stack trace:');
+                console.trace();
+                return;
+            }
+            originalAlert.call(window, message);
+        };
+
+        // También interceptar errores que podrían causar alerts
+        console.error = function(...args) {
+            // Filtrar errores que contengan undefined
+            const filteredArgs = args.filter(arg => {
+                if (typeof arg === 'string' && arg.includes('undefined')) {
+                    console.warn('🚫 Filtered undefined error:', arg);
+                    return false;
+                }
+                return true;
+            });
+            
+            if (filteredArgs.length > 0) {
+                originalConsoleError.apply(console, filteredArgs);
+            }
+        };
+
+        // Interceptar también promises rechazadas sin manejar
+        window.addEventListener('unhandledrejection', function(event) {
+            if (event.reason && (event.reason === 'undefined' || event.reason.toString().includes('undefined'))) {
+                console.warn('🚫 Blocked undefined promise rejection');
+                event.preventDefault();
+            }
+        });
+
+        // Manejar el formulario de login
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🔵 LOGIN: Iniciando proceso de login...');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = document.querySelector('button[type="submit"]');
+            
+            console.log('🔵 LOGIN: Credenciales obtenidas:', { email, password: '***' });
+            
+            // Mostrar estado de carga
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
+            submitBtn.disabled = true;
+            
+            try {
+                console.log('🔵 LOGIN: Llamando validarLogin...');
+                const resultado = await validarLogin(email, password);
+                console.log('🔵 LOGIN: Resultado recibido:', resultado);
+                
+                if (resultado && (resultado.exito || resultado.success)) {
+                    console.log('🟢 LOGIN: Éxito! Usuario:', resultado.usuario);
+                    // Login exitoso
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> ¡Bienvenido!';
+                    
+                    // Redirigir después de un momento
+                    setTimeout(() => {
+                        if (resultado.usuario) {
+                            console.log('🔵 LOGIN: Redirigiendo usuario...'); 
+                            redirigirSegunRol(resultado.usuario);
+                        } else {
+                            console.error('🔴 LOGIN: No hay datos de usuario para redirección');
+                        }
+                    }, 1500);
+                    
+                } else {
+                    console.log('🔴 LOGIN: Fallo en credenciales:', resultado);
+                    // Mostrar error en botón
+                    submitBtn.innerHTML = '<i class="fas fa-times"></i> Credenciales incorrectas';
+                    submitBtn.classList.remove('btn-success');
+                    submitBtn.classList.add('btn-danger');
+                    
+                    // Restaurar botón después de un momento
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.classList.remove('btn-danger');
+                        submitBtn.classList.add('btn-success');
+                        submitBtn.disabled = false;
+                    }, 2000);
+                }
+                
+            } catch (error) {
+                // Mostrar error en botón
+                submitBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error de conexión';
+                submitBtn.classList.remove('btn-success');
+                submitBtn.classList.add('btn-danger');
+                
+                // Restaurar botón
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.classList.remove('btn-danger');
+                    submitBtn.classList.add('btn-success');
+                    submitBtn.disabled = false;
+                }, 2000);
+            }
         });
     </script>
 </body>

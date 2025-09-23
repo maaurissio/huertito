@@ -783,3 +783,169 @@ function forceShowProducts() {
         console.error('❌ No se encontró productsSection');
     }
 }
+
+// ============================================================================
+// GESTIÓN DE USUARIOS - Integración con UserManager
+// ============================================================================
+
+/**
+ * Mostrar modal para agregar usuario
+ */
+function showAddUserModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+    
+    // Limpiar formulario
+    document.getElementById('addUserForm').reset();
+    document.getElementById('addUserMessage').innerHTML = '';
+    
+    modal.show();
+}
+
+/**
+ * Cargar tabla de usuarios desde userManager
+ */
+async function loadUsersTable() {
+    try {
+        const usuarios = await userManager.listarUsuarios();
+        const tableBody = document.getElementById('usersTableBody');
+        
+        if (!tableBody) {
+            console.error('No se encontró usersTableBody');
+            return;
+        }
+        
+        tableBody.innerHTML = '';
+        
+        usuarios.forEach(usuario => {
+            const row = `
+                <tr>
+                    <td>${usuario.id}</td>
+                    <td>${usuario.nombre} ${usuario.apellido || ''}</td>
+                    <td>${usuario.email}</td>
+                    <td>${usuario.usuario}</td>
+                    <td>${usuario.fechaRegistro}</td>
+                    <td>
+                        <span class="badge ${usuario.estado === 'activo' ? 'bg-success' : 'bg-danger'}">
+                            ${usuario.estado}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(${usuario.id})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" onclick="viewUser(${usuario.id})" title="Ver">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${usuario.id})" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+        
+        console.log(`✅ Tabla de usuarios cargada: ${usuarios.length} usuarios`);
+        
+    } catch (error) {
+        console.error('Error cargando usuarios:', error);
+        showUserMessage('Error cargando usuarios', 'danger');
+    }
+}
+
+/**
+ * Manejar envío del formulario de nuevo usuario
+ */
+async function handleAddUserForm(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('addUserBtn');
+    const originalText = submitBtn.innerHTML;
+    
+    // Mostrar loading
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creando...';
+    submitBtn.disabled = true;
+    
+    try {
+        // Recopilar datos del formulario
+        const datosUsuario = {
+            nombre: document.getElementById('userNombre').value.trim(),
+            apellido: document.getElementById('userApellido').value.trim(),
+            email: document.getElementById('userEmail').value.trim(),
+            usuario: document.getElementById('userUsuario').value.trim(),
+            password: document.getElementById('userPassword').value,
+            rol: document.getElementById('userRol').value
+        };
+        
+        // Validar datos
+        const validacion = userManager.validarDatosUsuario(datosUsuario);
+        if (!validacion.valido) {
+            showUserMessage(validacion.errores.join('<br>'), 'danger');
+            return;
+        }
+        
+        // Crear usuario
+        const resultado = await userManager.agregarUsuario(datosUsuario);
+        
+        if (resultado.success) {
+            showUserMessage(resultado.mensaje, 'success');
+            
+            // Cerrar modal después de un delay
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+                loadUsersTable(); // Recargar tabla
+            }, 1500);
+            
+        } else {
+            showUserMessage(resultado.mensaje, 'danger');
+        }
+        
+    } catch (error) {
+        console.error('Error creando usuario:', error);
+        showUserMessage('Error interno al crear usuario', 'danger');
+    } finally {
+        // Restaurar botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+/**
+ * Mostrar mensaje en el modal de usuario
+ */
+function showUserMessage(mensaje, tipo) {
+    const messageDiv = document.getElementById('addUserMessage');
+    messageDiv.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show">
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+}
+
+/**
+ * Funciones placeholder para acciones de usuario
+ */
+function editUser(id) {
+    alert(`Editar usuario ID: ${id} (Función por implementar)`);
+}
+
+function viewUser(id) {
+    alert(`Ver detalles usuario ID: ${id} (Función por implementar)`);
+}
+
+function deleteUser(id) {
+    if (confirm('¿Estás seguro de eliminar este usuario?')) {
+        alert(`Eliminar usuario ID: ${id} (Función por implementar)`);
+    }
+}
+
+// Agregar event listener para el formulario cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    const addUserForm = document.getElementById('addUserForm');
+    if (addUserForm) {
+        addUserForm.addEventListener('submit', handleAddUserForm);
+    }
+});

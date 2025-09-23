@@ -1,11 +1,3 @@
-/**
- * Sistema de Autenticación - HuertoHogar
- * Maneja login, validación de usuarios y redirecciones por rol
- */
-
-/**
- * Sistema de Notificaciones Toast
- */
 function mostrarNotificacion(mensaje, tipo = 'success', duracion = 4000) {
     // Crear contenedor si no existe
     let toastContainer = document.querySelector('.toast-container');
@@ -67,95 +59,92 @@ function cerrarToast(toastElement) {
     }, 400);
 }
 
-// Base de datos simulada de usuarios
-const usuarios = {
-    // Superusuarios (admin)
-    'admin@huerthogar.com': {
-        password: 'admin123',
-        rol: 'superusuario',
-        nombre: 'Administrador'
-    },
-    'mauricio@huerthogar.com': {
-        password: 'mauricio123',
-        rol: 'superusuario', 
-        nombre: 'Mauricio'
-    },
-    // Usuarios normales
-    'juan@correo.com': {
-        password: 'juan123',
-        rol: 'usuario',
-        nombre: 'Juan Pérez'
-    },
-    'maria@correo.com': {
-        password: 'maria123',
-        rol: 'usuario',
-        nombre: 'María González'
-    },
-    'cliente@test.com': {
-        password: 'test123',
-        rol: 'usuario',
-        nombre: 'Cliente Test'
-    }
-};
+// Base de datos de usuarios ahora manejada por userManager.js
+// Este archivo se enfoca solo en la UI y validaciones
 
 /**
- * Valida las credenciales de login
- * @param {string} email - Email del usuario
- * @param {string} password - Contraseña del usuario
- * @returns {Object} Resultado de la validación
+ * Valida las credenciales del usuario
+ * @param {string} usuario - Nombre de usuario o email
+ * @param {string} password - Contraseña
+ * @returns {Promise<Object>} Resultado de la validación
  */
-function validarLogin(email, password) {
-    const usuario = usuarios[email.toLowerCase()];
-    
-    if (!usuario) {
-        return { valido: false, mensaje: '❌ Usuario no encontrado. Verifica tu email.' };
+async function validarLogin(usuario, password) {
+    console.log('🔵 AUTH: validarLogin iniciado con:', { usuario, password: '***' });
+    try {
+        console.log('🔵 AUTH: Llamando userManager.validarLogin...');
+        const resultado = await userManager.validarLogin(usuario, password);
+        console.log('🔵 AUTH: Resultado de userManager:', resultado);
+        return resultado;
+    } catch (error) {
+        console.error('🔴 AUTH: Error en validación:', error);
+        const errorResult = { 
+            success: false, 
+            exito: false,
+            mensaje: 'Error de conexión. Intente nuevamente.' 
+        };
+        console.log('🔴 AUTH: Retornando error result:', errorResult);
+        return errorResult;
     }
-    
-    if (usuario.password !== password) {
-        return { valido: false, mensaje: '🔐 Contraseña incorrecta. Intenta de nuevo.' };
-    }
-    
-    return { 
-        valido: true, 
-        usuario: {
-            email: email,
-            nombre: usuario.nombre,
-            rol: usuario.rol
-        }
-    };
 }
 
 /**
- * Redirige al usuario según su rol y página de origen
- * @param {Object} usuario - Datos del usuario autenticado
+ * Redirige al usuario según su rol después del login
+ * @param {Object} usuario - Datos del usuario logueado
  */
+
 function redirigirSegunRol(usuario) {
-    // Guardar información del usuario en localStorage
-    localStorage.setItem('usuarioLogueado', JSON.stringify(usuario));
+    console.log('🔵 AUTH: Redirigiendo usuario:', usuario);
     
-    // Obtener la página de origen desde localStorage
-    const paginaOrigen = localStorage.getItem('paginaOrigen');
+    if (!usuario) {
+        console.error('🔴 AUTH: Usuario es undefined/null en redirigirSegunRol');
+        return;
+    }
     
-    if (usuario.rol === 'superusuario') {
-        // Los superusuarios siempre van al dashboard, a menos que especifiquen otra cosa
-        if (paginaOrigen && paginaOrigen !== 'login' && paginaOrigen !== 'registro') {
-            // Si venían de una página específica, redirigir ahí
-            localStorage.removeItem('paginaOrigen');
-            window.location.href = paginaOrigen;
+    console.log('🔵 AUTH: Rol del usuario:', usuario.rol);
+    
+    // La sesión ya está guardada por userManager
+    // Limpiar página de origen
+    localStorage.removeItem('paginaOrigen');
+    
+    // Determinar la ruta según la ubicación actual
+    const currentPath = window.location.pathname;
+    console.log('🔵 AUTH: Current path:', currentPath);
+    
+    if (usuario.rol === 'administrador' || usuario.rol === 'admin') {
+        // Solo administradores van al dashboard
+        let dashboardPath;
+        
+        if (currentPath.includes('/pages/client/auth/')) {
+            // Estamos en las páginas de auth
+            dashboardPath = '../../admin/dashboard.html';
+        } else if (currentPath.includes('/pages/')) {
+            // Estamos en alguna página dentro de pages
+            dashboardPath = '../admin/dashboard.html';
         } else {
-            // Ir al dashboard por defecto
-            window.location.href = '../../admin/dashboard.html';
+            // Estamos en la raíz
+            dashboardPath = 'pages/admin/dashboard.html';
         }
+        
+        console.log('Usuario es administrador, redirigiendo al dashboard:', dashboardPath);
+        window.location.href = dashboardPath;
+        
     } else {
-        // Usuarios normales
-        if (paginaOrigen && paginaOrigen !== 'login' && paginaOrigen !== 'registro') {
-            // Regresar a la página de origen
-            localStorage.removeItem('paginaOrigen');
-            window.location.href = paginaOrigen;
+        // Usuarios normales van al index
+        let indexPath;
+        
+        if (currentPath.includes('/pages/client/auth/')) {
+            // Estamos en las páginas de auth
+            indexPath = '../../../index.html';
+        } else if (currentPath.includes('/pages/')) {
+            // Estamos en alguna página dentro de pages
+            indexPath = '../../index.html';
         } else {
-            // Ir al catálogo por defecto
-            window.location.href = '../tienda/catalogo.html';
+            // Estamos en la raíz
+            indexPath = 'index.html';
         }
+        
+        console.log('Usuario es cliente, redirigiendo al index:', indexPath);
+        window.location.href = indexPath;
     }
 }
 
@@ -163,87 +152,21 @@ function redirigirSegunRol(usuario) {
  * Muestra un mensaje de error en el formulario
  * @param {string} mensaje - Mensaje de error a mostrar
  */
-function mostrarError(mensaje) {
-    // Buscar si ya existe un mensaje de error
-    let errorDiv = document.querySelector('.error-message');
-    
-    if (errorDiv) {
-        errorDiv.remove();
-    }
-    
-    // Crear nuevo mensaje de error
-    errorDiv = document.createElement('div');
-    errorDiv.className = 'alert alert-danger error-message mt-3';
-    errorDiv.style.cssText = `
-        border-left: 4px solid #dc3545 !important;
-        border-radius: 8px !important;
-        background-color: #f8d7da !important;
-        color: #721c24 !important;
-        padding: 15px !important;
-        margin: 15px 0 !important;
-        display: block !important;
-        animation: shake 0.5s ease-in-out;
-    `;
-    errorDiv.innerHTML = `
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <strong>${mensaje}</strong>
-    `;
-    
-    // Buscar el formulario y agregar el error ahí
-    const loginForm = document.getElementById('loginForm');
-    const submitBtn = document.querySelector('button[type="submit"]');
-    
-    if (submitBtn && submitBtn.parentNode) {
-        submitBtn.parentNode.insertBefore(errorDiv, submitBtn);
-    } else if (loginForm) {
-        loginForm.appendChild(errorDiv);
-    } else {
-        // Último recurso: agregar al body
-        document.body.appendChild(errorDiv);
-    }
-    
-    // Añadir animación de shake si no existe
-    if (!document.querySelector('#shake-keyframes')) {
-        const style = document.createElement('style');
-        style.id = 'shake-keyframes';
-        style.textContent = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-5px); }
-                75% { transform: translateX(5px); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    // Auto-remover después de 6 segundos
-    setTimeout(() => {
-        if (errorDiv && errorDiv.parentNode) {
-            errorDiv.style.opacity = '0';
-            errorDiv.style.transition = 'opacity 0.3s ease';
-            setTimeout(() => {
-                if (errorDiv && errorDiv.parentNode) {
-                    errorDiv.remove();
-                }
-            }, 300);
-        }
-    }, 6000);
-}
+
 
 /**
  * Obtiene el usuario actualmente logueado
  * @returns {Object|null} Datos del usuario o null si no está logueado
  */
 function obtenerUsuarioLogueado() {
-    const usuarioData = localStorage.getItem('usuarioLogueado');
-    return usuarioData ? JSON.parse(usuarioData) : null;
+    return userManager.getSesionActiva();
 }
 
 /**
  * Cierra la sesión del usuario actual
  */
 function cerrarSesion() {
-    localStorage.removeItem('usuarioLogueado');
+    userManager.cerrarSesion();
     actualizarNavbar(); // Actualizar navbar inmediatamente
     
     // Actualizar botones CTA si existen en la página
@@ -254,8 +177,26 @@ function cerrarSesion() {
     // Mostrar notificación elegante
     mostrarNotificacion('Sesión cerrada exitosamente', 'success', 3000);
     
-    // No redirigir - mantenerse en la página actual
-    // La navbar ya se habrá actualizado para mostrar los botones de login/registro
+    // Redirigir al index después de un pequeño delay para mostrar la notificación
+    setTimeout(() => {
+        // Determinar la ruta correcta al index según la ubicación actual
+        const currentPath = window.location.pathname;
+        let indexPath;
+        
+        if (currentPath.includes('/tienda/')) {
+            indexPath = '../../../index.html';
+        } else if (currentPath.includes('/auth/')) {
+            indexPath = '../../../index.html';
+        } else if (currentPath.includes('/info/')) {
+            indexPath = '../../../index.html';
+        } else if (currentPath.includes('/admin/')) {
+            indexPath = '../../../index.html';
+        } else {
+            indexPath = 'index.html';
+        }
+        
+        window.location.href = indexPath;
+    }, 1000);
 }
 
 /**
@@ -292,32 +233,64 @@ function protegerPagina(rolRequerido = 'usuario') {
  * Actualiza la navbar según el estado de sesión del usuario
  */
 function actualizarNavbar() {
-    const usuario = obtenerUsuarioLogueado();
+    console.log('Auth: Iniciando actualización de navbar');
     
-    // Esperar a que la navbar se cargue
-    setTimeout(() => {
-        // Buscar el menú en diferentes posibles contenedores
-        let navbarMenu = document.querySelector('#menu .navbar-nav');
+    // Verificar que userManager esté disponible con límite de reintentos
+    if (typeof userManager === 'undefined') {
+        // Contar reintentos para evitar bucle infinito
+        if (!window.navbarRetryCount) window.navbarRetryCount = 0;
         
-        // Si no se encuentra, intentar con el container del index
-        if (!navbarMenu) {
-            navbarMenu = document.querySelector('#navbar-container #menu .navbar-nav');
-        }
-        
-        if (!navbarMenu) {
-            console.warn('Navbar no encontrada, reintentando...');
-            setTimeout(actualizarNavbar, 500);
+        if (window.navbarRetryCount < 10) { // Máximo 10 reintentos
+            window.navbarRetryCount++;
+            console.warn(`Auth: UserManager no está disponible, reintento ${window.navbarRetryCount}/10 en 50ms...`);
+            setTimeout(actualizarNavbar, 50);
+            return;
+        } else {
+            console.error('Auth: UserManager no disponible después de 10 reintentos, usando modo sin autenticación');
+            // Mostrar botones de invitado sin verificar estado
+            setTimeout(() => {
+                const navbarMenu = document.querySelector('#menu .navbar-nav') || 
+                                 document.querySelector('#navbar-container #menu .navbar-nav');
+                if (navbarMenu) {
+                    mostrarMenuInvitado(navbarMenu);
+                }
+            }, 10);
             return;
         }
+    }
+    
+    // Reset counter si userManager está disponible
+    window.navbarRetryCount = 0;
+    
+    console.log('Auth: UserManager disponible, obteniendo usuario');
+    const usuario = obtenerUsuarioLogueado();
+    console.log('Auth: Usuario obtenido:', usuario);
+    
+    // Buscar el menú inmediatamente
+    // Buscar el menú en diferentes posibles contenedores
+    let navbarMenu = document.querySelector('#menu .navbar-nav');
         
-        if (usuario) {
-            // Usuario logueado - mostrar menú de usuario
-            mostrarMenuUsuario(navbarMenu, usuario);
-        } else {
-            // Usuario no logueado - mostrar botones de login/registro
-            mostrarMenuInvitado(navbarMenu);
-        }
-    }, 100);
+    // Si no se encuentra, intentar con el container del index
+    if (!navbarMenu) {
+        navbarMenu = document.querySelector('#navbar-container #menu .navbar-nav');
+    }
+    
+    if (!navbarMenu) {
+        console.warn('Auth: Navbar no encontrada');
+        return;
+    }
+    
+    console.log('Auth: Navbar encontrada, actualizando menú');
+    
+    if (usuario) {
+        console.log('Auth: Mostrando menú de usuario para:', usuario.nombre);
+        // Usuario logueado - mostrar menú de usuario
+        mostrarMenuUsuario(navbarMenu, usuario);
+    } else {
+        console.log('Auth: Mostrando menú de invitado');
+        // Usuario no logueado - mostrar botones de login/registro
+        mostrarMenuInvitado(navbarMenu);
+    }
 }
 
 /**
@@ -384,9 +357,9 @@ function mostrarMenuUsuario(navbarMenu, usuario) {
             <li><a class="dropdown-item" href="${perfilPath}?section=pedidos"><i class="fas fa-shopping-bag me-2"></i>Mis Pedidos</a></li>
             <li><a class="dropdown-item" href="${perfilPath}?section=favoritos"><i class="fas fa-heart me-2"></i>Favoritos</a></li>
             <li><a class="dropdown-item" href="${perfilPath}?section=configuracion"><i class="fas fa-cog me-2"></i>Configuración</a></li>
-            ${usuario.rol === 'superusuario' ? `<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-primary" href="${dashboardPath}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</a></li>` : ''}
+            ${usuario.rol === 'administrador' || usuario.rol === 'admin' ? `<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-primary" href="${dashboardPath}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</a></li>` : ''}
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+            <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
         </ul>
     `;
     
@@ -399,14 +372,18 @@ function mostrarMenuUsuario(navbarMenu, usuario) {
  * @param {Element} navbarMenu - Elemento del menú de la navbar
  */
 function mostrarMenuInvitado(navbarMenu) {
+    console.log('Auth: mostrarMenuInvitado ejecutándose');
+    
     // Verificar si ya existen los botones
     if (navbarMenu.querySelector('a[href*="login.html"]')) {
+        console.log('Auth: Botones de login ya existen, saliendo');
         return; // Ya existen, no duplicar
     }
     
     // Eliminar dropdown de usuario si existe
     const userDropdown = navbarMenu.querySelector('.user-dropdown');
     if (userDropdown) {
+        console.log('Auth: Eliminando dropdown de usuario existente');
         userDropdown.remove();
     }
     
@@ -414,6 +391,8 @@ function mostrarMenuInvitado(navbarMenu) {
     let loginPath, registroPath;
     const currentPath = window.location.pathname;
     const currentFile = window.location.pathname.split('/').pop();
+    
+    console.log('Auth: Determinando rutas para', { currentPath, currentFile });
     
     if (currentFile === 'index.html' || currentPath.endsWith('/huertito/') || currentPath.endsWith('/huertito')) {
         // Estamos en la página principal (index.html)
@@ -425,6 +404,8 @@ function mostrarMenuInvitado(navbarMenu) {
         registroPath = '../auth/registro.html';
     }
     
+    console.log('Auth: Rutas calculadas', { loginPath, registroPath });
+    
     // Crear botones de login y registro
     const loginItem = document.createElement('li');
     loginItem.className = 'nav-item';
@@ -434,9 +415,12 @@ function mostrarMenuInvitado(navbarMenu) {
     registroItem.className = 'nav-item';
     registroItem.innerHTML = `<a href="${registroPath}" class="btn btn-success text-white ms-2" onclick="guardarPaginaOrigen()">Registrarse</a>`;
     
+    console.log('Auth: Agregando botones al navbar');
     // Agregar al menú
     navbarMenu.appendChild(loginItem);
     navbarMenu.appendChild(registroItem);
+    
+    console.log('Auth: Botones agregados exitosamente');
 }
 
 /**
@@ -473,12 +457,25 @@ function guardarPaginaOrigen() {
  * Inicializa el sistema de navbar dinámico
  */
 function inicializarNavbarDinamico() {
+    // Evitar inicialización múltiple
+    if (window.navbarInicializado) {
+        console.log('Auth: inicializarNavbarDinamico ya fue ejecutado, evitando duplicación');
+        return;
+    }
+    
+    window.navbarInicializado = true;
+    console.log('Auth: inicializarNavbarDinamico ejecutándose');
+    
     // Actualizar navbar al cargar la página
-    actualizarNavbar();
+    setTimeout(() => {
+        console.log('Auth: Llamando actualizarNavbar desde inicializarNavbarDinamico');
+        actualizarNavbar();
+    }, 100);
     
     // Escuchar cambios en el localStorage para actualizar en tiempo real
     window.addEventListener('storage', function(e) {
-        if (e.key === 'usuarioLogueado') {
+        if (e.key === 'sesionActiva') {
+            console.log('Auth: Cambio detectado en sesionActiva, actualizando navbar');
             actualizarNavbar();
         }
     });
@@ -501,74 +498,14 @@ function limpiarPaginaOrigenSiEsNecesario() {
 }
 
 /**
- * Inicializa el sistema de login cuando se carga la página
+ * Limpiar página de origen en casos específicos
  */
-function inicializarLogin() {
-    const loginForm = document.getElementById('loginForm');
+function limpiarPaginaOrigenSiEsNecesario() {
+    const currentPath = window.location.pathname;
+    const currentFile = window.location.pathname.split('/').pop();
     
-    if (!loginForm) {
-        return;
+    // Si estamos en login o registro pero no venimos de otra página, limpiar
+    if ((currentFile === 'login.html' || currentFile === 'registro.html') && !document.referrer.includes(window.location.hostname)) {
+        localStorage.removeItem('paginaOrigen');
     }
-    
-    // Manejar el envío del formulario
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        
-        // Validaciones básicas
-        if (!email || !password) {
-            mostrarError('Por favor completa todos los campos');
-            return;
-        }
-        
-        // Validar credenciales
-        const resultado = validarLogin(email, password);
-        
-        if (resultado.valido) {
-            // Login exitoso - mostrar loading
-            const submitBtn = document.querySelector('button[type="submit"]');
-            const textOriginal = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Iniciando sesión...';
-            submitBtn.disabled = true;
-            
-            // Simular delay de servidor
-            setTimeout(() => {
-                redirigirSegunRol(resultado.usuario);
-            }, 1500);
-            
-        } else {
-            // Mostrar error
-            mostrarError(resultado.mensaje);
-        }
-    });
 }
-
-/**
- * Función para mostrar credenciales de prueba (solo para desarrollo)
- */
-function mostrarCredencialesPrueba() {
-    console.log('=== CREDENCIALES DE PRUEBA - HUERTO HOGAR ===');
-    console.log('');
-    console.log('🔑 SUPERUSUARIOS (Dashboard Admin):');
-    console.log('   admin@huerthogar.com / admin123');
-    console.log('   mauricio@huerthogar.com / mauricio123');
-    console.log('');
-    console.log('👤 USUARIOS NORMALES (Tienda):');
-    console.log('   juan@correo.com / juan123');
-    console.log('   maria@correo.com / maria123'); 
-    console.log('   cliente@test.com / test123');
-    console.log('');
-    console.log('💡 Tip: Copia y pega cualquiera de estas credenciales para probar');
-}
-
-// Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    inicializarLogin();
-    
-    // Mostrar credenciales en consola para testing (solo en desarrollo)
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        mostrarCredencialesPrueba();
-    }
-});

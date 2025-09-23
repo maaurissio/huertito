@@ -21,6 +21,9 @@
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
     
+    <!-- Sistema de gestión de usuarios -->
+    <script src="../../../js/userManager.js"></script>
+    
     <!-- Sistema de carrito -->
     <script src="../../../js/carrito.js"></script>
 
@@ -475,16 +478,13 @@
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
             
-            // Cargar carrito flotante
-            loadFloatingCart();
-            
-            // Inicializar sistema de carrito
+            // Inicializar sistema de carrito con delay mínimo
             setTimeout(() => {
                 initializeCartSystem();
                 if (typeof updateFloatingCartBadge === 'function') {
                     updateFloatingCartBadge();
                 }
-            }, 300);
+            }, 100);
             
             // Actualizar botones según estado de autenticación
             updateCTAButtons();

@@ -15,20 +15,38 @@ async function loadComponent(elementId, filePath) {
         }
         
         // Si es el carrito flotante, ajustar las rutas de los iconos
-        if (elementId === 'floating-cart' || filePath.includes('carrito-flotante')) {
+        if (elementId === 'floating-cart-container' || filePath.includes('carrito-flotante')) {
             html = adjustFloatingCartPaths(html);
         }
         
         document.getElementById(elementId).innerHTML = html;
         
         // Si se cargó la navbar, inicializar el sistema dinámico
-        if ((elementId === 'navbar' || elementId === 'navbar-container') && typeof inicializarNavbarDinamico === 'function') {
-            inicializarNavbarDinamico();
+        if ((elementId === 'navbar' || elementId === 'navbar-container')) {
+            console.log('Components: Navbar detectada, verificando inicializarNavbarDinamico...');
+            
+            if (typeof inicializarNavbarDinamico === 'function') {
+                console.log('Components: inicializarNavbarDinamico encontrada, ejecutando inmediatamente...');
+                inicializarNavbarDinamico();
+            } else {
+                console.error('Components: inicializarNavbarDinamico NO está disponible');
+                // Llamar directamente a actualizarNavbar como fallback con mínimo delay
+                setTimeout(() => {
+                    if (typeof actualizarNavbar === 'function') {
+                        console.log('Components: Fallback - llamando actualizarNavbar directamente');
+                        actualizarNavbar();
+                    } else {
+                        console.error('Components: Ni inicializarNavbarDinamico ni actualizarNavbar están disponibles');
+                    }
+                }, 10);
+            }
         }
         
         // Si se cargó el carrito flotante, inicializarlo
-        if ((elementId === 'floating-cart' || filePath.includes('carrito-flotante')) && typeof initializeFloatingCart === 'function') {
-            initializeFloatingCart();
+        if ((elementId === 'floating-cart-container' || filePath.includes('carrito-flotante')) && typeof initializeFloatingCart === 'function') {
+            setTimeout(() => {
+                initializeFloatingCart();
+            }, 50);
         }
     } catch (error) {
         console.error(`Error al cargar ${filePath}:`, error);
@@ -90,9 +108,9 @@ function adjustFloatingCartPaths(html) {
  */
 function loadFloatingCart() {
     // Crear el contenedor del carrito flotante si no existe
-    if (!document.getElementById('floating-cart')) {
+    if (!document.getElementById('floating-cart-container')) {
         const cartContainer = document.createElement('div');
-        cartContainer.id = 'floating-cart';
+        cartContainer.id = 'floating-cart-container';
         document.body.appendChild(cartContainer);
     }
     
@@ -103,5 +121,15 @@ function loadFloatingCart() {
     
     const cartPath = isIndex ? 'pages/client/shared/carrito-flotante.html' : '../shared/carrito-flotante.html';
     
-    loadComponent('floating-cart', cartPath);
+    loadComponent('floating-cart-container', cartPath);
 }
+
+// Inicialización automática cuando se carga el DOM
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Components: DOM cargado, inicializando componentes...');
+    
+    // Cargar carrito flotante automáticamente
+    loadFloatingCart();
+    
+    console.log('Components: Carrito flotante iniciado');
+});

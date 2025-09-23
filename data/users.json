@@ -1,0 +1,45 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "email": "admin@huertohogar.com",
+      "usuario": "admin",
+      "password": "admin123",
+      "nombre": "Administrador",
+      "apellido": "Sistema",
+      "rol": "administrador",
+      "fechaRegistro": "2024-01-01",
+      "estado": "activo",
+      "ultimoAcceso": null
+    },
+    {
+      "id": 2,
+      "email": "mauricio@huertohogar.com",
+      "usuario": "mauricio",
+      "password": "mauri123",
+      "nombre": "Mauricio",
+      "apellido": "González",
+      "rol": "usuario",
+      "fechaRegistro": "2024-01-15",
+      "estado": "activo",
+      "ultimoAcceso": null
+    },
+    {
+      "id": 3,
+      "email": "cliente@huertohogar.com",
+      "usuario": "cliente",
+      "password": "cliente123",
+      "nombre": "María",
+      "apellido": "Cliente",
+      "rol": "usuario",
+      "fechaRegistro": "2024-02-01",
+      "estado": "activo",
+      "ultimoAcceso": null
+    }
+  ],
+  "configuracion": {
+    "proximoId": 4,
+    "version": "1.0",
+    "ultimaActualizacion": "2024-01-01T00:00:00Z"
+  }
+}

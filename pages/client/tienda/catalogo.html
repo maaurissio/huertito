@@ -24,6 +24,9 @@
     <!-- JavaScript para componentes compartidos -->
     <script src="../shared/components.js"></script>
 
+    <!-- Sistema de gestión de usuarios -->
+    <script src="../../../js/userManager.js"></script>
+
     <style>
         /* Estilo pequeño para el botón activo de categoría */
         .category-btn.active {
@@ -354,18 +357,14 @@
             // Cargar navbar y footer
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
-            
-            // Cargar carrito flotante
-            loadFloatingCart();
-
-            // Inicializar sistemas después de un delay para asegurar que todo esté cargado
+            // Inicializar sistemas después de un delay mínimo para asegurar que todo esté cargado
             setTimeout(() => {
                 initializeCartSystem();
                 // Forzar actualización del badge del carrito
                 if (typeof updateFloatingCartBadge === 'function') {
                     updateFloatingCartBadge();
                 }
-            }, 300);
+            }, 100);
 
             // --- FILTRO (búsqueda + categorías) ---
             const searchInput = document.getElementById("searchInput");

@@ -352,17 +352,30 @@
     <!-- CSS Personalizado del Perfil -->
     <link href="../../../css/perfil.css" rel="stylesheet">
 
-    <!-- JavaScript para preload y cacheo -->
-    <script src="../../../js/preload.js"></script>
-    
-    <!-- JavaScript para funcionalidad del perfil -->
+    <!-- Scripts principales en orden correcto -->
+    <script src="../../../js/bootstrap.bundle.min.js"></script>
+    <script src="../../../js/userManager.js"></script>
     <script src="../../../js/auth.js"></script>
+    <script src="../shared/components.js"></script>
     <script src="../../../js/carrito.js"></script>
     <script src="../../../js/perfil.js"></script>
     
-    <!-- Cargar carrito flotante -->
+    <!-- Inicialización -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Cargar componentes con mejor timing
+            loadComponent('navbar-container', '../shared/navbar.html')
+                .then(() => {
+                    // Después de cargar navbar, asegurar autenticación
+                    setTimeout(() => {
+                        if (typeof inicializarNavbarDinamico === 'function') {
+                            inicializarNavbarDinamico();
+                        } else if (typeof actualizarNavbar === 'function') {
+                            actualizarNavbar();
+                        }
+                    }, 200);
+                });
+            
             // Cargar carrito flotante
             if (typeof loadFloatingCart === 'function') {
                 loadFloatingCart();

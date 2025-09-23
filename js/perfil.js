@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
  * Verificar si el usuario está autenticado
  */
 function verificarAutenticacion() {
-    const usuario = localStorage.getItem('usuarioLogueado');
+    const usuario = localStorage.getItem('sesionActiva');
     if (!usuario) {
         return false;
     }
@@ -52,7 +52,7 @@ function verificarAutenticacion() {
         return true;
     } catch (error) {
         console.error('Error al parsear datos del usuario:', error);
-        localStorage.removeItem('usuarioLogueado');
+        localStorage.removeItem('sesionActiva');
         return false;
     }
 }
@@ -63,10 +63,11 @@ function verificarAutenticacion() {
 function cargarInformacionUsuario() {
     if (!currentUser) return;
 
-    // Actualizar nombre de usuario
+    // Actualizar nombre de usuario (nombre completo)
     const userNameElemento = document.getElementById('userName');
     if (userNameElemento) {
-        userNameElemento.textContent = currentUser.nombre || 'Usuario';
+        const nombreCompleto = `${currentUser.nombre || ''} ${currentUser.apellido || ''}`.trim();
+        userNameElemento.textContent = nombreCompleto || 'Usuario';
     }
 
     // Actualizar email
@@ -98,10 +99,10 @@ function cargarInformacionUsuario() {
         nombreElemento.value = currentUser.nombre || '';
     }
 
-    // Actualizar apellidos en formulario
+    // Actualizar apellidos en formulario (usando apellido desde JSON)
     const apellidosElemento = document.getElementById('profileLastName');
     if (apellidosElemento) {
-        apellidosElemento.value = currentUser.apellidos || '';
+        apellidosElemento.value = currentUser.apellido || '';
     }
 
     // Actualizar fecha de nacimiento
@@ -110,10 +111,17 @@ function cargarInformacionUsuario() {
         fechaNacElemento.value = currentUser.fechaNacimiento || '';
     }
 
+    // Actualizar fecha de registro
+    const joinDateElemento = document.getElementById('joinDate');
+    if (joinDateElemento && currentUser.fechaRegistro) {
+        const fecha = new Date(currentUser.fechaRegistro);
+        joinDateElemento.textContent = fecha.getFullYear();
+    }
+
     // Actualizar avatar
     const avatarElemento = document.getElementById('profileImage');
     if (avatarElemento) {
-        avatarElemento.src = currentUser.avatar || '../../img/default-avatar.png';
+        avatarElemento.src = currentUser.avatar || '../../../img/usuario-avatar.webp';
     }
 }
 
@@ -365,35 +373,79 @@ function configurarEventListeners() {
 /**
  * Guardar cambios del perfil
  */
-function guardarPerfil(event) {
+async function guardarPerfil(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
+    
+    // Preparar datos actualizados - usar 'apellido' (singular) para coincidir con JSON
     const datosActualizados = {
-        ...currentUser,
         nombre: formData.get('nombre'),
-        apellidos: formData.get('apellidos'), 
+        apellido: formData.get('apellidos'), // Nota: del formulario viene 'apellidos' pero guardamos como 'apellido'
         email: formData.get('email'),
         telefono: formData.get('telefono'),
         fechaNacimiento: formData.get('fechaNacimiento'),
         direccion: formData.get('direccion')
     };
 
-    // Guardar en localStorage
-    localStorage.setItem('usuarioLogueado', JSON.stringify(datosActualizados));
-    currentUser = datosActualizados;
+    // Mostrar estado de carga
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+    submitBtn.disabled = true;
 
-    // Mostrar mensaje de éxito
-    mostrarMensaje('Perfil actualizado correctamente', 'success');
+    try {
+        // Actualizar usando UserManager (esto sincroniza con JSON y localStorage)
+        const resultado = await userManager.actualizarUsuario(currentUser.id, datosActualizados);
+        
+        if (resultado.exito) {
+            // Actualizar currentUser local
+            currentUser = {
+                ...currentUser,
+                ...datosActualizados
+            };
+            
+            // Mostrar mensaje de éxito
+            mostrarMensaje('Perfil actualizado correctamente', 'success');
+            
+            // Recargar información en la interfaz
+            cargarInformacionUsuario();
+            
+            // Actualizar navbar también
+            if (typeof actualizarNavbar === 'function') {
+                actualizarNavbar();
+            }
+            
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
+            submitBtn.classList.remove('btn-success');
+            submitBtn.classList.add('btn-primary');
+            
+        } else {
+            throw new Error(resultado.mensaje || 'Error al actualizar perfil');
+        }
+        
+    } catch (error) {
+        console.error('Error al guardar perfil:', error);
+        mostrarMensaje('Error al guardar los cambios: ' + error.message, 'error');
+        
+        submitBtn.innerHTML = '<i class="fas fa-times"></i> Error';
+        submitBtn.classList.remove('btn-success');
+        submitBtn.classList.add('btn-danger');
+    }
     
-    // Recargar información en la interfaz
-    cargarInformacionUsuario();
+    // Restaurar botón después de un momento
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.classList.remove('btn-primary', 'btn-danger');
+        submitBtn.classList.add('btn-success');
+        submitBtn.disabled = false;
+    }, 2000);
 }
 
 /**
  * Cambiar contraseña del usuario
  */
-function cambiarPassword(event) {
+async function cambiarPassword(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
@@ -417,14 +469,51 @@ function cambiarPassword(event) {
         return;
     }
 
-    // Actualizar contraseña
-    currentUser.password = passwordNueva;
-    localStorage.setItem('usuarioLogueado', JSON.stringify(currentUser));
+    // Mostrar estado de carga
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
+    submitBtn.disabled = true;
 
-    // Limpiar formulario
-    event.target.reset();
+    try {
+        // Actualizar contraseña usando UserManager
+        const resultado = await userManager.actualizarUsuario(currentUser.id, { 
+            password: passwordNueva 
+        });
+        
+        if (resultado.exito) {
+            // Actualizar password local
+            currentUser.password = passwordNueva;
+            
+            // Limpiar formulario
+            event.target.reset();
+            
+            mostrarMensaje('Contraseña actualizada correctamente', 'success');
+            
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> ¡Actualizada!';
+            submitBtn.classList.remove('btn-success');
+            submitBtn.classList.add('btn-primary');
+            
+        } else {
+            throw new Error(resultado.mensaje || 'Error al actualizar contraseña');
+        }
+        
+    } catch (error) {
+        console.error('Error al cambiar contraseña:', error);
+        mostrarMensaje('Error al cambiar la contraseña: ' + error.message, 'error');
+        
+        submitBtn.innerHTML = '<i class="fas fa-times"></i> Error';
+        submitBtn.classList.remove('btn-success');
+        submitBtn.classList.add('btn-danger');
+    }
     
-    mostrarMensaje('Contraseña actualizada correctamente', 'success');
+    // Restaurar botón después de un momento
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.classList.remove('btn-primary', 'btn-danger');
+        submitBtn.classList.add('btn-success');
+        submitBtn.disabled = false;
+    }, 2000);
 }
 
 /**
@@ -458,7 +547,7 @@ function cambiarImagenPerfil(event) {
 
         // Guardar en el usuario
         currentUser.avatar = nuevaImagen;
-        localStorage.setItem('usuarioLogueado', JSON.stringify(currentUser));
+        localStorage.setItem('sesionActiva', JSON.stringify(currentUser));
         
         mostrarMensaje('Imagen de perfil actualizada', 'success');
     };
@@ -470,7 +559,7 @@ function cambiarImagenPerfil(event) {
  * Cerrar sesión del usuario
  */
 function cerrarSesion() {
-    localStorage.removeItem('usuarioLogueado');
+    localStorage.removeItem('sesionActiva');
     localStorage.removeItem('isLoggedIn');
     window.location.href = '../../index.html';
 }
@@ -480,7 +569,7 @@ function cerrarSesion() {
  */
 function eliminarCuenta() {
     // Limpiar todos los datos del usuario
-    localStorage.removeItem('usuarioLogueado');
+    localStorage.removeItem('sesionActiva');
     localStorage.removeItem('isLoggedIn');
     
     // Cerrar modal
@@ -519,7 +608,7 @@ function eliminarFavorito(productoId) {
     if (!currentUser.favoritos) return;
     
     currentUser.favoritos = currentUser.favoritos.filter(p => p.id !== productoId);
-    localStorage.setItem('usuarioLogueado', JSON.stringify(currentUser));
+    localStorage.setItem('sesionActiva', JSON.stringify(currentUser));
     
     cargarFavoritos();
     mostrarMensaje('Producto eliminado de favoritos', 'success');

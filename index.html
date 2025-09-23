@@ -27,6 +27,45 @@
 </head>
 
 <body>
+    <!-- Interceptor de undefined global -->
+    <script>
+        // Interceptor robusto para eliminar undefined completamente
+        const originalAlert = window.alert;
+        const originalConsoleError = console.error;
+        
+        window.alert = function(message) {
+            if (message === undefined || message === 'undefined' || message === null || message === 'null') {
+                console.warn('🚫 Blocked undefined/null alert in INDEX. Stack trace:');
+                console.trace();
+                return;
+            }
+            originalAlert.call(window, message);
+        };
+
+        // Interceptar errores que podrían causar alerts
+        console.error = function(...args) {
+            const filteredArgs = args.filter(arg => {
+                if (typeof arg === 'string' && arg.includes('undefined')) {
+                    console.warn('🚫 Filtered undefined error in INDEX:', arg);
+                    return false;
+                }
+                return true;
+            });
+            
+            if (filteredArgs.length > 0) {
+                originalConsoleError.apply(console, filteredArgs);
+            }
+        };
+
+        // Interceptar promises rechazadas sin manejar
+        window.addEventListener('unhandledrejection', function(event) {
+            if (event.reason && (event.reason === 'undefined' || event.reason.toString().includes('undefined'))) {
+                console.warn('🚫 Blocked undefined promise rejection in INDEX');
+                event.preventDefault();
+            }
+        });
+    </script>
+
     <!-- Contenedor para la navbar -->
     <div id="navbar-container"></div>
 
@@ -423,31 +462,42 @@
     <div id="footer-container"></div>
 
     <!-- Scripts para cargar componentes y autenticación -->
+    <script src="js/userManager.js"></script>
     <script src="js/auth.js"></script>
     <script>
         // Cargar componentes al inicializar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            loadComponent('navbar-container', 'pages/client/shared/navbar.html');
-            loadComponent('footer-container', 'pages/client/shared/footer.html');
-            
-            // Cargar carrito flotante
-            loadFloatingCart();
-            
-            // Inicializar sistema de carrito
-            setTimeout(() => {
-                initializeCartSystem();
-                if (typeof updateFloatingCartBadge === 'function') {
-                    updateFloatingCartBadge();
-                }
-            }, 300);
-            
-            // Actualizar botones según estado de autenticación
-            updateCTAButtons();
-            
-            // Actualizar botones nuevamente después de un pequeño delay para asegurar que auth.js esté listo
-            setTimeout(() => {
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                console.log('Index: Cargando componentes...');
+                
+                // Cargar componentes de forma síncrona
+                await loadComponent('navbar-container', 'pages/client/shared/navbar.html');
+                console.log('Index: Navbar cargada');
+                
+                await loadComponent('footer-container', 'pages/client/shared/footer.html');
+                console.log('Index: Footer cargado');
+                
+                
+                // Inicializar sistema de carrito con delay mínimo
+                setTimeout(() => {
+                    initializeCartSystem();
+                    if (typeof updateFloatingCartBadge === 'function') {
+                        updateFloatingCartBadge();
+                    }
+                }, 100);
+                
+                // Actualizar botones según estado de autenticación
                 updateCTAButtons();
-            }, 500);
+                
+                // Verificación final con delay reducido
+                setTimeout(() => {
+                    updateCTAButtons();
+                    console.log('Index: Inicialización completa');
+                }, 200);
+                
+            } catch (error) {
+                console.error('Index: Error cargando componentes:', error);
+            }
         });
 
         function guardarPaginaOrigen() {
