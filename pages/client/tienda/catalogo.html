@@ -64,8 +64,38 @@
             flex-direction: column;
         }
         
-        .product-card .card-body .btn {
-            margin-top: auto;
+        /* Estilos para la sección de información de productos */
+        .product-info-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+        
+        .price-text {
+            font-size: 1.1rem;
+            color: #2f9e44 !important;
+        }
+        
+        .stock-info {
+            font-size: 0.9rem;
+        }
+        
+        .add-to-cart-btn {
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .add-to-cart-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .product-card .card-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -149,197 +179,18 @@
         <!-- Grid de productos -->
         <div class="container my-5">
           <h2 class="text-success text-center mb-4">Catálogo de Productos</h2>
-          <div class="row g-4">
-
-            <!-- FR001 - Manzanas Fuji -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="frutas">
-              <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/manzana.webp" class="card-img-top" alt="Manzanas Fuji">
-                <div class="card-body">
-                  <h5 class="card-title">FR001 - Manzanas Fuji</h5>
-                  <p class="card-text">Manzanas frescas, jugosas y dulces, perfectas para cualquier ocasión.</p>
-                  <p class="text-success fw-bold">$2.500 / Kg</p>
-                  <button class="btn btn-success add-to-cart-btn" 
-                          data-id="FR001" 
-                          data-name="Manzanas Fuji" 
-                          data-price="2500" 
-                          data-unit="/Kg" 
-                          data-image="../../../img/manzana.webp" 
-                          data-stock="50">
-                    Agregar al carrito
-                  </button>
+          
+          <!-- Contenedor dinámico para productos -->
+          <div id="productos-container">
+            <div class="row g-4" id="productos-grid">
+              <!-- Loading placeholder -->
+              <div class="col-12 text-center py-5" id="loading-products">
+                <div class="spinner-border text-success" role="status">
+                  <span class="visually-hidden">Cargando productos...</span>
                 </div>
+                <p class="mt-3 text-muted">Cargando productos frescos...</p>
               </div>
             </div>
-
-            <!-- FR002 - Naranjas Valencia -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="frutas">
-              <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/naranja.webp" class="card-img-top" alt="Naranjas Valencia">
-                <div class="card-body">
-                  <h5 class="card-title">FR002 - Naranjas Valencia</h5>
-                  <p class="card-text">Naranjas frescas, ideales para jugo o consumo directo.</p>
-                  <p class="text-success fw-bold">$2.200 / Kg</p>
-                  <button class="btn btn-success add-to-cart-btn" 
-                          data-id="FR002" 
-                          data-name="Naranjas Valencia" 
-                          data-price="2200" 
-                          data-unit="/Kg" 
-                          data-image="../../../img/naranja.webp" 
-                          data-stock="40">
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- FR003 - Plátanos Cavendish -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="frutas">
-              <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/platanos3.webp" class="card-img-top" alt="Plátanos Cavendish">
-                <div class="card-body">
-                  <h5 class="card-title">FR003 - Plátanos Cavendish</h5>
-                  <p class="card-text">Plátanos dulces y nutritivos, perfectos para postres y colaciones.</p>
-                  <p class="text-success fw-bold">$1.800 / Kg</p>
-                  <button class="btn btn-success add-to-cart-btn" 
-                          data-id="FR003" 
-                          data-name="Plátanos Cavendish" 
-                          data-price="1800" 
-                          data-unit="/Kg" 
-                          data-image="../../../img/platanos3.webp" 
-                          data-stock="60">
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- VR001 - Zanahorias Orgánicas -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="verduras">
-              <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/zanahorias.webp" class="card-img-top" alt="Zanahorias Orgánicas">
-                <div class="card-body">
-                  <h5 class="card-title">VR001 - Zanahorias Orgánicas</h5>
-                  <p class="card-text">Zanahorias crujientes y llenas de vitamins.</p>
-                  <p class="text-success fw-bold">$1.500 / Kg</p>
-                  <button class="btn btn-success add-to-cart-btn" 
-                          data-id="VR001" 
-                          data-name="Zanahorias Orgánicas" 
-                          data-price="1500" 
-                          data-unit="/Kg" 
-                          data-image="../../../img/zanahorias.webp" 
-                          data-stock="35">
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- VR002 - Espinacas Frescas -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="verduras">
-              <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/espinaca.webp" class="card-img-top" alt="Espinacas Frescas">
-                <div class="card-body">
-                  <h5 class="card-title">VR002 - Espinacas Frescas</h5>
-                  <p class="card-text">Espinacas frescas y saludables, ideales para ensaladas y guisos.</p>
-                  <p class="text-success fw-bold">$1.200 / Atado</p>
-                  <button class="btn btn-success add-to-cart-btn" 
-                          data-id="VR002" 
-                          data-name="Espinacas Frescas" 
-                          data-price="1200" 
-                          data-unit="/Atado" 
-                          data-image="../../../img/espinaca.webp" 
-                          data-stock="25">
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- VR003 - Pimientos Tricolores -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="verduras">
-              <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/pimientos.webp" class="card-img-top" alt="Pimientos Tricolores">
-                <div class="card-body">
-                  <h5 class="card-title">VR003 - Pimientos Tricolores</h5>
-                  <p class="card-text">Pimientos rojos, verdes y amarillos llenos de sabor y color.</p>
-                  <p class="text-success fw-bold">$2.800 / Kg</p>
-                  <button class="btn btn-success add-to-cart-btn" 
-                          data-id="VR003" 
-                          data-name="Pimientos Tricolores" 
-                          data-price="2800" 
-                          data-unit="/Kg" 
-                          data-image="../../../img/pimientos.webp" 
-                          data-stock="30">
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- PO001 - Miel Orgánica -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="organicos">
-              <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/miel.webp" class="card-img-top" alt="Miel Orgánica">
-                <div class="card-body">
-                  <h5 class="card-title">PO001 - Miel Orgánica</h5>
-                  <p class="card-text">Miel 100% natural y sin aditivos, directamente del apicultor.</p>
-                  <p class="text-success fw-bold">$4.500 / Frasco 500g</p>
-                  <button class="btn btn-success add-to-cart-btn" 
-                          data-id="PO001" 
-                          data-name="Miel Orgánica" 
-                          data-price="4500" 
-                          data-unit="/Frasco 500g" 
-                          data-image="../../../img/miel.webp" 
-                          data-stock="20">
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- PO003 - Quinua Orgánica -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="organicos">
-              <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/quinoa.webp" class="card-img-top" alt="Quinua Orgánica">
-                <div class="card-body">
-                  <h5 class="card-title">PO003 - Quinua Orgánica</h5>
-                  <p class="card-text">Quinua natural y rica en proteínas, ideal para comidas saludables.</p>
-                  <p class="text-success fw-bold">$4.000 / Kg</p>
-                  <button class="btn btn-success add-to-cart-btn" 
-                          data-id="PO003" 
-                          data-name="Quinua Orgánica" 
-                          data-price="3200" 
-                          data-unit="/Kg" 
-                          data-image="../../../img/quinoa.webp" 
-                          data-stock="15">
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- PL001 - Leche Entera -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-col" data-category="lacteos">
-              <div class="card product-card shadow-sm h-100">
-                <img src="../../../img/leche.webp" class="card-img-top" alt="Leche Entera">
-                <div class="card-body">
-                  <h5 class="card-title">PL001 - Leche Entera</h5>
-                  <p class="card-text">Leche entera fresca y nutritiva para toda la familia.</p>
-                  <p class="text-success fw-bold">$1.100 / Litro</p>
-                  <button class="btn btn-success add-to-cart-btn" 
-                          data-id="PL001" 
-                          data-name="Leche Entera" 
-                          data-price="1100" 
-                          data-unit="/Litro" 
-                          data-image="../../../img/leche.webp" 
-                          data-stock="45">
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
 
@@ -350,73 +201,224 @@
 
     <!-- Scripts para cargar componentes y carrito -->
     <script src="../../../js/auth.js"></script>
+    <script src="../../../js/productManager.js"></script>
     <script src="../../../js/carrito.js"></script>
 
     <script>
+        // Variables globales para productos y filtros
+        let todosLosProductos = [];
+        let productosFiltrados = [];
+        let categoriaActiva = 'todos';
+        let busquedaActiva = '';
+
         document.addEventListener('DOMContentLoaded', function() {
             // Cargar navbar y footer
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
-            // Inicializar sistemas después de un delay mínimo para asegurar que todo esté cargado
+            
+            // Inicializar sistemas después de un delay mínimo
             setTimeout(() => {
+                console.log('=== TIMEOUT EJECUTÁNDOSE ===');
+                console.log('Inicializando sistemas...');
                 initializeCartSystem();
+                cargarProductosCatalogo();
                 // Forzar actualización del badge del carrito
                 if (typeof updateFloatingCartBadge === 'function') {
                     updateFloatingCartBadge();
                 }
-            }, 100);
+            }, 500);
 
-            // --- FILTRO (búsqueda + categorías) ---
+            // Configurar filtros de búsqueda y categorías
+            configurarFiltros();
+        });
+
+        // Cargar productos desde productManager
+        async function cargarProductosCatalogo() {
+            try {
+                console.log('=== INICIANDO CARGA DE PRODUCTOS ===');
+                console.log('¿ProductManager disponible?', typeof productManager);
+                
+                if (typeof productManager === 'undefined') {
+                    console.error('ProductManager no está disponible!');
+                    return;
+                }
+                
+                console.log('Llamando a productManager.obtenerProductosActivos()...');
+                todosLosProductos = await productManager.obtenerProductosActivos();
+                console.log('Productos obtenidos:', todosLosProductos);
+                console.log('Cantidad de productos:', todosLosProductos ? todosLosProductos.length : 'null/undefined');
+                
+                // Mostrar productos
+                mostrarProductos(todosLosProductos);
+                
+            } catch (error) {
+                console.error('Error cargando productos:', error);
+                mostrarErrorCarga();
+            }
+        }
+
+        // Mostrar productos en el catálogo
+        function mostrarProductos(productos) {
+            const productosGrid = document.getElementById('productos-grid');
+            const loadingElement = document.getElementById('loading-products');
+            
+            // Ocultar loading
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+
+            if (!productos || productos.length === 0) {
+                productosGrid.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
+                        <p class="mt-3 text-muted">No se encontraron productos</p>
+                    </div>
+                `;
+                return;
+            }
+
+            productosGrid.innerHTML = '';
+            
+            productos.forEach(producto => {
+                const col = document.createElement('div');
+                col.className = 'col-12 col-sm-6 col-md-4 col-lg-3 product-col';
+                col.setAttribute('data-category', producto.categoria);
+                
+                col.innerHTML = `
+                    <div class="card product-card shadow-sm h-100 d-flex flex-column">
+                        <img src="${producto.imagen}" 
+                             class="card-img-top" 
+                             alt="${producto.nombre}"
+                             onerror="this.src='../../../img/default.jpg';">
+                        <div class="card-body d-flex flex-column flex-grow-1">
+                            <h5 class="card-title">PR${String(producto.id).padStart(3, '0')} - ${producto.nombre}</h5>
+                            <p class="card-text flex-grow-1">${producto.descripcion}</p>
+                            
+                            <!-- Sección de precio y stock fija -->
+                            <div class="product-info-section mt-auto pt-2 border-top">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="price-info">
+                                        <span class="price-text fw-bold text-success">${formatearPrecio(producto.precio)}</span>
+                                        <small class="text-muted d-block">por ${producto.peso}</small>
+                                    </div>
+                                    <div class="stock-info text-end">
+                                        <small class="text-muted">Stock:</small>
+                                        <span class="fw-bold ${producto.stock <= 5 ? 'text-warning' : 'text-success'}">${producto.stock}</span>
+                                    </div>
+                                </div>
+                                
+                                ${producto.stock <= 5 && producto.stock > 0 ? '<div class="text-center mb-2"><small class="text-warning"><i class="fas fa-exclamation-triangle"></i> ¡Últimas unidades!</small></div>' : ''}
+                                
+                                <button class="btn btn-success w-100 add-to-cart-btn" 
+                                        data-id="PR${String(producto.id).padStart(3, '0')}" 
+                                        data-name="${producto.nombre}" 
+                                        data-price="${producto.precio}" 
+                                        data-unit="/${producto.peso}" 
+                                        data-image="${producto.imagen}" 
+                                        data-stock="${producto.stock}"
+                                        ${producto.stock === 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-shopping-cart me-1"></i>
+                                    ${producto.stock === 0 ? 'Agotado' : 'Agregar al carrito'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                productosGrid.appendChild(col);
+            });
+
+            // Reinicializar eventos del carrito para los nuevos botones
+            if (typeof initializeCartButtons === 'function') {
+                initializeCartButtons();
+            }
+        }
+
+        // Mostrar error de carga
+        function mostrarErrorCarga() {
+            const productosGrid = document.getElementById('productos-grid');
+            const loadingElement = document.getElementById('loading-products');
+            
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+
+            productosGrid.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                    <p class="mt-3 text-muted">Error al cargar productos</p>
+                    <button class="btn btn-outline-success btn-sm" onclick="cargarProductosCatalogo()">
+                        <i class="fas fa-redo me-1"></i>Reintentar
+                    </button>
+                </div>
+            `;
+        }
+
+        // Configurar filtros de búsqueda y categorías
+        function configurarFiltros() {
             const searchInput = document.getElementById("searchInput");
             const categoryButtons = document.querySelectorAll(".category-btn");
-            const productCols = document.querySelectorAll(".product-col");
 
-            // Función que aplica filtro combinado
-            function applyFilter() {
-                const query = (searchInput.value || "").toLowerCase().trim();
-                const activeBtn = document.querySelector(".category-btn.active");
-                const activeCategory = activeBtn ? activeBtn.dataset.category : "";
-
-                productCols.forEach(col => {
-                    const card = col.querySelector(".product-card");
-                    const name = (card.querySelector("h5")?.textContent || "").toLowerCase();
-                    const description = (card.querySelector("p")?.textContent || "").toLowerCase();
-                    const code = (card.querySelector(".product-code")?.textContent || "").toLowerCase();
-                    const matchesQuery = !query || name.includes(query) || description.includes(query) || code.includes(query);
-                    const matchesCategory = !activeCategory || (col.dataset.category === activeCategory);
-
-                    if (matchesQuery && matchesCategory) {
-                        col.classList.remove("d-none");
-                    } else {
-                        col.classList.add("d-none");
-                    }
+            // Filtro de búsqueda
+            if (searchInput) {
+                searchInput.addEventListener("input", function() {
+                    busquedaActiva = this.value.toLowerCase();
+                    aplicarFiltros();
                 });
             }
 
-            // Escuchar input de búsqueda
-            searchInput.addEventListener("input", () => {
-                applyFilter();
-            });
-
-            // Escuchar clicks en botones de categoría
+            // Filtro de categorías
             categoryButtons.forEach(btn => {
-                btn.addEventListener("click", () => {
+                btn.addEventListener("click", function() {
+                    const categoria = this.getAttribute('data-category');
+                    
                     // Toggle active
-                    const alreadyActive = btn.classList.contains("active");
-                    // Quitar active en todos
+                    const alreadyActive = this.classList.contains("active");
                     categoryButtons.forEach(b => b.classList.remove("active"));
-                    // Si no estaba activo, activarlo
+                    
                     if (!alreadyActive) {
-                        btn.classList.add("active");
+                        this.classList.add("active");
+                        categoriaActiva = categoria;
+                    } else {
+                        categoriaActiva = 'todos';
                     }
-                    // Aplicar filtro
-                    applyFilter();
+                    
+                    aplicarFiltros();
                 });
             });
+        }
 
-            // Al cargar, mostrar todos (por si)
-            applyFilter();
-        });
+        // Aplicar filtros combinados
+        function aplicarFiltros() {
+            let productosFiltrados = todosLosProductos;
+
+            // Filtrar por categoría
+            if (categoriaActiva && categoriaActiva !== 'todos') {
+                productosFiltrados = productosFiltrados.filter(producto => 
+                    producto.categoria === categoriaActiva
+                );
+            }
+
+            // Filtrar por búsqueda
+            if (busquedaActiva) {
+                productosFiltrados = productosFiltrados.filter(producto =>
+                    producto.nombre.toLowerCase().includes(busquedaActiva) ||
+                    producto.descripcion.toLowerCase().includes(busquedaActiva) ||
+                    producto.categoria.toLowerCase().includes(busquedaActiva)
+                );
+            }
+
+            mostrarProductos(productosFiltrados);
+        }
+
+        // Función auxiliar para formatear precios
+        function formatearPrecio(precio) {
+            return new Intl.NumberFormat('es-CL', {
+                style: 'currency',
+                currency: 'CLP',
+                minimumFractionDigits: 0
+            }).format(precio);
+        }
     </script>
 
 </body>

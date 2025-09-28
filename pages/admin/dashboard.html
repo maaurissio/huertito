@@ -517,6 +517,182 @@
         </div>
     </div>
 
+    <!-- Modal para Agregar Producto -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="addProductModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i>Agregar Nuevo Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addProductForm">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="productName" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Nombre del Producto *
+                                </label>
+                                <input type="text" class="form-control" id="productName" name="productName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="productCategory" class="form-label">
+                                    <i class="fas fa-list me-1"></i>Categoría *
+                                </label>
+                                <select class="form-select" id="productCategory" name="productCategory" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option value="frutas">Frutas</option>
+                                    <option value="verduras">Verduras</option>
+                                    <option value="hortalizas">Hortalizas</option>
+                                    <option value="frutos-secos">Frutos Secos</option>
+                                    <option value="especias">Especias</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="productDescription" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>Descripción *
+                                </label>
+                                <textarea class="form-control" id="productDescription" name="productDescription" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="productPrice" class="form-label">
+                                    <i class="fas fa-dollar-sign me-1"></i>Precio (CLP) *
+                                </label>
+                                <input type="number" class="form-control" id="productPrice" name="productPrice" min="0" step="50" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="productStock" class="form-label">
+                                    <i class="fas fa-boxes me-1"></i>Stock *
+                                </label>
+                                <input type="number" class="form-control" id="productStock" name="productStock" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="productWeight" class="form-label">
+                                    <i class="fas fa-weight me-1"></i>Peso/Unidad
+                                </label>
+                                <input type="text" class="form-control" id="productWeight" name="productWeight" placeholder="ej: 1kg, 500g">
+                            </div>
+                            <div class="col-12">
+                                <label for="productImage" class="form-label">
+                                    <i class="fas fa-image me-1"></i>Imagen del producto
+                                </label>
+                                <input type="file" class="form-control" id="productImage" name="productImage" accept="image/*">
+                                <small class="form-text text-muted">Selecciona una imagen desde tu computadora (.jpg, .png, .webp)</small>
+                                <div id="imagePreview" class="mt-2" style="display: none;">
+                                    <img id="previewImg" src="" alt="Vista previa" style="max-width: 200px; max-height: 150px; border-radius: 8px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-1"></i>Guardar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Producto -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editProductModalLabel">
+                        <i class="fas fa-edit me-2"></i>Editar Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editProductForm">
+                    <input type="hidden" id="editProductId" name="productId">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editProductName" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Nombre del Producto *
+                                </label>
+                                <input type="text" class="form-control" id="editProductName" name="productName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editProductCategory" class="form-label">
+                                    <i class="fas fa-list me-1"></i>Categoría *
+                                </label>
+                                <select class="form-select" id="editProductCategory" name="productCategory" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option value="frutas">Frutas</option>
+                                    <option value="verduras">Verduras</option>
+                                    <option value="hortalizas">Hortalizas</option>
+                                    <option value="frutos-secos">Frutos Secos</option>
+                                    <option value="especias">Especias</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="editProductDescription" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>Descripción *
+                                </label>
+                                <textarea class="form-control" id="editProductDescription" name="productDescription" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editProductPrice" class="form-label">
+                                    <i class="fas fa-dollar-sign me-1"></i>Precio (CLP) *
+                                </label>
+                                <input type="number" class="form-control" id="editProductPrice" name="productPrice" min="0" step="50" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editProductStock" class="form-label">
+                                    <i class="fas fa-boxes me-1"></i>Stock *
+                                </label>
+                                <input type="number" class="form-control" id="editProductStock" name="productStock" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editProductWeight" class="form-label">
+                                    <i class="fas fa-weight me-1"></i>Peso/Unidad
+                                </label>
+                                <input type="text" class="form-control" id="editProductWeight" name="productWeight" placeholder="ej: 1kg, 500g">
+                            </div>
+                            <div class="col-md-8">
+                                <label for="editProductImage" class="form-label">
+                                    <i class="fas fa-image me-1"></i>Imagen del producto
+                                </label>
+                                <input type="file" class="form-control" id="editProductImage" name="productImage" accept="image/*">
+                                <small class="form-text text-muted">Selecciona una nueva imagen o deja vacío para mantener la actual</small>
+                                <div id="editImagePreview" class="mt-2" style="display: none;">
+                                    <img id="editPreviewImg" src="" alt="Vista previa" style="max-width: 200px; max-height: 150px; border-radius: 8px;">
+                                </div>
+                                <div id="currentImage" class="mt-2">
+                                    <small class="text-muted">Imagen actual:</small>
+                                    <img id="currentImg" src="" alt="Imagen actual" style="max-width: 150px; max-height: 100px; border-radius: 8px;">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editProductStatus" class="form-label">
+                                    <i class="fas fa-toggle-on me-1"></i>Estado
+                                </label>
+                                <select class="form-select" id="editProductStatus" name="productStatus">
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Actualizar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Confirmación para Cerrar Sesión -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -551,6 +727,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- User Management System -->
     <script src="../../js/userManager.js"></script>
+    <!-- Product Management System -->
+    <script src="../../js/productManager.js"></script>
     <!-- Dashboard JavaScript -->
     <script src="../../js/dashboard.js"></script>
 </body>

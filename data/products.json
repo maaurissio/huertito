@@ -1,0 +1,94 @@
+{
+  "productos": [
+    {
+      "id": 1,
+      "nombre": "Espinacas Frescas",
+      "descripcion": "Espinacas orgánicas recién cosechadas, ricas en hierro y vitaminas. Perfectas para ensaladas y smoothies.",
+      "precio": 2500,
+      "stock": 45,
+      "categoria": "verduras",
+      "imagen": "../../../img/espinaca.webp",
+      "estado": "activo",
+      "fechaCreacion": "2025-01-01",
+      "peso": "250g"
+    },
+    {
+      "id": 2,
+      "nombre": "Manzanas Rojas",
+      "descripcion": "Manzanas rojas dulces y crujientes, cultivadas sin pesticidas. Ideales para toda la familia.",
+      "precio": 3200,
+      "stock": 32,
+      "categoria": "frutas",
+      "imagen": "../../../img/manzana.webp",
+      "estado": "activo",
+      "fechaCreacion": "2025-01-02",
+      "peso": "1kg"
+    },
+    {
+      "id": 3,
+      "nombre": "Naranjas Jugosas",
+      "descripcion": "Naranjas valencianas llenas de vitamina C. Perfectas para zumos frescos y postres naturales.",
+      "precio": 2800,
+      "stock": 28,
+      "categoria": "frutas",
+      "imagen": "../../../img/naranja.webp",
+      "estado": "activo",
+      "fechaCreacion": "2025-01-03",
+      "peso": "1kg"
+    },
+    {
+      "id": 4,
+      "nombre": "Pimientos Coloridos",
+      "descripcion": "Mix de pimientos rojos, amarillos y verdes. Frescos y crujientes, perfectos para ensaladas y guisos.",
+      "precio": 3500,
+      "stock": 18,
+      "categoria": "verduras",
+      "imagen": "../../../img/pimientos.webp",
+      "estado": "activo",
+      "fechaCreacion": "2025-01-04",
+      "peso": "500g"
+    },
+    {
+      "id": 5,
+      "nombre": "Plátanos Maduros",
+      "descripcion": "Plátanos dulces y nutritivos, ricos en potasio. Perfectos para desayunos y meriendas saludables.",
+      "precio": 2200,
+      "stock": 25,
+      "categoria": "frutas",
+      "imagen": "../../../img/platanos.webp",
+      "estado": "activo",
+      "fechaCreacion": "2025-01-05",
+      "peso": "1kg"
+    },
+    {
+      "id": 6,
+      "nombre": "Zanahorias Orgánicas",
+      "descripcion": "Zanahorias orgánicas dulces y crujientes, ricas en betacaroteno. Excelentes para jugos y ensaladas.",
+      "precio": 2100,
+      "stock": 40,
+      "categoria": "verduras",
+      "imagen": "../../../img/zanahorias.webp",
+      "estado": "activo",
+      "fechaCreacion": "2025-01-06",
+      "peso": "500g"
+    },
+    {
+      "id": 7,
+      "nombre": "Plátanos Premium",
+      "descripción": "Plátanos de primera calidad, perfectos para batidos y postres. Cultivados de forma sostenible.",
+      "precio": 2400,
+      "stock": 30,
+      "categoria": "frutas",
+      "imagen": "../../../img/platanos2.webp",
+      "estado": "activo",
+      "fechaCreacion": "2025-01-07",
+      "peso": "1kg"
+    }
+  ],
+  "configuracion": {
+    "proximoId": 8,
+    "version": "1.0",
+    "ultimaActualizacion": "2025-01-01T00:00:00Z",
+    "categorias": ["frutas", "verduras", "hortalizas", "frutos-secos", "especias"]
+  }
+}

@@ -269,66 +269,101 @@ function showSection(sectionName) {
     }
 }
 
-function loadProductsTable() {
+// Función para cargar productos dinámicamente
+async function loadProductsTable() {
     const tbody = document.getElementById('productsTableBody');
     if (!tbody) return;
     
-    tbody.innerHTML = '';
-    
-    if (mockData.products.length === 0) {
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="8" class="text-center py-4">
+                <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                <br>Cargando productos...
+            </td>
+        </tr>
+    `;
+
+    try {
+        // Obtener productos desde productManager
+        const resultado = await productManager.obtenerTodosLosProductos();
+        
+        if (!resultado.success || resultado.productos.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        <i class="fas fa-box fa-3x mb-3 d-block"></i>
+                        No hay productos registrados
+                        <br>
+                        <button class="btn btn-success btn-sm mt-2" onclick="showAddProductModal()">
+                            <i class="fas fa-plus me-1"></i>Agregar primer producto
+                        </button>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = '';
+        resultado.productos.forEach(product => {
+            const statusClass = product.estado === 'activo' ? 'success' : 
+                              product.stock === 0 ? 'danger' : 'warning';
+            
+            const statusText = product.estado === 'activo' ? 
+                             (product.stock === 0 ? 'Agotado' : 'Activo') : 'Inactivo';
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>PR${String(product.id).padStart(3, '0')}</strong></td>
+                <td>
+                    <img src="${product.imagen}" 
+                         alt="${product.nombre}" 
+                         style="width: 45px; height: 45px; object-fit: cover; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
+                         onerror="this.src='../../img/default.jpg';">
+                </td>
+                <td><strong>${product.nombre}</strong></td>
+                <td style="color: var(--success-color); font-weight: 600;">$${product.precio.toLocaleString('es-CL')} CLP</td>
+                <td>
+                    <span class="badge ${product.stock <= 5 ? 'bg-warning' : 'bg-light text-dark border'}">${product.stock} unidades</span>
+                </td>
+                <td>
+                    <span class="badge bg-info">${product.categoria}</span>
+                </td>
+                <td><span class="badge bg-${statusClass}">${statusText}</span></td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-info" onclick="viewProduct(${product.id})" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="editProduct(${product.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="deleteProduct(${product.id})" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Actualizar contador de productos en stats
+        updateProductCount(resultado.productos.length);
+
+    } catch (error) {
+        console.error('Error cargando productos:', error);
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" class="text-center py-4 text-muted">
-                    <i class="fas fa-box fa-3x mb-3 d-block"></i>
-                    No hay productos registrados
+                <td colspan="8" class="text-center py-4 text-danger">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <br>Error al cargar productos
+                    <br>
+                    <button class="btn btn-outline-secondary btn-sm mt-2" onclick="loadProductsTable()">
+                        <i class="fas fa-redo me-1"></i>Reintentar
+                    </button>
                 </td>
             </tr>
         `;
-        return;
     }
-    
-    mockData.products.forEach(product => {
-        const statusClass = product.status === 'Activo' ? 'success' : 
-                          product.status === 'Agotado' ? 'danger' : 'warning';
-        
-        // Mapear imagen exacta del catálogo basada en el nombre del producto
-        let imagePath = '../../img/';
-        if (product.name.includes('Manzana')) imagePath += 'manzana.webp';
-        else if (product.name.includes('Naranja')) imagePath += 'naranja.webp';
-        else if (product.name.includes('Plátano')) imagePath += 'platanos.webp';
-        else if (product.name.includes('Zanahoria')) imagePath += 'zanahorias.webp';
-        else if (product.name.includes('Espinaca')) imagePath += 'espinaca.webp';
-        else if (product.name.includes('Pimiento')) imagePath += 'pimientos.webp';
-        else imagePath += 'manzana.webp'; // imagen por defecto
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><strong>${product.id}</strong></td>
-            <td>
-                <img src="${imagePath}" 
-                     alt="${product.name}" 
-                     style="width: 45px; height: 45px; object-fit: cover; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            </td>
-            <td><strong>${product.name}</strong></td>
-            <td style="color: var(--success-color); font-weight: 600;">$${product.price.toLocaleString('es-CL')} CLP</td>
-            <td>
-                <span class="badge bg-light text-dark border">${product.stock} unidades</span>
-            </td>
-            <td>
-                <span class="badge bg-info">${product.category}</span>
-            </td>
-            <td><span class="badge bg-${statusClass}">${product.status}</span></td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary me-1" onclick="editProduct('${product.id}')" title="Editar producto">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct('${product.id}')" title="Eliminar producto">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
 }
 
 function loadUsersTable() {
@@ -976,10 +1011,277 @@ function deleteUser(id) {
     }
 }
 
-// Agregar event listener para el formulario cuando el DOM esté listo
+// ===============================================
+// FUNCIONES PARA GESTIÓN DE PRODUCTOS
+// ===============================================
+
+// Función para actualizar contador de productos en stats
+function updateProductCount(count) {
+    const productCountElement = document.querySelector('[data-stat="products"]');
+    if (productCountElement) {
+        productCountElement.textContent = count;
+    }
+}
+
+// Mostrar modal para agregar producto
+function showAddProductModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addProductModal'));
+    modal.show();
+}
+
+// Ver detalles de producto
+async function viewProduct(id) {
+    try {
+        const producto = await productManager.obtenerProductoPorId(id);
+        if (producto) {
+            showToast('Detalles del Producto', 
+                `<strong>${producto.nombre}</strong><br>
+                 Precio: $${producto.precio.toLocaleString('es-CL')} CLP<br>
+                 Stock: ${producto.stock} unidades<br>
+                 Categoría: ${producto.categoria}<br>
+                 Estado: ${producto.estado}`, 
+                'info', 5000);
+        }
+    } catch (error) {
+        console.error('Error obteniendo producto:', error);
+        showToast('Error', 'No se pudo obtener la información del producto', 'error');
+    }
+}
+
+// Editar producto
+async function editProduct(id) {
+    try {
+        const producto = await productManager.obtenerProductoPorId(id);
+        if (producto) {
+            // Llenar formulario de edición
+            document.getElementById('editProductId').value = producto.id;
+            document.getElementById('editProductName').value = producto.nombre;
+            document.getElementById('editProductDescription').value = producto.descripcion;
+            document.getElementById('editProductPrice').value = producto.precio;
+            document.getElementById('editProductStock').value = producto.stock;
+            document.getElementById('editProductCategory').value = producto.categoria;
+            document.getElementById('editProductWeight').value = producto.peso;
+            document.getElementById('editProductStatus').value = producto.estado;
+            
+            // Mostrar imagen actual
+            const currentImg = document.getElementById('currentImg');
+            if (currentImg && producto.imagen) {
+                currentImg.src = producto.imagen;
+                document.getElementById('currentImage').style.display = 'block';
+            }
+            
+            // Limpiar vista previa
+            document.getElementById('editImagePreview').style.display = 'none';
+            document.getElementById('editProductImage').value = '';
+            
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+            modal.show();
+        }
+    } catch (error) {
+        console.error('Error obteniendo producto para editar:', error);
+        showToast('Error', 'No se pudo cargar el producto para editar', 'error');
+    }
+}
+
+// Eliminar producto
+async function deleteProduct(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+        try {
+            const resultado = await productManager.eliminarProducto(id);
+            if (resultado.success) {
+                showToast('Éxito', resultado.mensaje, 'success');
+                loadProductsTable(); // Recargar tabla
+            } else {
+                showToast('Error', resultado.mensaje, 'error');
+            }
+        } catch (error) {
+            console.error('Error eliminando producto:', error);
+            showToast('Error', 'No se pudo eliminar el producto', 'error');
+        }
+    }
+}
+
+// Manejar formulario de agregar producto
+async function handleAddProductForm(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    
+    // Procesar archivo de imagen
+    const imageFile = formData.get('productImage');
+    let imagePath = null;
+    
+    if (imageFile && imageFile.size > 0) {
+        imagePath = await processImageFile(imageFile);
+        if (!imagePath) {
+            showToast('Error', 'Error procesando la imagen', 'error');
+            return;
+        }
+    }
+    
+    const productData = {
+        nombre: formData.get('productName'),
+        descripcion: formData.get('productDescription'),
+        precio: formData.get('productPrice'),
+        stock: formData.get('productStock'),
+        categoria: formData.get('productCategory'),
+        peso: formData.get('productWeight'),
+        imagen: imagePath || '../../../img/default.jpg' // Usar imagen por defecto si no se selecciona ninguna
+    };
+    
+    try {
+        const resultado = await productManager.agregarProducto(productData);
+        if (resultado.success) {
+            showToast('Éxito', resultado.mensaje, 'success');
+            event.target.reset(); // Limpiar formulario
+            // Limpiar vista previa
+            document.getElementById('imagePreview').style.display = 'none';
+            bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
+            loadProductsTable(); // Recargar tabla
+        } else {
+            showToast('Error', resultado.mensaje, 'error');
+        }
+    } catch (error) {
+        console.error('Error agregando producto:', error);
+        showToast('Error', 'No se pudo agregar el producto', 'error');
+    }
+}
+
+// Manejar formulario de editar producto
+async function handleEditProductForm(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const productId = formData.get('productId');
+    
+    // Procesar archivo de imagen si se seleccionó uno nuevo
+    const imageFile = formData.get('productImage');
+    let imagePath = null;
+    
+    if (imageFile && imageFile.size > 0) {
+        imagePath = await processImageFile(imageFile);
+        if (!imagePath) {
+            showToast('Error', 'Error procesando la imagen', 'error');
+            return;
+        }
+    }
+    
+    // Obtener producto actual para preservar imagen si no se cambia
+    const productos = await productManager.cargarProductos();
+    const productoActual = productos.productos.find(p => p.id == productId);
+    
+    const productData = {
+        nombre: formData.get('productName'),
+        descripcion: formData.get('productDescription'),
+        precio: formData.get('productPrice'),
+        stock: formData.get('productStock'),
+        categoria: formData.get('productCategory'),
+        peso: formData.get('productWeight'),
+        imagen: imagePath || productoActual?.imagen || '../../../img/default.jpg', // Mantener imagen actual si no se cambia
+        estado: formData.get('productStatus')
+    };
+    
+    try {
+        const resultado = await productManager.actualizarProducto(productId, productData);
+        if (resultado.success) {
+            showToast('Éxito', resultado.mensaje, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
+            loadProductsTable(); // Recargar tabla
+        } else {
+            showToast('Error', resultado.mensaje, 'error');
+        }
+    } catch (error) {
+        console.error('Error actualizando producto:', error);
+        showToast('Error', 'No se pudo actualizar el producto', 'error');
+    }
+}
+
+// Agregar event listener para los formularios de productos cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     const addUserForm = document.getElementById('addUserForm');
     if (addUserForm) {
         addUserForm.addEventListener('submit', handleAddUserForm);
     }
+    
+    // Formularios de productos
+    const addProductForm = document.getElementById('addProductForm');
+    if (addProductForm) {
+        addProductForm.addEventListener('submit', handleAddProductForm);
+    }
+    
+    const editProductForm = document.getElementById('editProductForm');
+    if (editProductForm) {
+        editProductForm.addEventListener('submit', handleEditProductForm);
+    }
+    
+    // Vista previa de imágenes
+    const productImageInput = document.getElementById('productImage');
+    if (productImageInput) {
+        productImageInput.addEventListener('change', handleImagePreview);
+    }
+    
+    const editProductImageInput = document.getElementById('editProductImage');
+    if (editProductImageInput) {
+        editProductImageInput.addEventListener('change', handleEditImagePreview);
+    }
 });
+
+// Funciones para manejar vistas previas de imágenes
+function handleImagePreview(event) {
+    const file = event.target.files[0];
+    const previewContainer = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
+
+function handleEditImagePreview(event) {
+    const file = event.target.files[0];
+    const previewContainer = document.getElementById('editImagePreview');
+    const previewImg = document.getElementById('editPreviewImg');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
+
+// Función para generar nombre único de archivo
+function generateUniqueFileName(originalName) {
+    const timestamp = Date.now();
+    const extension = originalName.split('.').pop();
+    const nameWithoutExt = originalName.replace(/\.[^/.]+$/, "");
+    const cleanName = nameWithoutExt.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    return `${cleanName}_${timestamp}.${extension}`;
+}
+
+// Función para procesar archivo de imagen
+async function processImageFile(file) {
+    if (!file) return null;
+    
+    // Generar nombre único
+    const uniqueFileName = generateUniqueFileName(file.name);
+    
+    // En un entorno real, aquí subirías el archivo al servidor
+    // Por ahora, simularemos que se guarda en la carpeta img
+    console.log(`Archivo procesado: ${file.name} -> img/${uniqueFileName}`);
+    
+    // Retornar la ruta relativa que usará el catálogo
+    return `../../../img/${uniqueFileName}`;
+}
