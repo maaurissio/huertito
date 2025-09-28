@@ -35,7 +35,6 @@
         
         window.alert = function(message) {
             if (message === undefined || message === 'undefined' || message === null || message === 'null') {
-                console.warn('🚫 Blocked undefined/null alert in INDEX. Stack trace:');
                 console.trace();
                 return;
             }
@@ -46,7 +45,6 @@
         console.error = function(...args) {
             const filteredArgs = args.filter(arg => {
                 if (typeof arg === 'string' && arg.includes('undefined')) {
-                    console.warn('🚫 Filtered undefined error in INDEX:', arg);
                     return false;
                 }
                 return true;
@@ -60,7 +58,6 @@
         // Interceptar promises rechazadas sin manejar
         window.addEventListener('unhandledrejection', function(event) {
             if (event.reason && (event.reason === 'undefined' || event.reason.toString().includes('undefined'))) {
-                console.warn('🚫 Blocked undefined promise rejection in INDEX');
                 event.preventDefault();
             }
         });

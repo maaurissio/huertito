@@ -12,9 +12,7 @@ const mockData = {
         products: 9 // Actualizado con el número real de productos
     },
     salesData: {
-        2025: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        2024: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        2023: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        2025: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     },
     recentActivity: [
         { type: 'system', title: 'Sistema iniciado correctamente', time: 'Hace 1 minuto', icon: 'check-circle', color: 'success' },

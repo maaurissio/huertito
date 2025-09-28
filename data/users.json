@@ -2,39 +2,36 @@
   "usuarios": [
     {
       "id": 1,
-      "email": "admin@huertohogar.com",
-      "usuario": "admin",
-      "password": "admin123",
-      "nombre": "Administrador",
-      "apellido": "Sistema",
+      "email": "mauri@huertohogar.com",
+      "usuario": "maurisio",
+      "password": "mauri123",
+      "nombre": "Mauricio",
+      "apellido": "Gajardo",
       "rol": "administrador",
-      "fechaRegistro": "2024-01-01",
-      "estado": "activo",
-      "ultimoAcceso": null
+      "fechaRegistro": "2025-01-01",
+      "estado": "activo"
     },
     {
       "id": 2,
-      "email": "mauricio@huertohogar.com",
-      "usuario": "mauricio",
-      "password": "mauri123",
-      "nombre": "Mauricio",
-      "apellido": "González",
-      "rol": "usuario",
-      "fechaRegistro": "2024-01-15",
-      "estado": "activo",
-      "ultimoAcceso": null
+      "email": "vixo@huertohogar.com",
+      "usuario": "minipekka",
+      "password": "vixo123",
+      "nombre": "Vicente",
+      "apellido": "Colicheo",
+      "rol": "administrador",
+      "fechaRegistro": "2025-01-15",
+      "estado": "activo"
     },
     {
       "id": 3,
-      "email": "cliente@huertohogar.com",
-      "usuario": "cliente",
-      "password": "cliente123",
-      "nombre": "María",
-      "apellido": "Cliente",
+      "email": "wacoldo@gmail.com",
+      "usuario": "wacoldo",
+      "password": "wa123",
+      "nombre": "Wacoldo",
+      "apellido": "Diogenes",
       "rol": "usuario",
-      "fechaRegistro": "2024-02-01",
-      "estado": "activo",
-      "ultimoAcceso": null
+      "fechaRegistro": "2025-02-01",
+      "estado": "activo"
     }
   ],
   "configuracion": {

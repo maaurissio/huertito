@@ -1,8 +1,3 @@
-/**
- * Gestor de Usuarios - HuertoHogar
- * Maneja la lectura y escritura de usuarios en JSON
- */
-
 class UserManager {
     constructor() {
         this.usuariosCache = null;
@@ -86,8 +81,7 @@ class UserManager {
                     apellido: "Sistema",
                     rol: "administrador",
                     fechaRegistro: new Date().toISOString().split('T')[0],
-                    estado: "activo",
-                    ultimoAcceso: null
+                    estado: "activo"
                 }
             ],
             configuracion: {
@@ -118,16 +112,6 @@ class UserManager {
             console.log('UserManager: Usuario encontrado:', !!usuarioEncontrado);
 
             if (usuarioEncontrado) {
-                // Actualizar último acceso
-                usuarioEncontrado.ultimoAcceso = new Date().toISOString();
-                
-                try {
-                    await this.guardarUsuarios(data);
-                } catch (saveError) {
-                    console.warn('UserManager: No se pudo guardar último acceso:', saveError);
-                    // Continuar con el login aunque no se pueda guardar
-                }
-                
                 // Guardar sesión
                 const sesion = {
                     id: usuarioEncontrado.id,
@@ -187,8 +171,7 @@ class UserManager {
                 apellido: datosUsuario.apellido || '',
                 rol: datosUsuario.rol || 'vendedor',
                 fechaRegistro: new Date().toISOString().split('T')[0],
-                estado: 'activo',
-                ultimoAcceso: null
+                estado: 'activo'
             };
 
             // Agregar a la lista
@@ -260,8 +243,7 @@ class UserManager {
             apellido: u.apellido,
             rol: u.rol,
             fechaRegistro: u.fechaRegistro,
-            estado: u.estado,
-            ultimoAcceso: u.ultimoAcceso
+            estado: u.estado
         }));
     }
 
@@ -412,7 +394,102 @@ class UserManager {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return regex.test(email);
     }
+
+    async resetearSistemaUsuarios() {
+        console.log('UserManager: Reseteando sistema de usuarios...');
+        
+        try {
+            // Limpiar caché y localStorage
+            this.usuariosCache = null;
+            localStorage.removeItem('usuariosJSON');
+            
+            // Forzar recarga desde JSON
+            const data = await this.cargarUsuarios();
+            
+            console.log('UserManager: Sistema reseteado exitosamente');
+            console.log('UserManager: Usuarios cargados:', data.usuarios.length);
+            
+            return {
+                success: true,
+                mensaje: `Sistema reseteado. ${data.usuarios.length} usuarios cargados desde JSON`,
+                usuarios: data.usuarios
+            };
+        } catch (error) {
+            console.error('UserManager: Error al resetear sistema:', error);
+            return {
+                success: false,
+                mensaje: 'Error al resetear sistema de usuarios'
+            };
+        }
+    }
+
+    /**
+     * Verificar origen de usuarios actual
+     */
+    verificarOrigenUsuarios() {
+        const usuariosLocal = localStorage.getItem('usuariosJSON');
+        if (usuariosLocal) {
+            return {
+                origen: 'localStorage',
+                mensaje: 'Usando usuarios desde localStorage (dashboard)'
+            };
+        } else {
+            return {
+                origen: 'json',
+                mensaje: 'Se cargarán usuarios desde users.json'
+            };
+        }
+    }
 }
 
 // Crear instancia global
 const userManager = new UserManager();
+
+/**
+ * Resetear usuarios desde JSON - usar en consola del navegador
+ */
+window.resetearUsuarios = async function() {
+    console.log('🔄 Reseteando usuarios desde JSON...');
+    const resultado = await userManager.resetearSistemaUsuarios();
+    console.log(resultado.success ? '✅' : '❌', resultado.mensaje);
+    if (resultado.success) {
+        console.table(resultado.usuarios.map(u => ({
+            ID: u.id,
+            Usuario: u.usuario,
+            Email: u.email,
+            Nombre: `${u.nombre} ${u.apellido}`,
+            Rol: u.rol
+        })));
+    }
+    return resultado;
+};
+
+/**
+ * Ver usuarios actuales - usar en consola del navegador
+ */
+window.verUsuarios = async function() {
+    console.log('👥 Usuarios actuales:');
+    const data = await userManager.cargarUsuarios();
+    console.table(data.usuarios.map(u => ({
+        ID: u.id,
+        Usuario: u.usuario,
+        Email: u.email,
+        Nombre: `${u.nombre} ${u.apellido}`,
+        Rol: u.rol,
+        Estado: u.estado
+    })));
+    
+    const origen = userManager.verificarOrigenUsuarios();
+    console.log('📍 Origen:', origen.mensaje);
+    return data.usuarios;
+};
+
+/**
+ * Limpiar localStorage de usuarios - usar en consola del navegador
+ */
+window.limpiarUsuarios = function() {
+    localStorage.removeItem('usuariosJSON');
+    localStorage.removeItem('sesionActiva');
+    console.log('🧹 localStorage de usuarios limpiado');
+    console.log('💡 Recarga la página para cargar usuarios desde JSON');
+};

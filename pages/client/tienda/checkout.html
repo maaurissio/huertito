@@ -171,7 +171,11 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="phone" class="form-label">Teléfono *</label>
-                                        <input type="tel" class="form-control" id="phone" required>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-success text-white">+56</span>
+                                            <input type="tel" class="form-control" id="phone" placeholder="912345678" maxlength="9" pattern="[0-9]{9}" required>
+                                        </div>
+                                        <small class="form-text text-muted">Ingresa 9 dígitos (ej: 912345678)</small>
                                     </div>
 
                                     <!-- Datos de envío -->
@@ -185,20 +189,31 @@
                                         <input type="text" class="form-control" id="address" placeholder="Calle, número, piso, departamento" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="city" class="form-label">Ciudad *</label>
-                                        <input type="text" class="form-control" id="city" required>
-                                    </div>
-                                    <div class="col-md-4">
                                         <label for="region" class="form-label">Región *</label>
                                         <select class="form-select" id="region" required>
                                             <option value="">Seleccionar región</option>
-                                            <option value="metropolitana">Región Metropolitana</option>
+                                            <option value="arica-parinacota">Arica y Parinacota</option>
+                                            <option value="tarapaca">Tarapacá</option>
+                                            <option value="antofagasta">Antofagasta</option>
+                                            <option value="atacama">Atacama</option>
+                                            <option value="coquimbo">Coquimbo</option>
                                             <option value="valparaiso">Valparaíso</option>
+                                            <option value="metropolitana">Región Metropolitana</option>
+                                            <option value="ohiggins">O'Higgins</option>
+                                            <option value="maule">Maule</option>
+                                            <option value="nuble">Ñuble</option>
                                             <option value="bio-bio">Biobío</option>
                                             <option value="araucania">La Araucanía</option>
-                                            <option value="maule">Maule</option>
+                                            <option value="los-rios">Los Ríos</option>
                                             <option value="los-lagos">Los Lagos</option>
-                                            <option value="other">Otra región</option>
+                                            <option value="aysen">Aysén</option>
+                                            <option value="magallanes">Magallanes</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="city" class="form-label">Ciudad *</label>
+                                        <select class="form-select" id="city" required disabled>
+                                            <option value="">Primero selecciona una región</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -296,9 +311,38 @@
         let checkoutType = null;
         let cartItems = [];
         
+        // Ciudades por región de Chile
+        const ciudadesPorRegion = {
+            'arica-parinacota': ['Arica', 'Putre', 'Camarones'],
+            'tarapaca': ['Iquique', 'Alto Hospicio', 'Pozo Almonte', 'Pica'],
+            'antofagasta': ['Antofagasta', 'Calama', 'Tocopilla', 'Mejillones', 'Taltal'],
+            'atacama': ['Copiapó', 'Vallenar', 'Caldera', 'Chañaral', 'Diego de Almagro'],
+            'coquimbo': ['La Serena', 'Coquimbo', 'Ovalle', 'Illapel', 'Vicuña'],
+            'valparaiso': ['Valparaíso', 'Viña del Mar', 'Quilpué', 'Villa Alemana', 'San Antonio', 'Quillota', 'Los Andes', 'Limache'],
+            'metropolitana': ['Santiago', 'Puente Alto', 'Maipú', 'Las Condes', 'La Florida', 'Ñuñoa', 'Providencia', 'Vitacura', 'San Bernardo', 'Quilicura'],
+            'ohiggins': ['Rancagua', 'Machalí', 'Graneros', 'San Fernando', 'Rengo', 'Pichilemu'],
+            'maule': ['Talca', 'Curicó', 'Linares', 'Molina', 'Constitución', 'Cauquenes'],
+            'nuble': ['Chillán', 'San Carlos', 'Bulnes', 'Quirihue'],
+            'bio-bio': ['Concepción', 'Talcahuano', 'Los Ángeles', 'Chiguayante', 'San Pedro de la Paz', 'Coronel', 'Tomé'],
+            'araucania': ['Temuco', 'Padre Las Casas', 'Villarrica', 'Pucón', 'Angol', 'Victoria'],
+            'los-rios': ['Valdivia', 'La Unión', 'Río Bueno', 'Panguipulli'],
+            'los-lagos': ['Puerto Montt', 'Castro', 'Osorno', 'Puerto Varas', 'Ancud', 'Frutillar'],
+            'aysen': ['Coyhaique', 'Puerto Aysén', 'Chile Chico'],
+            'magallanes': ['Punta Arenas', 'Puerto Natales', 'Porvenir']
+        };
+        
         document.addEventListener('DOMContentLoaded', function() {
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
+            
+            // Configurar eventos de región y ciudad
+            setupRegionCityEvents();
+            
+            // Configurar validación de teléfono chileno
+            setupPhoneValidation();
+            
+            // Configurar validaciones de formulario
+            setupFormValidations();
             
             // Inicializar carrito y verificar usuario
             setTimeout(() => {
@@ -489,8 +533,8 @@
                 return;
             }
             
-            if (phone.length < 8) {
-                document.getElementById('phone').setCustomValidity('Por favor ingresa un número de teléfono válido.');
+            if (phone.length !== 9 || !/^\d{9}$/.test(phone)) {
+                document.getElementById('phone').setCustomValidity('El teléfono debe tener exactamente 9 dígitos.');
                 form.reportValidity();
                 return;
             }
@@ -635,6 +679,224 @@
         function saveCartForLogin() {
             localStorage.setItem('pendingCheckout', 'true');
         }
+        
+        // Función para configurar los eventos de región y ciudad
+        function setupRegionCityEvents() {
+            const regionSelect = document.getElementById('region');
+            const citySelect = document.getElementById('city');
+            
+            if (regionSelect && citySelect) {
+                // Asegurar que ciudad esté deshabilitada al inicio
+                citySelect.disabled = true;
+                citySelect.innerHTML = '<option value="">Primero selecciona una región</option>';
+                
+                regionSelect.addEventListener('change', function() {
+                    const selectedRegion = this.value;
+                    console.log('Checkout: Región seleccionada:', selectedRegion);
+                    
+                    // Limpiar opciones de ciudad
+                    citySelect.innerHTML = '';
+                    
+                    if (selectedRegion && ciudadesPorRegion[selectedRegion]) {
+                        // Habilitar el campo de ciudad
+                        citySelect.disabled = false;
+                        
+                        // Agregar opción por defecto
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = 'Selecciona tu ciudad';
+                        citySelect.appendChild(defaultOption);
+                        
+                        // Agregar ciudades de la región seleccionada
+                        ciudadesPorRegion[selectedRegion].forEach(ciudad => {
+                            const option = document.createElement('option');
+                            option.value = ciudad.toLowerCase().replace(/\s+/g, '-');
+                            option.textContent = ciudad;
+                            citySelect.appendChild(option);
+                        });
+                        
+                        // Cambiar el estilo visual para indicar que ahora está habilitado
+                        citySelect.classList.remove('text-muted');
+                        
+                        console.log('Checkout: Ciudades cargadas para', selectedRegion, ':', ciudadesPorRegion[selectedRegion].length);
+                        
+                        // Pequeña animación para llamar la atención al campo de ciudad
+                        citySelect.style.transform = 'scale(1.02)';
+                        setTimeout(() => {
+                            citySelect.style.transform = 'scale(1)';
+                        }, 200);
+                        
+                    } else {
+                        // Si no hay región seleccionada, deshabilitar ciudad
+                        citySelect.disabled = true;
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = 'Primero selecciona una región';
+                        citySelect.appendChild(defaultOption);
+                        citySelect.classList.add('text-muted');
+                    }
+                });
+                
+                console.log('Checkout: Eventos de región y ciudad configurados');
+            } else {
+                console.warn('Checkout: No se encontraron los elementos region o city');
+            }
+        }
+        
+        // Función para configurar validación de teléfono chileno
+        function setupPhoneValidation() {
+            const phoneInput = document.getElementById('phone');
+            
+            if (phoneInput) {
+                // Solo permitir números
+                phoneInput.addEventListener('input', function(e) {
+                    // Remover cualquier caracter que no sea número
+                    let value = e.target.value.replace(/\D/g, '');
+                    
+                    // Limitar a 9 dígitos
+                    if (value.length > 9) {
+                        value = value.slice(0, 9);
+                    }
+                    
+                    e.target.value = value;
+                });
+                
+                // Formatear mientras se escribe para mejor UX
+                phoneInput.addEventListener('input', function(e) {
+                    let value = e.target.value;
+                    
+                    // Si tiene 9 dígitos, formatear como 9 1234 5678
+                    if (value.length === 9) {
+                        value = value.replace(/(\d{1})(\d{4})(\d{4})/, '$1 $2 $3');
+                    }
+                    
+                    e.target.value = value.replace(/\s/g, ''); // Remover espacios para el valor real
+                });
+                
+                // Validación en tiempo real
+                phoneInput.addEventListener('blur', function(e) {
+                    const value = e.target.value;
+                    
+                    if (value.length > 0 && value.length < 9) {
+                        e.target.setCustomValidity('El teléfono debe tener exactamente 9 dígitos');
+                        e.target.classList.add('is-invalid');
+                    } else if (value.length === 9) {
+                        e.target.setCustomValidity('');
+                        e.target.classList.remove('is-invalid');
+                        e.target.classList.add('is-valid');
+                    } else {
+                        e.target.setCustomValidity('');
+                        e.target.classList.remove('is-invalid', 'is-valid');
+                    }
+                });
+                
+                // Limpiar validación cuando el usuario empiece a escribir de nuevo
+                phoneInput.addEventListener('focus', function(e) {
+                    e.target.classList.remove('is-invalid', 'is-valid');
+                });
+                
+                console.log('Checkout: Validación de teléfono configurada');
+            } else {
+                console.warn('Checkout: No se encontró el campo de teléfono');
+            }
+        }
+        
+        // Función para configurar validaciones de formulario (nombre, apellido, email)
+        function setupFormValidations() {
+            const firstNameInput = document.getElementById('firstName');
+            const lastNameInput = document.getElementById('lastName');
+            const emailInput = document.getElementById('email');
+            
+            // Validación para nombre - solo letras, espacios y acentos
+            if (firstNameInput) {
+                firstNameInput.addEventListener('input', function(e) {
+                    // Permitir solo letras, espacios, acentos y caracteres especiales del español
+                    let value = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                    e.target.value = value;
+                });
+                
+                firstNameInput.addEventListener('blur', function(e) {
+                    const value = e.target.value.trim();
+                    
+                    if (value.length === 0) {
+                        e.target.setCustomValidity('El nombre es obligatorio.');
+                        e.target.classList.add('is-invalid');
+                    } else if (value.length < 2) {
+                        e.target.setCustomValidity('El nombre debe tener al menos 2 caracteres.');
+                        e.target.classList.add('is-invalid');
+                    } else {
+                        e.target.setCustomValidity('');
+                        e.target.classList.remove('is-invalid');
+                        e.target.classList.add('is-valid');
+                    }
+                });
+                
+                firstNameInput.addEventListener('focus', function(e) {
+                    e.target.classList.remove('is-invalid', 'is-valid');
+                });
+            }
+            
+            // Validación para apellido - solo letras, espacios y acentos
+            if (lastNameInput) {
+                lastNameInput.addEventListener('input', function(e) {
+                    // Permitir solo letras, espacios, acentos y caracteres especiales del español
+                    let value = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                    e.target.value = value;
+                });
+                
+                lastNameInput.addEventListener('blur', function(e) {
+                    const value = e.target.value.trim();
+                    
+                    if (value.length === 0) {
+                        e.target.setCustomValidity('El apellido es obligatorio.');
+                        e.target.classList.add('is-invalid');
+                    } else if (value.length < 2) {
+                        e.target.setCustomValidity('El apellido debe tener al menos 2 caracteres.');
+                        e.target.classList.add('is-invalid');
+                    } else {
+                        e.target.setCustomValidity('');
+                        e.target.classList.remove('is-invalid');
+                        e.target.classList.add('is-valid');
+                    }
+                });
+                
+                lastNameInput.addEventListener('focus', function(e) {
+                    e.target.classList.remove('is-invalid', 'is-valid');
+                });
+            }
+            
+            // Validación para email - formato válido
+            if (emailInput) {
+                emailInput.addEventListener('blur', function(e) {
+                    const value = e.target.value.trim();
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    
+                    if (value.length === 0) {
+                        e.target.setCustomValidity('El correo electrónico es obligatorio.');
+                        e.target.classList.add('is-invalid');
+                    } else if (!emailRegex.test(value)) {
+                        e.target.setCustomValidity('Por favor ingresa un correo electrónico válido.');
+                        e.target.classList.add('is-invalid');
+                    } else {
+                        e.target.setCustomValidity('');
+                        e.target.classList.remove('is-invalid');
+                        e.target.classList.add('is-valid');
+                    }
+                });
+                
+                emailInput.addEventListener('focus', function(e) {
+                    e.target.classList.remove('is-invalid', 'is-valid');
+                });
+                
+                // Validación en tiempo real para email (opcional, más suave)
+                emailInput.addEventListener('input', function(e) {
+                    // Remover espacios en tiempo real
+                    e.target.value = e.target.value.replace(/\s/g, '');
+                });
+            }
+            
+            console.log('Checkout: Validaciones de formulario configuradas');
+        }
     </script>
 
     <style>
@@ -656,6 +918,87 @@
             position: sticky;
             top: 20px;
             z-index: 1020;
+        }
+        
+        /* Estilos para campos deshabilitados */
+        .form-select:disabled {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .form-select:disabled:focus {
+            box-shadow: none;
+            border-color: #ced4da;
+        }
+        
+        .form-select {
+            transition: all 0.3s ease;
+        }
+        
+        .form-select:not(:disabled):hover {
+            border-color: #28a745;
+        }
+        
+        /* Estilos para el campo de teléfono */
+        .input-group-text.bg-success {
+            border-color: #28a745;
+            font-weight: 600;
+        }
+        
+        .input-group .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            border-color: #28a745;
+        }
+        
+        .input-group .form-control.is-valid {
+            border-color: #28a745;
+        }
+        
+        .input-group .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+        
+        /* Estilos consistentes para campos de formulario con borde verde suave */
+        .form-control {
+            border-color: rgba(40, 167, 69, 0.3);
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-control:hover {
+            border-color: rgba(40, 167, 69, 0.5);
+        }
+        
+        .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        
+        .input-group-text {
+            border-color: rgba(40, 167, 69, 0.3);
+            transition: border-color 0.2s ease;
+        }
+        
+        .input-group-text:hover {
+            border-color: rgba(40, 167, 69, 0.5);
+        }
+        
+        .input-group-text.bg-success {
+            border-color: rgba(40, 167, 69, 0.6);
+        }
+        
+        .input-group-text.bg-success:hover {
+            border-color: #28a745;
+        }
+        
+        /* Estilos para cuando el input del teléfono está enfocado */
+        .input-group:focus-within .input-group-text.bg-success {
+            border-color: #28a745;
+        }
+        
+        .input-group:focus-within .form-control {
+            border-color: #28a745;
         }
         
         @media (max-width: 991px) {
