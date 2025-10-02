@@ -38,53 +38,13 @@ const mockData = {
     orders: []
 };
 
-document.addEventListener('DOMContentLoaded', async function() {
-    await setupAutomatico();
+document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
     loadStats();
     initializeCharts();
     loadRecentActivity();
     updateNotificationCount();
 });
-
-// Setup automatico del sistema
-async function setupAutomatico() {
-    const productosExistentes = localStorage.getItem('productosJSON');
-    
-    if (!productosExistentes) {
-        console.log('Cargando productos desde JSON...');
-        
-        try {
-            const response = await fetch('../../data/products.json');
-            if (response.ok) {
-                const datosJSON = await response.json();
-                
-                // Normalizar rutas de imagenes
-                datosJSON.productos.forEach(producto => {
-                    if (producto.imagen && !producto.imagen.startsWith('http')) {
-                        if (!producto.imagen.startsWith('img/')) {
-                            if (producto.imagen.includes('img/')) {
-                                const nombreArchivo = producto.imagen.split('img/')[1];
-                                producto.imagen = 'img/' + nombreArchivo;
-                            } else {
-                                producto.imagen = 'img/default.jpg';
-                            }
-                        }
-                    }
-                });
-                
-                localStorage.setItem('productosJSON', JSON.stringify(datosJSON));
-                console.log('Productos cargados desde JSON:', datosJSON.productos.length);
-            } else {
-                console.warn('No se pudo cargar products.json');
-            }
-        } catch (error) {
-            console.warn('Error cargando JSON:', error);
-        }
-    } else {
-        console.log('Productos ya existen en localStorage');
-    }
-}
 
 // Funciones principales
 function initializeDashboard() {
@@ -2061,25 +2021,3 @@ async function confirmStockReplenishment(productId) {
         showToast('Error', 'Error al reponer el stock', 'error');
     }
 }
-
-// Funciones de utilidad
-window.resetearSistema = function() {
-    console.log('Reseteando sistema...');
-    localStorage.clear();
-    location.reload();
-};
-
-window.verificarSistema = function() {
-    console.log('Estado del sistema:');
-    const productos = localStorage.getItem('productosJSON');
-    console.log('Productos en localStorage:', productos ? 'SI' : 'NO');
-    
-    if (productos) {
-        try {
-            const data = JSON.parse(productos);
-            console.log('Cantidad de productos:', data.productos?.length || 0);
-        } catch (error) {
-            console.log('Error parseando productos:', error);
-        }
-    }
-};

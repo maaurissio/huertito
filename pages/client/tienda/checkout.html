@@ -29,6 +29,13 @@
     
     <!-- Sistema de carrito -->
     <script src="../../../js/carrito.js"></script>
+    
+    <!-- Sistema de configuración de envío -->
+    <script src="../../../js/shippingConfig.js"></script>
+    
+    <!-- Sistema de gestión de pedidos -->
+    <script src="../../../js/productManager.js"></script>
+    <script src="../../../js/orderManager.js"></script>
 
 </head>
 
@@ -478,23 +485,35 @@
                 `;
             }).join('');
             
-            // Agregar información de envío
+            // Calcular información de envío usando configuración dinámica
+            const shippingCost = shippingConfig.calculateShippingCost(total);
+            const isFreeShipping = shippingConfig.qualifiesForFreeShipping(total);
+            const shippingMessage = shippingConfig.getShippingMessage(total);
+            const config = shippingConfig.getConfig();
+            
+            // Agregar información de envío dinámica
             const shippingHTML = `
                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                     <div class="flex-grow-1">
-                        <h6 class="mb-0 small text-success">
+                        <h6 class="mb-0 small ${isFreeShipping ? 'text-success' : 'text-dark'}">
                             <i class="fas fa-truck me-1"></i>Envío
                         </h6>
-                        <small class="text-muted">Gratis en pedidos sobre $30.000</small>
+                        <small class="text-muted">${config.enableFreeShipping ? `Gratis desde ${shippingConfig.formatPrice(config.freeShippingThreshold)}` : 'Costo fijo de envío'}</small>
                     </div>
                     <div class="text-end">
-                        <strong class="small text-success">Gratis</strong>
+                        ${isFreeShipping ? 
+                            '<strong class="small text-success">Gratis</strong>' : 
+                            `<strong class="small">${shippingConfig.formatPrice(shippingCost)}</strong>`
+                        }
                     </div>
                 </div>
             `;
             
+            // Calcular total final incluyendo envío
+            const finalOrderTotal = total + shippingCost;
+            
             summaryContainer.innerHTML = itemsHTML + shippingHTML;
-            finalTotal.textContent = formatPrice(total);
+            finalTotal.textContent = formatPrice(finalOrderTotal);
             
             console.log('Checkout: Total calculado:', total);
         }
@@ -557,6 +576,11 @@
                 }
             }
             
+            // Calcular totales
+            const subtotal = calculateSubtotal();
+            const shippingCost = shippingConfig.calculateShippingCost(subtotal);
+            const finalTotal = subtotal + shippingCost;
+            
             // Recopilar datos del formulario
             const orderData = {
                 type: checkoutType,
@@ -571,10 +595,15 @@
                     city: document.getElementById('city').value,
                     region: document.getElementById('region').value,
                     zipCode: document.getElementById('zipCode').value,
-                    notes: document.getElementById('notes').value
+                    notes: document.getElementById('notes').value,
+                    cost: shippingCost,
+                    isFree: shippingConfig.qualifiesForFreeShipping(subtotal),
+                    config: shippingConfig.getConfig() // Para referencia
                 },
                 items: cartItems,
-                total: calculateTotal()
+                subtotal: subtotal,
+                shippingCost: shippingCost,
+                total: finalTotal
             };
             
             // Si quiere crear cuenta
@@ -600,6 +629,18 @@
         }
         
         function calculateTotal() {
+            const subtotal = cartItems.reduce((sum, item) => {
+                const price = parseFloat(item.price || item.precio || 0);
+                const quantity = parseInt(item.quantity || item.cantidad || 1);
+                return sum + (price * quantity);
+            }, 0);
+            
+            // Agregar costo de envío
+            const shippingCost = shippingConfig.calculateShippingCost(subtotal);
+            return subtotal + shippingCost;
+        }
+        
+        function calculateSubtotal() {
             return cartItems.reduce((sum, item) => {
                 const price = parseFloat(item.price || item.precio || 0);
                 const quantity = parseInt(item.quantity || item.cantidad || 1);
@@ -607,7 +648,7 @@
             }, 0);
         }
 
-        function processOrder(orderData) {
+        async function processOrder(orderData) {
             console.log('Checkout: Procesando orden:', orderData);
             
             // Mostrar indicador de procesamiento
@@ -616,31 +657,42 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando pedido...';
             btn.disabled = true;
             
-            // Simular procesamiento
-            setTimeout(() => {
-                try {
-                    // Limpiar carrito usando el sistema correcto
-                    if (window.cartSystem) {
-                        console.log('Checkout: Limpiando carrito con CartSystem');
-                        window.cartSystem.clearCartSilent();
-                    } else {
-                        console.log('Checkout: Limpiando carrito manualmente');
-                        // Fallback: limpiar manualmente
-                        const user = typeof obtenerUsuarioLogueado === 'function' ? obtenerUsuarioLogueado() : null;
-                        const cartKey = user ? `carrito_${user.email}` : 'carrito_guest';
-                        localStorage.removeItem(cartKey);
-                    }
+            // Simular procesamiento con async/await
+            try {
+                // Simular un breve delay para UX
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Limpiar carrito usando el sistema correcto
+                if (window.cartSystem) {
+                    console.log('Checkout: Limpiando carrito con CartSystem');
+                    window.cartSystem.clearCartSilent();
+                } else {
+                    console.log('Checkout: Limpiando carrito manualmente');
+                    // Fallback: limpiar manualmente
+                    const user = typeof obtenerUsuarioLogueado === 'function' ? obtenerUsuarioLogueado() : null;
+                    const cartKey = user ? `carrito_${user.email}` : 'carrito_guest';
+                    localStorage.removeItem(cartKey);
+                }
+                
+                // Actualizar badge del carrito flotante si existe
+                if (typeof updateFloatingCartBadge === 'function') {
+                    updateFloatingCartBadge();
+                }
+                
+                // Guardar pedido en el sistema de gestión
+                const orderResult = orderManager.createOrder(orderData);
+                
+                if (orderResult.success) {
+                    console.log('Checkout: Pedido guardado en sistema:', orderResult.order.id);
                     
-                    // Actualizar badge del carrito flotante si existe
-                    if (typeof updateFloatingCartBadge === 'function') {
-                        updateFloatingCartBadge();
-                    }
+                    // Reducir stock de productos en el pedido
+                    await processStockReduction(orderData.items);
                     
-                    // Guardar orden para página de confirmación con timestamp
+                    // Guardar orden para página de confirmación
                     const orderWithId = {
                         ...orderData,
-                        id: 'ORD-' + Date.now(),
-                        fecha: new Date().toISOString(),
+                        id: orderResult.order.id,
+                        fecha: orderResult.order.date,
                         estado: 'confirmado'
                     };
                     
@@ -651,23 +703,26 @@
                     // Redirigir a página de éxito
                     window.location.href = 'compraexitosa.html';
                     
-                } catch (error) {
-                    console.error('Error procesando orden:', error);
-                    
-                    // Mostrar error en la página sin usar alert
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'alert alert-danger mt-3';
-                    errorDiv.innerHTML = `
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        Hubo un error procesando tu pedido. Por favor intenta nuevamente.
-                    `;
-                    btn.parentNode.insertBefore(errorDiv, btn.nextSibling);
-                    
-                    // Restaurar botón
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                } else {
+                    throw new Error('Error al guardar el pedido: ' + orderResult.error);
                 }
-            }, 1500);
+                
+            } catch (error) {
+                console.error('Error procesando orden:', error);
+                
+                // Mostrar error en la página sin usar alert
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger mt-3';
+                errorDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Hubo un error procesando tu pedido. Por favor intenta nuevamente.
+                `;
+                btn.parentNode.insertBefore(errorDiv, btn.nextSibling);
+                
+                // Restaurar botón
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
         function goBack() {
@@ -896,6 +951,58 @@
             }
             
             console.log('Checkout: Validaciones de formulario configuradas');
+        }
+
+        // Función para reducir stock después de confirmar compra
+        async function processStockReduction(orderItems) {
+            console.log('Checkout: Iniciando reducción de stock para:', orderItems);
+            
+            try {
+                // Crear una instancia de ProductManager si no existe
+                const productManager = new ProductManager();
+                
+                for (const item of orderItems) {
+                    console.log(`Checkout: Procesando stock para producto ${item.name} (ID: ${item.id})`);
+                    
+                    // Obtener información actual del producto
+                    const allProducts = await productManager.obtenerTodosLosProductos();
+                    if (!allProducts.success) {
+                        console.error('Error obteniendo productos:', allProducts.mensaje);
+                        continue;
+                    }
+                    
+                    const producto = allProducts.productos.find(p => p.id === parseInt(item.id));
+                    if (!producto) {
+                        console.warn(`Producto ${item.id} no encontrado en inventario`);
+                        continue;
+                    }
+                    
+                    // Calcular nuevo stock
+                    const nuevoStock = Math.max(0, producto.stock - parseInt(item.quantity));
+                    console.log(`Checkout: Stock actual: ${producto.stock}, cantidad vendida: ${item.quantity}, nuevo stock: ${nuevoStock}`);
+                    
+                    // Actualizar producto con nuevo stock
+                    const datosActualizados = {
+                        ...producto,
+                        stock: nuevoStock
+                    };
+                    
+                    const resultado = await productManager.actualizarProducto(producto.id, datosActualizados);
+                    
+                    if (resultado.success) {
+                        console.log(`Checkout: Stock actualizado para ${producto.nombre}: ${nuevoStock}`);
+                    } else {
+                        console.error(`Error actualizando stock para ${producto.nombre}:`, resultado.mensaje);
+                    }
+                }
+                
+                console.log('Checkout: Reducción de stock completada');
+                return { success: true };
+                
+            } catch (error) {
+                console.error('Error en reducción de stock:', error);
+                return { success: false, error: error.message };
+            }
         }
     </script>
 

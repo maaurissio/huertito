@@ -7,7 +7,26 @@
     <title>HuertoHogar - Catálogo</title>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/            productos.forEach(producto => {
+                const col = document.createElement('div');
+                col.className = 'col-12 col-sm-6 col-md-4 col-lg-3 product-col';
+                col.setAttribute('data-category', producto.categoria);
+                
+                // Transformar ruta de imagen para el catálogo
+                let imagenSrc = producto.imagen;
+                if (imagenSrc && imagenSrc.includes('img/') && !imagenSrc.includes('../../../')) {
+                    if (imagenSrc.startsWith('img/')) {
+                        imagenSrc = '../../../' + imagenSrc;
+                    } else {
+                        imagenSrc = imagenSrc.replace('img/', '../../../img/');
+                    }
+                } else if (!imagenSrc || !imagenSrc.includes('img/')) {
+                    imagenSrc = '../../../img/default.jpg';
+                }
+                
+                col.innerHTML = `
+                    <div class="card product-card shadow-sm h-100 d-flex flex-column">
+                        
 
     <!-- CSS Personalizado -->
     <link href="../../../css/style.css" rel="stylesheet">
@@ -66,19 +85,47 @@
         
         /* Estilos para la sección de información de productos */
         .product-info-section {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 10px;
+            /* Fondo removido para diseño más limpio */
+            border-top: 2px solid #e9ecef;
+            padding: 15px 0 0 0;
+            margin-top: 15px;
         }
         
         .price-text {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: #2f9e44 !important;
+            font-weight: 600;
         }
         
         .stock-info {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+        }
+        
+        .stock-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .stock-high {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .stock-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .stock-low {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .price-container {
+            border-left: 3px solid #2f9e44;
+            padding-left: 10px;
         }
         
         .add-to-cart-btn {
@@ -154,19 +201,19 @@
                     <div class="col-lg-10">
                         <h5 class="text-center text-muted mb-4 fw-medium">Explora por categorías</h5>
                         <div class="d-flex flex-wrap justify-content-center gap-3">
-                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="frutas" style="min-width: 160px;">
+                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="Frutas Frescas" style="min-width: 160px;">
                                 <span class="fs-4 me-2">🍎</span>
                                 <span class="fw-medium">Frutas Frescas</span>
                             </button>
-                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="verduras" style="min-width: 160px;">
+                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="Verduras Orgánicas" style="min-width: 160px;">
                                 <span class="fs-4 me-2">🥬</span>
                                 <span class="fw-medium">Verduras Orgánicas</span>
                             </button>
-                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="organicos" style="min-width: 160px;">
+                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="Productos Orgánicos" style="min-width: 160px;">
                                 <span class="fs-4 me-2">🌱</span>
                                 <span class="fw-medium">Productos Orgánicos</span>
                             </button>
-                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="lacteos" style="min-width: 160px;">
+                            <button class="btn btn-outline-success rounded-pill px-4 py-3 border-2 category-btn" data-category="Productos Lácteos" style="min-width: 160px;">
                                 <span class="fs-4 me-2">🥛</span>
                                 <span class="fw-medium">Productos Lácteos</span>
                             </button>
@@ -216,10 +263,19 @@
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
             
-            // Inicializar sistemas después de un delay mínimo
+            // Inicializar ProductManager y sistemas después de un delay mínimo
             setTimeout(() => {
                 console.log('=== TIMEOUT EJECUTÁNDOSE ===');
                 console.log('Inicializando sistemas...');
+                
+                // Crear instancia global de ProductManager
+                if (typeof ProductManager !== 'undefined') {
+                    window.productManager = new ProductManager();
+                    console.log('✅ ProductManager instanciado globalmente');
+                } else {
+                    console.error('❌ ProductManager no está disponible');
+                }
+                
                 initializeCartSystem();
                 cargarProductosCatalogo();
                 // Forzar actualización del badge del carrito
@@ -244,9 +300,16 @@
                 }
                 
                 console.log('Llamando a productManager.obtenerProductosActivos()...');
-                todosLosProductos = await productManager.obtenerProductosActivos();
-                console.log('Productos obtenidos:', todosLosProductos);
-                console.log('Cantidad de productos:', todosLosProductos ? todosLosProductos.length : 'null/undefined');
+                const resultado = await productManager.obtenerProductosActivos();
+                console.log('Resultado obtenido:', resultado);
+                
+                if (resultado.success) {
+                    todosLosProductos = resultado.productos;
+                    console.log('Productos activos obtenidos:', todosLosProductos.length);
+                } else {
+                    console.error('Error obteniendo productos:', resultado.mensaje);
+                    todosLosProductos = [];
+                }
                 
                 // Mostrar productos
                 mostrarProductos(todosLosProductos);
@@ -284,9 +347,21 @@
                 col.className = 'col-12 col-sm-6 col-md-4 col-lg-3 product-col';
                 col.setAttribute('data-category', producto.categoria);
                 
+                // Transformar ruta de imagen para el catálogo
+                let imagenSrc = producto.imagen;
+                if (imagenSrc && imagenSrc.includes('img/') && !imagenSrc.includes('../../../')) {
+                    if (imagenSrc.startsWith('img/')) {
+                        imagenSrc = '../../../' + imagenSrc;
+                    } else {
+                        imagenSrc = imagenSrc.replace('img/', '../../../img/');
+                    }
+                } else if (!imagenSrc || !imagenSrc.includes('img/')) {
+                    imagenSrc = '../../../img/default.jpg';
+                }
+                
                 col.innerHTML = `
                     <div class="card product-card shadow-sm h-100 d-flex flex-column">
-                        <img src="${producto.imagen}" 
+                        <img src="${imagenSrc}" 
                              class="card-img-top" 
                              alt="${producto.nombre}"
                              onerror="this.src='../../../img/default.jpg';">
@@ -294,20 +369,21 @@
                             <h5 class="card-title">PR${String(producto.id).padStart(3, '0')} - ${producto.nombre}</h5>
                             <p class="card-text flex-grow-1">${producto.descripcion}</p>
                             
-                            <!-- Sección de precio y stock fija -->
-                            <div class="product-info-section mt-auto pt-2 border-top">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <div class="price-info">
-                                        <span class="price-text fw-bold text-success">${formatearPrecio(producto.precio)}</span>
-                                        <small class="text-muted d-block">por ${producto.peso}</small>
-                                    </div>
-                                    <div class="stock-info text-end">
-                                        <small class="text-muted">Stock:</small>
-                                        <span class="fw-bold ${producto.stock <= 5 ? 'text-warning' : 'text-success'}">${producto.stock}</span>
-                                    </div>
+                            <!-- Sección de precio y stock limpia -->
+                            <div class="product-info-section mt-auto">
+                                <div class="price-container mb-3">
+                                    <div class="price-text">${formatearPrecio(producto.precio)}</div>
+                                    <small class="text-muted">por ${producto.peso}</small>
                                 </div>
                                 
-                                ${producto.stock <= 5 && producto.stock > 0 ? '<div class="text-center mb-2"><small class="text-warning"><i class="fas fa-exclamation-triangle"></i> ¡Últimas unidades!</small></div>' : ''}
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <small class="text-muted">Disponibilidad:</small>
+                                    <span class="stock-badge ${getStockClass(producto.stock)}">
+                                        ${getStockText(producto.stock)}
+                                    </span>
+                                </div>
+                                
+                                ${producto.stock <= 5 && producto.stock > 0 ? '<div class="text-center mb-2"><small class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i>¡Últimas unidades disponibles!</small></div>' : ''}
                                 
                                 <button class="btn btn-success w-100 add-to-cart-btn" 
                                         data-id="PR${String(producto.id).padStart(3, '0')}" 
@@ -418,6 +494,20 @@
                 currency: 'CLP',
                 minimumFractionDigits: 0
             }).format(precio);
+        }
+
+        // Función para obtener clase CSS según stock
+        function getStockClass(stock) {
+            if (stock === 0) return 'stock-low';
+            if (stock <= 5) return 'stock-medium';
+            return 'stock-high';
+        }
+
+        // Función para obtener texto según stock
+        function getStockText(stock) {
+            if (stock === 0) return 'Agotado';
+            if (stock <= 5) return `Quedan ${stock}`;
+            return `${stock} disponibles`;
         }
     </script>
 

@@ -216,6 +216,69 @@ class UserManager {
     }
 
     /**
+     * Obtener todos los usuarios
+     */
+    getAllUsers() {
+        try {
+            if (this.usuariosCache) {
+                return this.usuariosCache.usuarios || [];
+            }
+            
+            // Intentar cargar desde localStorage
+            const usuariosLocal = localStorage.getItem('usuariosJSON');
+            if (usuariosLocal) {
+                const data = JSON.parse(usuariosLocal);
+                this.usuariosCache = data;
+                return data.usuarios || [];
+            }
+            
+            return [];
+        } catch (error) {
+            console.error('Error obteniendo usuarios:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Eliminar un usuario por ID
+     */
+    deleteUser(userId) {
+        try {
+            const users = this.getAllUsers();
+            const userIndex = users.findIndex(u => u.id === userId);
+            
+            if (userIndex === -1) {
+                return { success: false, message: 'Usuario no encontrado' };
+            }
+            
+            // Verificar si es el último administrador
+            const user = users[userIndex];
+            if (user.rol === 'admin') {
+                const adminCount = users.filter(u => u.rol === 'admin').length;
+                if (adminCount <= 1) {
+                    return { 
+                        success: false, 
+                        message: 'No se puede eliminar el último administrador del sistema' 
+                    };
+                }
+            }
+            
+            // Eliminar usuario del array
+            users.splice(userIndex, 1);
+            
+            // Guardar la lista actualizada
+            const data = { usuarios: users };
+            this.guardarUsuarios(data);
+            
+            console.log('UserManager: Usuario eliminado:', userId);
+            return { success: true, message: 'Usuario eliminado correctamente' };
+        } catch (error) {
+            console.error('Error eliminando usuario:', error);
+            return { success: false, message: 'Error interno al eliminar usuario' };
+        }
+    }
+
+    /**
      * Obtener sesión activa
      */
     getSesionActiva() {

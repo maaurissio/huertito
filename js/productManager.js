@@ -12,7 +12,6 @@ class ProductManager {
         const currentPath = window.location.pathname;
         console.log('ProductManager: Determinando ruta JSON para:', currentPath);
         
-        // Si estamos en el catálogo (páginas de cliente), usar ruta relativa
         if (currentPath.includes('/client/') || currentPath.includes('\\client\\') || 
             currentPath.includes('catalogo.html') || currentPath.includes('tienda')) {
             const relativaUrl = '../../../data/products.json';
@@ -20,15 +19,11 @@ class ProductManager {
             return relativaUrl;
         }
         
-        // Para dashboard y otras páginas, usar ruta absoluta
-        const simpleUrl = '/data/products.json';
-        console.log('ProductManager: Usando ruta JSON absoluta:', simpleUrl);
-        return simpleUrl;
+        const relativaUrl = '../../data/products.json';
+        console.log('ProductManager: Usando ruta JSON relativa para dashboard:', relativaUrl);
+        return relativaUrl;
     }
 
-    /**
-     * Cargar productos desde localStorage o JSON
-     */
     async cargarProductos() {
         try {
             if (this.productosCache) {
@@ -36,8 +31,9 @@ class ProductManager {
                 return this.productosCache;
             }
 
-            // Primero intentar cargar desde localStorage (productos creados por dashboard)
+            // SIEMPRE verificar localStorage primero
             const productosLocal = localStorage.getItem('productosJSON');
+            
             if (productosLocal) {
                 try {
                     const data = JSON.parse(productosLocal);
@@ -46,32 +42,23 @@ class ProductManager {
                         this.productosCache = data;
                         return data;
                     }
-                } catch (error) {
-                    console.warn('ProductManager: Error parseando productos de localStorage:', error);
+                } catch (parseError) {
+                    console.warn('ProductManager: Error parseando localStorage, usando defecto');
                 }
             }
 
-            // Si no hay en localStorage, intentar cargar desde JSON
-            console.log('ProductManager: Intentando cargar productos desde:', this.rutaJSON);
-            const response = await fetch(this.rutaJSON);
-            if (!response.ok) {
-                throw new Error(`Error al cargar productos: ${response.status} ${response.statusText}`);
-            }
+            // Si no hay localStorage, usar productos por defecto
+            console.log('ProductManager: Usando productos por defecto (localStorage vacio)');
+            const productosDefecto = this.getProductosPorDefecto();
+            this.productosCache = productosDefecto;
+            return productosDefecto;
             
-            const data = await response.json();
-            // Sincronizar con localStorage para futuras creaciones
-            localStorage.setItem('productosJSON', JSON.stringify(data));
-            this.productosCache = data;
-            console.log('ProductManager: Productos cargados desde JSON y sincronizados:', data.productos.length, 'productos');
-            return data;
         } catch (error) {
-            console.error('ProductManager: Error cargando productos:', error);
-            // Fallback a productos por defecto
-            console.log('ProductManager: Usando productos por defecto e inicializando localStorage');
-            const productosPorDefecto = this.getProductosPorDefecto();
-            localStorage.setItem('productosJSON', JSON.stringify(productosPorDefecto));
-            this.productosCache = productosPorDefecto;
-            return productosPorDefecto;
+            console.error('ProductManager: Error en ProductManager:', error);
+            console.log('ProductManager: Usando productos por defecto como fallback');
+            const productosDefecto = this.getProductosPorDefecto();
+            this.productosCache = productosDefecto;
+            return productosDefecto;
         }
     }
 
@@ -83,22 +70,49 @@ class ProductManager {
             productos: [
                 {
                     id: 1,
-                    nombre: "Producto de ejemplo",
-                    descripcion: "Descripción del producto de ejemplo",
-                    precio: 1000,
-                    stock: 10,
-                    categoria: "general",
-                    imagen: "img/default.jpg",
+                    codigo: "FR001",
+                    nombre: "Manzanas Fuji",
+                    descripcion: "Manzanas Fuji dulces y crujientes, cultivadas sin pesticidas. Ideales para toda la familia.",
+                    precio: 3200,
+                    stock: 45,
+                    categoria: "Frutas Frescas",
+                    imagen: "img/manzana.webp",
                     estado: "activo",
-                    fechaCreacion: new Date().toISOString().split('T')[0],
+                    fechaCreacion: "2025-01-01",
                     peso: "1kg"
+                },
+                {
+                    id: 2,
+                    codigo: "FR002",
+                    nombre: "Naranjas Valencia",
+                    descripcion: "Naranjas valencianas llenas de vitamina C. Perfectas para zumos frescos y postres naturales.",
+                    precio: 2800,
+                    stock: 38,
+                    categoria: "Frutas Frescas",
+                    imagen: "img/naranja.webp",
+                    estado: "activo",
+                    fechaCreacion: "2025-01-02",
+                    peso: "1kg"
+                },
+                {
+                    id: 3,
+                    codigo: "VR001",
+                    nombre: "Zanahorias Orgánicas",
+                    descripcion: "Zanahorias orgánicas dulces y crujientes, ricas en betacaroteno.",
+                    precio: 2100,
+                    stock: 35,
+                    categoria: "Verduras Orgánicas",
+                    imagen: "img/zanahorias.webp",
+                    estado: "activo",
+                    fechaCreacion: "2025-01-03",
+                    peso: "500g"
                 }
             ],
             configuracion: {
-                proximoId: 2,
+                proximoId: 4,
                 version: "1.0",
                 ultimaActualizacion: new Date().toISOString(),
-                categorias: ["frutas", "verduras", "hortalizas", "frutos-secos", "especias", "general"]
+                categorias: ["Frutas Frescas", "Verduras Orgánicas", "Productos Orgánicos", "Productos Lácteos"]
             }
         };
     }
@@ -255,6 +269,9 @@ class ProductManager {
             // Guardar los cambios
             await this.guardarProductos(data);
             
+            // Verificar automáticamente productos sin stock
+            await this.verificarYDesactivarSinStock();
+            
             console.log('ProductManager: Producto actualizado exitosamente');
             return { 
                 success: true, 
@@ -272,22 +289,22 @@ class ProductManager {
     }
 
     /**
-     * Eliminar producto
+     * Desactivar producto (reemplaza eliminación)
      */
-    async eliminarProducto(productoId) {
+    async desactivarProducto(productoId) {
         try {
             const data = await this.cargarProductos();
-            const indice = data.productos.findIndex(p => p.id === parseInt(productoId));
+            const producto = data.productos.find(p => p.id === parseInt(productoId));
             
-            if (indice === -1) {
+            if (!producto) {
                 return {
                     success: false,
                     mensaje: 'Producto no encontrado'
                 };
             }
 
-            // Eliminar producto
-            const productoEliminado = data.productos.splice(indice, 1)[0];
+            // Cambiar estado a inactivo
+            producto.estado = 'inactivo';
             data.configuracion.ultimaActualizacion = new Date().toISOString();
 
             // Guardar cambios
@@ -295,20 +312,91 @@ class ProductManager {
             
             return {
                 success: true,
-                mensaje: `Producto ${productoEliminado.nombre} eliminado exitosamente`
+                mensaje: `Producto ${producto.nombre} desactivado exitosamente`
             };
             
         } catch (error) {
-            console.error('ProductManager: Error al eliminar producto:', error);
+            console.error('ProductManager: Error al desactivar producto:', error);
             return {
                 success: false,
-                mensaje: 'Error interno al eliminar producto'
+                mensaje: 'Error interno al desactivar producto'
             };
         }
     }
 
     /**
-     * Obtener todos los productos para el dashboard
+     * Activar producto
+     */
+    async activarProducto(productoId) {
+        try {
+            const data = await this.cargarProductos();
+            const producto = data.productos.find(p => p.id === parseInt(productoId));
+            
+            if (!producto) {
+                return {
+                    success: false,
+                    mensaje: 'Producto no encontrado'
+                };
+            }
+
+            // Cambiar estado a activo
+            producto.estado = 'activo';
+            data.configuracion.ultimaActualizacion = new Date().toISOString();
+
+            // Guardar cambios
+            await this.guardarProductos(data);
+            
+            return {
+                success: true,
+                mensaje: `Producto ${producto.nombre} activado exitosamente`
+            };
+            
+        } catch (error) {
+            console.error('ProductManager: Error al activar producto:', error);
+            return {
+                success: false,
+                mensaje: 'Error interno al activar producto'
+            };
+        }
+    }
+
+    /**
+     * Verificar y desactivar productos sin stock
+     */
+    async verificarYDesactivarSinStock() {
+        try {
+            const data = await this.cargarProductos();
+            let productosDesactivados = 0;
+            
+            data.productos.forEach(producto => {
+                if (producto.stock <= 0 && producto.estado === 'activo') {
+                    producto.estado = 'inactivo';
+                    productosDesactivados++;
+                    console.log(`ProductManager: Producto ${producto.nombre} desactivado automáticamente por falta de stock`);
+                }
+            });
+
+            if (productosDesactivados > 0) {
+                data.configuracion.ultimaActualizacion = new Date().toISOString();
+                await this.guardarProductos(data);
+            }
+            
+            return {
+                success: true,
+                productosDesactivados
+            };
+            
+        } catch (error) {
+            console.error('ProductManager: Error verificando stock:', error);
+            return {
+                success: false,
+                mensaje: 'Error al verificar stock'
+            };
+        }
+    }
+
+    /**
+     * Obtener todos los productos para el dashboard (incluye activos e inactivos)
      */
     async obtenerTodosLosProductos() {
         try {
@@ -322,6 +410,27 @@ class ProductManager {
             return {
                 success: false,
                 mensaje: 'Error al cargar productos',
+                productos: []
+            };
+        }
+    }
+
+    /**
+     * Obtener solo productos activos para el catálogo
+     */
+    async obtenerProductosActivos() {
+        try {
+            const data = await this.cargarProductos();
+            const productosActivos = data.productos.filter(producto => producto.estado === 'activo');
+            return {
+                success: true,
+                productos: productosActivos || []
+            };
+        } catch (error) {
+            console.error('ProductManager: Error al obtener productos activos:', error);
+            return {
+                success: false,
+                mensaje: 'Error al cargar productos activos',
                 productos: []
             };
         }
@@ -436,6 +545,39 @@ class ProductManager {
                 origen: 'json',
                 mensaje: 'Se cargarán productos desde products.json'
             };
+        }
+    }
+
+    saveProducts(productos) {
+        try {
+            const data = {
+                productos: productos,
+                configuracion: {
+                    version: "1.0",
+                    proximoId: Math.max(...productos.map(p => p.id)) + 1
+                }
+            };
+            localStorage.setItem('productosJSON', JSON.stringify(data));
+            this.productosCache = data;
+            console.log('ProductManager: Productos guardados en localStorage');
+            return { success: true };
+        } catch (error) {
+            console.error('ProductManager: Error guardando productos:', error);
+            return { success: false, error };
+        }
+    }
+
+    getProducts() {
+        try {
+            const productosLocal = localStorage.getItem('productosJSON');
+            if (productosLocal) {
+                const data = JSON.parse(productosLocal);
+                return data.productos || [];
+            }
+            return [];
+        } catch (error) {
+            console.error('ProductManager: Error obteniendo productos:', error);
+            return [];
         }
     }
 }
