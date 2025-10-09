@@ -1,36 +1,57 @@
-import { Estado, RolUsuario } from './models.js';
+import { Estado, IDataUsuarios, IUsuario, RolUsuario } from './models.js';
 import { obtenerDatosUsuarios, guardarDatosUsuarios } from './servicioUsuarios.js';
+
+export interface IDatosUsuarioFormulario {
+    email: string;
+    usuario: string;
+    password: string;
+    nombre: string;
+    apellido: string;
+    rol?: RolUsuario;
+    estado?: Estado;
+    telefono?: string;
+    direccion?: string;
+}
+
 class UserManager {
-    constructor() {
-        this.usuariosCache = null;
-        this.claveSesion = 'sesionActiva';
-    }
-    cargarDatos() {
+    private usuariosCache: IDataUsuarios | null = null;
+    private readonly claveSesion = 'sesionActiva';
+
+    private cargarDatos(): IDataUsuarios {
         if (this.usuariosCache) {
             return this.usuariosCache;
         }
+
         const datos = obtenerDatosUsuarios();
         this.usuariosCache = datos;
         return datos;
     }
-    persistir(datos) {
+
+    private persistir(datos: IDataUsuarios): void {
         guardarDatosUsuarios(datos);
         this.usuariosCache = datos;
     }
-    obtenerTodosLosUsuarios() {
+
+    obtenerTodosLosUsuarios(): IUsuario[] {
         return this.cargarDatos().usuarios;
     }
-    obtenerUsuariosActivos() {
+
+    obtenerUsuariosActivos(): IUsuario[] {
         return this.obtenerTodosLosUsuarios().filter(usuario => usuario.isActivo === Estado.activo);
     }
-    validarLogin(identificador, password) {
+
+    validarLogin(identificador: string, password: string): { success: boolean; mensaje?: string; usuario?: IUsuario } {
         const datos = this.cargarDatos();
-        const usuario = datos.usuarios.find(u => (u.usuario === identificador || u.email === identificador) &&
-            u.password === password &&
-            u.isActivo === Estado.activo);
+        const usuario = datos.usuarios.find(
+            u => (u.usuario === identificador || u.email === identificador) &&
+                u.password === password &&
+                u.isActivo === Estado.activo
+        );
+
         if (!usuario) {
             return { success: false, mensaje: 'Usuario o contraseña incorrectos' };
         }
+
         const sesion = {
             id: usuario.id,
             usuario: usuario.usuario,
@@ -40,23 +61,33 @@ class UserManager {
             rol: usuario.rol,
             fechaLogin: new Date().toISOString(),
         };
+
         localStorage.setItem(this.claveSesion, JSON.stringify(sesion));
+
         return { success: true, usuario };
     }
-    obtenerSesionActiva() {
+
+    obtenerSesionActiva<T = unknown>(): T | null {
         const sesion = localStorage.getItem(this.claveSesion);
-        return sesion ? JSON.parse(sesion) : null;
+        return sesion ? (JSON.parse(sesion) as T) : null;
     }
-    cerrarSesion() {
+
+    cerrarSesion(): void {
         localStorage.removeItem(this.claveSesion);
     }
-    agregarUsuario(datosUsuario) {
+
+    agregarUsuario(datosUsuario: IDatosUsuarioFormulario): { success: boolean; mensaje: string; usuario?: IUsuario } {
         const datos = this.cargarDatos();
-        const existe = datos.usuarios.some(usuario => usuario.email === datosUsuario.email || usuario.usuario === datosUsuario.usuario);
+
+        const existe = datos.usuarios.some(
+            usuario => usuario.email === datosUsuario.email || usuario.usuario === datosUsuario.usuario
+        );
+
         if (existe) {
             return { success: false, mensaje: 'El usuario o email ya existe' };
         }
-        const nuevoUsuario = {
+
+        const nuevoUsuario: IUsuario = {
             id: datos.configuracion.proximoId,
             email: datosUsuario.email,
             usuario: datosUsuario.usuario,
@@ -69,23 +100,31 @@ class UserManager {
             ...(datosUsuario.telefono ? { telefono: datosUsuario.telefono } : {}),
             ...(datosUsuario.direccion ? { direccion: datosUsuario.direccion } : {}),
         };
+
         datos.usuarios.push(nuevoUsuario);
         datos.configuracion.proximoId += 1;
         datos.configuracion.ultimaActualizacion = new Date().toISOString();
+
         this.persistir(datos);
+
         return { success: true, mensaje: 'Usuario creado exitosamente', usuario: nuevoUsuario };
     }
-    actualizarUsuario(id, datosActualizados) {
+
+    actualizarUsuario(id: number, datosActualizados: Partial<IDatosUsuarioFormulario & Pick<IUsuario, 'password'>>): { success: boolean; mensaje: string; usuario?: IUsuario } {
         const datos = this.cargarDatos();
         const indice = datos.usuarios.findIndex(usuario => usuario.id === id);
+
         if (indice === -1) {
             return { success: false, mensaje: 'Usuario no encontrado' };
         }
+
         const usuarioActual = datos.usuarios[indice];
+
         if (!usuarioActual) {
             return { success: false, mensaje: 'Usuario no encontrado' };
         }
-        const usuarioActualizado = {
+
+        const usuarioActualizado: IUsuario = {
             ...usuarioActual,
             email: datosActualizados.email ?? usuarioActual.email,
             usuario: datosActualizados.usuario ?? usuarioActual.usuario,
@@ -99,40 +138,56 @@ class UserManager {
             fechaRegistro: usuarioActual.fechaRegistro,
             ultimaActualizacion: new Date().toISOString(),
         };
+
         datos.usuarios[indice] = usuarioActualizado;
         datos.configuracion.ultimaActualizacion = new Date().toISOString();
+
         this.persistir(datos);
-        const sesion = this.obtenerSesionActiva();
+
+        const sesion = this.obtenerSesionActiva<{ id: number }>();
         if (sesion && sesion.id === id) {
             localStorage.setItem(this.claveSesion, JSON.stringify({ ...sesion, ...usuarioActualizado }));
         }
+
         return { success: true, mensaje: 'Usuario actualizado correctamente', usuario: usuarioActualizado };
     }
-    eliminarUsuario(id) {
+
+    eliminarUsuario(id: number): { success: boolean; mensaje: string } {
         const datos = this.cargarDatos();
         const indice = datos.usuarios.findIndex(usuario => usuario.id === id);
+
         if (indice === -1) {
             return { success: false, mensaje: 'Usuario no encontrado' };
         }
+
         const usuario = datos.usuarios[indice];
+
         if (!usuario) {
             return { success: false, mensaje: 'Usuario no encontrado' };
         }
         const administradoresActivos = datos.usuarios.filter(u => u.rol === RolUsuario.administrador && u.isActivo === Estado.activo);
+
         if (usuario.rol === RolUsuario.administrador && administradoresActivos.length <= 1) {
             return { success: false, mensaje: 'No se puede eliminar el último administrador activo' };
         }
+
         datos.usuarios.splice(indice, 1);
         datos.configuracion.ultimaActualizacion = new Date().toISOString();
+
         this.persistir(datos);
+
         return { success: true, mensaje: 'Usuario eliminado correctamente' };
     }
-    restaurarDatosIniciales() {
+
+    restaurarDatosIniciales(): void {
         this.usuariosCache = null;
         localStorage.removeItem('usuarios_huertohogar_data');
         this.cargarDatos();
     }
 }
+
 const userManager = new UserManager();
+
 export { userManager };
-window.userManager = userManager;
+
+(window as any).userManager = userManager;
