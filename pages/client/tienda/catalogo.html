@@ -7,26 +7,8 @@
     <title>HuertoHogar - Catálogo</title>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/            productos.forEach(producto => {
-                const col = document.createElement('div');
-                col.className = 'col-12 col-sm-6 col-md-4 col-lg-3 product-col';
-                col.setAttribute('data-category', producto.categoria);
-                
-                // Transformar ruta de imagen para el catálogo
-                let imagenSrc = producto.imagen;
-                if (imagenSrc && imagenSrc.includes('img/') && !imagenSrc.includes('../../../')) {
-                    if (imagenSrc.startsWith('img/')) {
-                        imagenSrc = '../../../' + imagenSrc;
-                    } else {
-                        imagenSrc = imagenSrc.replace('img/', '../../../img/');
-                    }
-                } else if (!imagenSrc || !imagenSrc.includes('img/')) {
-                    imagenSrc = '../../../img/default.jpg';
-                }
-                
-                col.innerHTML = `
-                    <div class="card product-card shadow-sm h-100 d-flex flex-column">
-                        
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- CSS Personalizado -->
     <link href="../../../css/style.css" rel="stylesheet">
@@ -247,8 +229,8 @@
     <div id="footer-container"></div>
 
     <!-- Scripts para cargar componentes y carrito -->
+    <script type="module" src="../../../js/productManager.js"></script>
     <script defer src="../../../js/auth.js"></script>
-    <script src="../../../js/productManager.js"></script>
     <script src="../../../js/carrito.js"></script>
 
     <script>
@@ -262,54 +244,70 @@
             // Cargar navbar y footer
             loadComponent('navbar-container', '../shared/navbar.html');
             loadComponent('footer-container', '../shared/footer.html');
-            
-            // Inicializar ProductManager y sistemas después de un delay mínimo
-            setTimeout(() => {
-                console.log('=== TIMEOUT EJECUTÁNDOSE ===');
-                console.log('Inicializando sistemas...');
-                
-                // Crear instancia global de ProductManager
-                if (typeof ProductManager !== 'undefined') {
-                    window.productManager = new ProductManager();
-                    console.log('✅ ProductManager instanciado globalmente');
-                } else {
-                    console.error('❌ ProductManager no está disponible');
-                }
-                
-                initializeCartSystem();
-                cargarProductosCatalogo();
-                // Forzar actualización del badge del carrito
-                if (typeof updateFloatingCartBadge === 'function') {
-                    updateFloatingCartBadge();
-                }
-            }, 500);
+
+            // Esperar a que el módulo de productos esté disponible
+            esperarProductManager()
+                .then(() => {
+                    console.log('✅ ProductManager listo para usar');
+                    if (typeof initializeCartSystem === 'function') {
+                        initializeCartSystem();
+                    }
+                    cargarProductosCatalogo();
+                    if (typeof updateFloatingCartBadge === 'function') {
+                        updateFloatingCartBadge();
+                    }
+                })
+                .catch((error) => {
+                    console.error('❌ No fue posible inicializar ProductManager', error);
+                    mostrarErrorCarga();
+                });
 
             // Configurar filtros de búsqueda y categorías
             configurarFiltros();
         });
 
+        function esperarProductManager(intentos = 10, intervalo = 150) {
+            return new Promise((resolve, reject) => {
+                let contador = 0;
+
+                const verificar = () => {
+                    if (typeof window.productManager !== 'undefined') {
+                        resolve(window.productManager);
+                        return;
+                    }
+
+                    if (contador >= intentos) {
+                        reject(new Error('ProductManager no está disponible en el contexto global'));
+                        return;
+                    }
+
+                    contador++;
+                    setTimeout(verificar, intervalo);
+                };
+
+                verificar();
+            });
+        }
+
         // Cargar productos desde productManager
-        async function cargarProductosCatalogo() {
+        function cargarProductosCatalogo() {
             try {
                 console.log('=== INICIANDO CARGA DE PRODUCTOS ===');
-                console.log('¿ProductManager disponible?', typeof productManager);
-                
-                if (typeof productManager === 'undefined') {
-                    console.error('ProductManager no está disponible!');
+                const manager = window.productManager;
+                console.log('¿ProductManager disponible?', typeof manager);
+
+                if (typeof manager === 'undefined') {
+                    console.error('ProductManager no está disponible en window');
+                    mostrarErrorCarga();
                     return;
                 }
-                
+
                 console.log('Llamando a productManager.obtenerProductosActivos()...');
-                const resultado = await productManager.obtenerProductosActivos();
-                console.log('Resultado obtenido:', resultado);
-                
-                if (resultado.success) {
-                    todosLosProductos = resultado.productos;
-                    console.log('Productos activos obtenidos:', todosLosProductos.length);
-                } else {
-                    console.error('Error obteniendo productos:', resultado.mensaje);
-                    todosLosProductos = [];
-                }
+                const productosActivos = manager.obtenerProductosActivos();
+                console.log('Productos obtenidos:', productosActivos);
+
+                todosLosProductos = Array.isArray(productosActivos) ? productosActivos : [];
+                console.log('Total de productos activos:', todosLosProductos.length);
                 
                 // Mostrar productos
                 mostrarProductos(todosLosProductos);

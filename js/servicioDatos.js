@@ -1,15 +1,11 @@
 // En js/servicioDatos.ts:
-
-import { IDataProductos, IProducto, CategoriaProducto, Estado } from './models.js';
-import { productosIniciales } from './datosIniciales.js'; 
-
+import { CategoriaProducto, Estado } from './models.js';
+import { productosIniciales } from './datosIniciales.js';
 const CLAVE_DATOS_PRODUCTOS = 'productos_huertohogar_data'; // Nueva clave más clara
-
-function normalizarEstado(valor: unknown): Estado {
+function normalizarEstado(valor) {
     if (valor === Estado.activo || valor === Estado.inactivo) {
         return valor;
     }
-
     if (typeof valor === 'string') {
         const lower = valor.toLowerCase();
         if (lower === Estado.activo.toLowerCase()) {
@@ -19,15 +15,12 @@ function normalizarEstado(valor: unknown): Estado {
             return Estado.inactivo;
         }
     }
-
     return Estado.activo;
 }
-
-function limpiarPrecio(valor: unknown): number {
+function limpiarPrecio(valor) {
     if (typeof valor === 'number' && !Number.isNaN(valor)) {
         return valor;
     }
-
     if (typeof valor === 'string') {
         const limpio = valor
             .replace(/[^0-9,.-]/g, '')
@@ -38,35 +31,29 @@ function limpiarPrecio(valor: unknown): number {
             return numero;
         }
     }
-
     return 0;
 }
-
-function limpiarStock(valor: unknown): number {
+function limpiarStock(valor) {
     if (typeof valor === 'number' && Number.isFinite(valor)) {
         return Math.max(0, Math.trunc(valor));
     }
-
     if (typeof valor === 'string') {
         const numero = Number.parseInt(valor, 10);
         if (!Number.isNaN(numero)) {
             return Math.max(0, numero);
         }
     }
-
     return 0;
 }
-
-function normalizarProducto(producto: IProducto): IProducto {
+function normalizarProducto(producto) {
     return {
         ...producto,
         precio: limpiarPrecio(producto.precio),
         stock: limpiarStock(producto.stock),
-        isActivo: normalizarEstado((producto as unknown as { isActivo?: Estado | string; estado?: Estado | string; }).isActivo ?? (producto as unknown as { estado?: Estado | string; }).estado),
+        isActivo: normalizarEstado(producto.isActivo ?? producto.estado),
     };
 }
-
-function normalizarDatos(data: IDataProductos): IDataProductos {
+function normalizarDatos(data) {
     return {
         productos: data.productos.map(normalizarProducto),
         configuracion: {
@@ -76,9 +63,8 @@ function normalizarDatos(data: IDataProductos): IDataProductos {
         },
     };
 }
-
 // Esta función creará el objeto completo IDataProductos inicial
-function crearDatosIniciales(): IDataProductos {
+function crearDatosIniciales() {
     return normalizarDatos({
         productos: productosIniciales,
         configuracion: {
@@ -86,22 +72,21 @@ function crearDatosIniciales(): IDataProductos {
             version: "1.0",
             ultimaActualizacion: new Date().toISOString(),
             // Mapeamos los valores del Enum a strings para la configuración
-            categorias: Object.values(CategoriaProducto), 
+            categorias: Object.values(CategoriaProducto),
         }
     });
 }
-
-export function obtenerDatosProductos(): IDataProductos {
+export function obtenerDatosProductos() {
     const datosAlmacenados = localStorage.getItem(CLAVE_DATOS_PRODUCTOS);
-
     if (datosAlmacenados) {
-        const datos = JSON.parse(datosAlmacenados) as IDataProductos; 
+        const datos = JSON.parse(datosAlmacenados);
         const normalizados = normalizarDatos(datos);
         if (normalizados !== datos) {
             guardarDatosProductos(normalizados);
         }
         return normalizados;
-    } else {
+    }
+    else {
         // Inicializamos, guardamos y devolvemos la versión inicial tipada
         console.log('Inicializando la estructura de datos de productos.');
         const datosIniciales = crearDatosIniciales();
@@ -109,7 +94,6 @@ export function obtenerDatosProductos(): IDataProductos {
         return datosIniciales;
     }
 }
-
-export function guardarDatosProductos(data: IDataProductos): void {
+export function guardarDatosProductos(data) {
     localStorage.setItem(CLAVE_DATOS_PRODUCTOS, JSON.stringify(data));
 }

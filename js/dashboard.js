@@ -52,34 +52,34 @@ async function setupAutomatico() {
     const productosExistentes = localStorage.getItem('productosJSON');
     
     if (!productosExistentes) {
-        console.log('Cargando productos desde JSON...');
-        
+        console.log('Inicializando productos mediante ProductManager...');
+
+        if (typeof productManager === 'undefined') {
+            console.error('ProductManager no está disponible en dashboard.');
+            return;
+        }
+
         try {
-            const response = await fetch('../../data/products.json');
-            if (response.ok) {
-                const datosJSON = await response.json();
-                
-                // Normalizar rutas de imagenes
-                datosJSON.productos.forEach(producto => {
-                    if (producto.imagen && !producto.imagen.startsWith('http')) {
-                        if (!producto.imagen.startsWith('img/')) {
-                            if (producto.imagen.includes('img/')) {
-                                const nombreArchivo = producto.imagen.split('img/')[1];
-                                producto.imagen = 'img/' + nombreArchivo;
-                            } else {
-                                producto.imagen = 'img/default.jpg';
-                            }
+            const datos = productManager.obtenerDatosCompletos();
+
+            // Normalizar rutas de imágenes a formato esperado por el dashboard
+            datos.productos.forEach(producto => {
+                if (producto.imagen && !producto.imagen.startsWith('http')) {
+                    if (!producto.imagen.startsWith('img/')) {
+                        if (producto.imagen.includes('img/')) {
+                            const nombreArchivo = producto.imagen.split('img/')[1];
+                            producto.imagen = 'img/' + nombreArchivo;
+                        } else {
+                            producto.imagen = 'img/default.jpg';
                         }
                     }
-                });
-                
-                localStorage.setItem('productosJSON', JSON.stringify(datosJSON));
-                console.log('Productos cargados desde JSON:', datosJSON.productos.length);
-            } else {
-                console.warn('No se pudo cargar products.json');
-            }
+                }
+            });
+
+            localStorage.setItem('productosJSON', JSON.stringify(datos));
+            console.log('Productos cargados desde ProductManager:', datos.productos.length);
         } catch (error) {
-            console.warn('Error cargando JSON:', error);
+            console.warn('Error obteniendo datos desde ProductManager:', error);
         }
     } else {
         console.log('Productos ya existen en localStorage');

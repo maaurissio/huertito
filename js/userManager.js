@@ -47,6 +47,9 @@ class UserManager {
         const sesion = localStorage.getItem(this.claveSesion);
         return sesion ? JSON.parse(sesion) : null;
     }
+    getSesionActiva() {
+        return this.obtenerSesionActiva();
+    }
     cerrarSesion() {
         localStorage.removeItem(this.claveSesion);
     }

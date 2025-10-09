@@ -1,6 +1,5 @@
-import { CategoriaProducto, Estado, IProducto } from "./models.js";
-
-export const productosIniciales: IProducto[] = [
+import { CategoriaProducto, Estado } from "./models.js";
+export const productosIniciales = [
     {
         id: 1,
         codigo: 'FR001',
