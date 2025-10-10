@@ -21,11 +21,11 @@ export interface IProducto {
     codigo: string;
     nombre: string;
     descripcion: string;
-    precio: number; // CAMBIO IMPORTANTE: Debe ser NUMBER para los cálculos
+    precio: number;
     stock: number;
-    categoria: CategoriaProducto; // Usamos el Enum CategoriaProducto
+    categoria: CategoriaProducto;
     imagen: string;
-    isActivo: Estado; // Usamos el nuevo Enum EstadoProducto
+    isActivo: Estado;
     fechaCreacion: string;
     peso: string;
     fechaActualizacion?: string; 

@@ -1,7 +1,6 @@
-// En js/servicioDatos.ts:
 import { CategoriaProducto, Estado } from './models.js';
 import { productosIniciales } from './datosIniciales.js';
-const CLAVE_DATOS_PRODUCTOS = 'productos_huertohogar_data'; // Nueva clave más clara
+const CLAVE_DATOS_PRODUCTOS = 'productos_huertohogar_data';
 function normalizarEstado(valor) {
     if (valor === Estado.activo || valor === Estado.inactivo) {
         return valor;
@@ -46,35 +45,57 @@ function limpiarStock(valor) {
     return 0;
 }
 function normalizarProducto(producto) {
-    return {
-        ...producto,
+    const estadoNormalizado = normalizarEstado(producto.isActivo ?? producto.estado);
+    const base = {
+        id: producto.id ?? 0,
+        codigo: producto.codigo ?? `PR${Date.now()}`,
+        nombre: producto.nombre ?? 'Producto sin nombre',
+        descripcion: producto.descripcion ?? '',
         precio: limpiarPrecio(producto.precio),
         stock: limpiarStock(producto.stock),
-        isActivo: normalizarEstado(producto.isActivo ?? producto.estado),
+        imagen: producto.imagen ?? 'img/default.jpg',
+        categoria: producto.categoria ?? CategoriaProducto.frutas,
+        isActivo: estadoNormalizado,
+        estado: estadoNormalizado,
+        peso: producto.peso ?? '1kg',
     };
+    if (producto.fechaCreacion) {
+        base.fechaCreacion = producto.fechaCreacion;
+    }
+    if (producto.fechaActualizacion) {
+        base.fechaActualizacion = producto.fechaActualizacion;
+    }
+    return base;
 }
 function normalizarDatos(data) {
     return {
-        productos: data.productos.map(normalizarProducto),
+        productos: data.productos.map((producto) => normalizarProducto(producto)),
         configuracion: {
             ...data.configuracion,
-            categorias: data.configuracion.categorias?.length ? data.configuracion.categorias : Object.values(CategoriaProducto),
+            categorias: data.configuracion.categorias?.length
+                ? data.configuracion.categorias
+                : Object.values(CategoriaProducto),
             ultimaActualizacion: data.configuracion.ultimaActualizacion ?? new Date().toISOString(),
         },
     };
 }
-// Esta función creará el objeto completo IDataProductos inicial
 function crearDatosIniciales() {
+    const configuracion = {
+        proximoId: Math.max(...productosIniciales.map((p) => p.id)) + 1,
+        version: '1.0',
+        ultimaActualizacion: new Date().toISOString(),
+        categorias: Object.values(CategoriaProducto),
+    };
     return normalizarDatos({
         productos: productosIniciales,
-        configuracion: {
-            proximoId: Math.max(...productosIniciales.map(p => p.id)) + 1,
-            version: "1.0",
-            ultimaActualizacion: new Date().toISOString(),
-            // Mapeamos los valores del Enum a strings para la configuración
-            categorias: Object.values(CategoriaProducto),
-        }
+        configuracion,
     });
+}
+function clonarDatos(data) {
+    return {
+        productos: data.productos.map((producto) => ({ ...producto })),
+        configuracion: { ...data.configuracion },
+    };
 }
 export function obtenerDatosProductos() {
     const datosAlmacenados = localStorage.getItem(CLAVE_DATOS_PRODUCTOS);
@@ -84,16 +105,19 @@ export function obtenerDatosProductos() {
         if (normalizados !== datos) {
             guardarDatosProductos(normalizados);
         }
-        return normalizados;
+        return clonarDatos(normalizados);
     }
-    else {
-        // Inicializamos, guardamos y devolvemos la versión inicial tipada
-        console.log('Inicializando la estructura de datos de productos.');
-        const datosIniciales = crearDatosIniciales();
-        guardarDatosProductos(datosIniciales);
-        return datosIniciales;
-    }
+    const datosIniciales = crearDatosIniciales();
+    guardarDatosProductos(datosIniciales);
+    return clonarDatos(datosIniciales);
 }
 export function guardarDatosProductos(data) {
     localStorage.setItem(CLAVE_DATOS_PRODUCTOS, JSON.stringify(data));
 }
+export function actualizarDatosProductos(transformer) {
+    const actual = obtenerDatosProductos();
+    const actualizado = transformer(actual);
+    guardarDatosProductos(actualizado);
+    return actualizado;
+}
+//# sourceMappingURL=servicioDatos.js.map

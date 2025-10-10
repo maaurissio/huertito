@@ -16,3 +16,4 @@ export var Estado;
     Estado["activo"] = "Activo";
     Estado["inactivo"] = "Inactivo";
 })(Estado || (Estado = {}));
+//# sourceMappingURL=models.js.map

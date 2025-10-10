@@ -1,4 +1,4 @@
-import { CategoriaProducto, Estado } from "./models.js";
+import { CategoriaProducto, Estado } from './models.js';
 export const productosIniciales = [
     {
         id: 1,
@@ -10,6 +10,7 @@ export const productosIniciales = [
         imagen: 'img/manzana.webp',
         categoria: CategoriaProducto.frutas,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaCreacion: '2025-01-01',
         peso: '1kg',
     },
@@ -23,6 +24,7 @@ export const productosIniciales = [
         imagen: 'img/naranja.webp',
         categoria: CategoriaProducto.frutas,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaCreacion: '2025-01-02',
         peso: '1kg',
     },
@@ -36,6 +38,7 @@ export const productosIniciales = [
         imagen: 'img/platanos.webp',
         categoria: CategoriaProducto.frutas,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaCreacion: '2025-01-03',
         peso: '1kg',
     },
@@ -49,6 +52,7 @@ export const productosIniciales = [
         imagen: 'img/zanahorias.webp',
         categoria: CategoriaProducto.verduras,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaCreacion: '2025-01-04',
         peso: '500g',
     },
@@ -62,6 +66,7 @@ export const productosIniciales = [
         imagen: 'img/espinaca.webp',
         categoria: CategoriaProducto.verduras,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaCreacion: '2025-01-05',
         peso: '250g',
     },
@@ -75,6 +80,7 @@ export const productosIniciales = [
         imagen: 'img/pimientos.webp',
         categoria: CategoriaProducto.verduras,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaCreacion: '2025-01-06',
         peso: '500g',
     },
@@ -88,6 +94,7 @@ export const productosIniciales = [
         imagen: 'img/miel.webp',
         categoria: CategoriaProducto.organicos,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaCreacion: '2025-01-07',
         peso: '500g',
     },
@@ -101,6 +108,7 @@ export const productosIniciales = [
         imagen: 'img/quinoa.webp',
         categoria: CategoriaProducto.organicos,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaCreacion: '2025-01-08',
         peso: '1kg',
     },
@@ -114,7 +122,9 @@ export const productosIniciales = [
         imagen: 'img/default.jpg',
         categoria: CategoriaProducto.lacteos,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaCreacion: '2025-01-09',
         peso: '1L',
     },
 ];
+//# sourceMappingURL=datosIniciales.js.map

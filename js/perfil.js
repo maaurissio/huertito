@@ -1,287 +1,187 @@
-/**
- * ==========================================
- * PERFIL DE USUARIO - HUERTOHOGAR
- * JavaScript para la página de perfil del usuario
- * ==========================================
- */
-
-// Variables globales
+import { userManager } from './userManager.js';
 let currentUser = null;
-
-// Inicialización cuando se carga la página
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     console.log('Perfil: DOM cargado, iniciando...');
-    
-    // Cargar componentes compartidos
-    if (typeof loadComponent === 'function') {
-        loadComponent('navbar-container', '../shared/navbar.html');
-        loadComponent('footer-container', '../shared/footer.html');
+    if (typeof window.loadComponent === 'function') {
+        window.loadComponent('navbar-container', '../shared/navbar.html');
+        window.loadComponent('footer-container', '../shared/footer.html');
     }
-    
-    // Inicializar después de un breve delay para que los componentes se carguen
-    setTimeout(() => {
+    window.setTimeout(() => {
         console.log('Perfil: Iniciando configuración...');
-        
-        // Verificar autenticación
         if (!verificarAutenticacion()) {
             console.warn('Perfil: Usuario no autenticado, redirigiendo...');
             window.location.href = '../../../index.html';
             return;
         }
-
-        // Cargar información del usuario
         cargarInformacionUsuario();
-        
-        // Configurar navegación por URL
         configurarNavegacionURL();
-        
-        // Configurar listeners de eventos
         configurarEventListeners();
-        
-        // Inicializar carrito flotante
-        if (typeof loadFloatingCart === 'function') {
-            loadFloatingCart();
+        if (typeof window.loadFloatingCart === 'function') {
+            window.loadFloatingCart();
         }
-        
-        // Inicializar sistema de carrito después de un delay
-        setTimeout(() => {
-            if (typeof initializeCartSystem === 'function') {
-                initializeCartSystem();
-            }
-            if (typeof updateFloatingCartBadge === 'function') {
-                updateFloatingCartBadge();
-            }
+        window.setTimeout(() => {
+            window.initializeCartSystem?.();
+            window.updateFloatingCartBadge?.();
         }, 200);
-        
-        // Mostrar sección inicial con timeout adicional para asegurar que el DOM esté listo
-        setTimeout(() => {
+        window.setTimeout(() => {
             mostrarSeccionInicial();
         }, 100);
     }, 150);
 });
-
-// También asegurar que funcione si la página ya está completamente cargada
 if (document.readyState === 'complete') {
     console.log('Perfil: Página ya cargada, iniciando inmediatamente...');
-    setTimeout(() => {
+    window.setTimeout(() => {
         if (!document.querySelector('.profile-section.active')) {
             mostrarSeccionInicial();
         }
     }, 100);
 }
-
-/**
- * Verificar si el usuario está autenticado
- */
 function verificarAutenticacion() {
     const usuario = localStorage.getItem('sesionActiva');
     if (!usuario) {
         return false;
     }
-    
     try {
         currentUser = JSON.parse(usuario);
         return true;
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error al parsear datos del usuario:', error);
         localStorage.removeItem('sesionActiva');
         return false;
     }
 }
-
-/**
- * Cargar información del usuario en la interfaz
- */
 function cargarInformacionUsuario() {
-    if (!currentUser) return;
-
-    // Actualizar nombre de usuario (nombre completo)
+    if (!currentUser)
+        return;
     const userNameElemento = document.getElementById('userName');
     if (userNameElemento) {
         const nombreCompleto = `${currentUser.nombre || ''} ${currentUser.apellido || ''}`.trim();
         userNameElemento.textContent = nombreCompleto || 'Usuario';
     }
-
-    // Actualizar email
     const emailElementos = document.querySelectorAll('#userEmail, #profileEmail');
-    emailElementos.forEach(elemento => {
-        if (elemento) {
-            elemento.textContent = currentUser.email || '';
-            if (elemento.tagName === 'INPUT') {
-                elemento.value = currentUser.email || '';
-            }
+    emailElementos.forEach((elemento) => {
+        const el = elemento;
+        if (el.tagName === 'INPUT') {
+            el.value = currentUser.email || '';
+        }
+        else {
+            el.textContent = currentUser.email || '';
         }
     });
-
-    // Actualizar teléfono si existe
     const telefonoElemento = document.getElementById('profilePhone');
     if (telefonoElemento) {
         telefonoElemento.value = currentUser.telefono || '';
     }
-
-    // Actualizar dirección si existe
     const direccionElemento = document.getElementById('profileAddress');
     if (direccionElemento) {
         direccionElemento.value = currentUser.direccion || '';
     }
-
-    // Actualizar nombre en formulario
     const nombreElemento = document.getElementById('profileName');
     if (nombreElemento) {
         nombreElemento.value = currentUser.nombre || '';
     }
-
-    // Actualizar apellidos en formulario (usando apellido desde JSON)
     const apellidosElemento = document.getElementById('profileLastName');
     if (apellidosElemento) {
         apellidosElemento.value = currentUser.apellido || '';
     }
-
-    // Actualizar fecha de nacimiento
     const fechaNacElemento = document.getElementById('profileBirthDate');
     if (fechaNacElemento) {
         fechaNacElemento.value = currentUser.fechaNacimiento || '';
     }
-
-    // Actualizar fecha de registro
     const joinDateElemento = document.getElementById('joinDate');
     if (joinDateElemento && currentUser.fechaRegistro) {
         const fecha = new Date(currentUser.fechaRegistro);
-        joinDateElemento.textContent = fecha.getFullYear();
+        joinDateElemento.textContent = `${fecha.getFullYear()}`;
     }
-
-    // Actualizar avatar - usar avatar por defecto si no tiene imagen personalizada
     const avatarElemento = document.getElementById('profileImage');
     if (avatarElemento) {
-        // Usar una imagen por defecto o generar un avatar con iniciales
         if (currentUser.avatar) {
             avatarElemento.src = currentUser.avatar;
-        } else {
-            // Generar avatar con iniciales
-            const iniciales = (currentUser.nombre?.charAt(0) || '') + (currentUser.apellido?.charAt(0) || '');
+        }
+        else {
+            const iniciales = `${currentUser.nombre?.charAt(0) || ''}${currentUser.apellido?.charAt(0) || ''}`;
             avatarElemento.src = `https://ui-avatars.com/api/?name=${iniciales}&background=28a745&color=fff&size=128&rounded=true`;
         }
     }
 }
-
-/**
- * Configurar navegación basada en URL
- */
 function configurarNavegacionURL() {
-    // Escuchar cambios en la URL (botón atrás/adelante)
-    window.addEventListener('popstate', function(event) {
+    window.addEventListener('popstate', (event) => {
         console.log('Perfil: Navegación con popstate detectada');
-        if (event.state && event.state.section) {
-            mostrarSeccion(event.state.section);
-        } else {
+        const state = event.state;
+        if (state?.section) {
+            mostrarSeccion(state.section);
+        }
+        else {
             mostrarSeccionActual();
         }
     });
-    
-    // También escuchar cambios de hash por si acaso
-    window.addEventListener('hashchange', function() {
+    window.addEventListener('hashchange', () => {
         console.log('Perfil: Cambio de hash detectado');
         mostrarSeccionActual();
     });
 }
-
-/**
- * Mostrar sección inicial basada en URL o por defecto
- */
 function mostrarSeccionInicial() {
-    // Esperar a que el DOM esté completamente cargado
-    setTimeout(() => {
+    window.setTimeout(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const seccion = urlParams.get('section') || 'general';
-        
         console.log('Perfil: Inicializando con sección:', seccion);
         console.log('Perfil: URL actual:', window.location.href);
-        
-        // Verificar que los elementos existan antes de proceder
         const sidebar = document.querySelector('.sidebar');
         const secciones = document.querySelectorAll('.profile-section');
-        
         if (sidebar && secciones.length > 0) {
             mostrarSeccion(seccion);
-        } else {
+        }
+        else {
             console.warn('Perfil: Elementos del DOM no están listos, reintentando...');
-            setTimeout(() => mostrarSeccionInicial(), 200);
+            window.setTimeout(() => mostrarSeccionInicial(), 200);
         }
     }, 100);
 }
-
-/**
- * Mostrar sección actual basada en URL
- */
 function mostrarSeccionActual() {
     const urlParams = new URLSearchParams(window.location.search);
     const seccion = urlParams.get('section') || 'general';
     console.log('Perfil: Mostrando sección actual desde URL:', seccion);
     mostrarSeccion(seccion);
 }
-
-/**
- * Mostrar una sección específica del perfil
- */
 function mostrarSeccion(seccionId) {
     console.log('Perfil: Mostrando sección:', seccionId);
-    
-    // Ocultar todas las secciones
     const secciones = document.querySelectorAll('.profile-section');
-    secciones.forEach(seccion => {
+    secciones.forEach((seccion) => {
         seccion.classList.remove('active');
     });
-
-    // Mostrar la sección seleccionada
     const seccionActiva = document.getElementById(seccionId);
     if (seccionActiva) {
         seccionActiva.classList.add('active');
         console.log('Perfil: Sección activada:', seccionId);
-    } else {
+    }
+    else {
         console.warn('Perfil: No se encontró la sección:', seccionId);
     }
-
-    // Actualizar navegación activa
     actualizarNavegacionActiva(seccionId);
-
-    // Actualizar URL sin recargar la página (solo si no es la carga inicial)
     if (document.readyState === 'complete') {
         const nuevaURL = `${window.location.pathname}?section=${seccionId}`;
         window.history.pushState({ section: seccionId }, '', nuevaURL);
     }
-
-    // Cargar contenido específico de la sección
     cargarContenidoSeccion(seccionId);
 }
-
-/**
- * Actualizar el estado activo de la navegación
- */
 function actualizarNavegacionActiva(seccionId) {
     console.log('Perfil: Actualizando navegación para:', seccionId);
-    
-    // Esperar un poco si los elementos no están listos
-    setTimeout(() => {
-        // Remover active de todos los enlaces
+    window.setTimeout(() => {
         const enlaces = document.querySelectorAll('.sidebar .nav-link');
         console.log('Perfil: Enlaces encontrados:', enlaces.length);
-        
-        enlaces.forEach(enlace => {
+        enlaces.forEach((enlace) => {
             enlace.classList.remove('active');
         });
-
-        // Agregar active al enlace correspondiente
         const enlaceActivo = document.querySelector(`[onclick="mostrarSeccion('${seccionId}')"]`);
         if (enlaceActivo) {
             enlaceActivo.classList.add('active');
             console.log('Perfil: Enlace activado para:', seccionId);
-        } else {
+        }
+        else {
             console.warn('Perfil: No se encontró enlace para:', seccionId);
-            
-            // Fallback: buscar por texto del enlace
-            const enlaces = document.querySelectorAll('.sidebar .nav-link');
-            enlaces.forEach(enlace => {
-                const texto = enlace.textContent.toLowerCase();
+            enlaces.forEach((enlace) => {
+                const texto = enlace.textContent?.toLowerCase() ?? '';
                 if ((seccionId === 'general' && texto.includes('perfil')) ||
                     (seccionId === 'pedidos' && texto.includes('pedidos')) ||
                     (seccionId === 'favoritos' && texto.includes('favoritos')) ||
@@ -293,10 +193,6 @@ function actualizarNavegacionActiva(seccionId) {
         }
     }, 50);
 }
-
-/**
- * Cargar contenido específico de cada sección
- */
 function cargarContenidoSeccion(seccionId) {
     switch (seccionId) {
         case 'pedidos':
@@ -306,25 +202,16 @@ function cargarContenidoSeccion(seccionId) {
             cargarFavoritos();
             break;
         case 'general':
-            // Ya se carga en la inicialización
-            break;
         case 'configuracion':
-            // Configuración ya está en el HTML
-            break;
         default:
-            console.log('Sección no reconocida:', seccionId);
+            break;
     }
 }
-
-/**
- * Cargar lista de pedidos del usuario
- */
 function cargarPedidos() {
-    const pedidos = currentUser.pedidos || [];
+    const pedidos = currentUser?.pedidos || [];
     const contenedorPedidos = document.getElementById('ordersList');
-    
-    if (!contenedorPedidos) return;
-
+    if (!contenedorPedidos)
+        return;
     if (pedidos.length === 0) {
         contenedorPedidos.innerHTML = `
             <div class="empty-state">
@@ -339,9 +226,8 @@ function cargarPedidos() {
         `;
         return;
     }
-
     let html = '';
-    pedidos.forEach(pedido => {
+    pedidos.forEach((pedido) => {
         html += `
             <div class="order-item">
                 <div class="d-flex justify-content-between align-items-start">
@@ -360,19 +246,13 @@ function cargarPedidos() {
             </div>
         `;
     });
-
     contenedorPedidos.innerHTML = html;
 }
-
-/**
- * Cargar lista de productos favoritos
- */
 function cargarFavoritos() {
-    const favoritos = currentUser.favoritos || [];
+    const favoritos = currentUser?.favoritos || [];
     const contenedorFavoritos = document.getElementById('favoritesList');
-    
-    if (!contenedorFavoritos) return;
-
+    if (!contenedorFavoritos)
+        return;
     if (favoritos.length === 0) {
         contenedorFavoritos.innerHTML = `
             <div class="empty-state">
@@ -387,9 +267,8 @@ function cargarFavoritos() {
         `;
         return;
     }
-
     let html = '<div class="row g-3">';
-    favoritos.forEach(producto => {
+    favoritos.forEach((producto) => {
         html += `
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100">
@@ -414,344 +293,247 @@ function cargarFavoritos() {
         `;
     });
     html += '</div>';
-
     contenedorFavoritos.innerHTML = html;
 }
-
-/**
- * Configurar todos los event listeners
- */
 function configurarEventListeners() {
     console.log('Perfil: Configurando event listeners...');
-    
-    // Event delegation para botones de navegación (más confiable)
-    document.addEventListener('click', function(event) {
-        // Detectar clicks en botones de navegación del perfil
-        if (event.target.matches('.sidebar .nav-link') || event.target.closest('.sidebar .nav-link')) {
+    document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target?.matches('.sidebar .nav-link') ||
+            target?.closest('.sidebar .nav-link')) {
             event.preventDefault();
             event.stopPropagation();
-            
-            const button = event.target.matches('.sidebar .nav-link') ? event.target : event.target.closest('.sidebar .nav-link');
-            const onclick = button.getAttribute('onclick');
-            
+            const button = target.matches('.sidebar .nav-link') ? target : target.closest('.sidebar .nav-link');
+            const onclick = button?.getAttribute('onclick') ?? '';
             console.log('Perfil: Click detectado en botón navegación:', onclick);
-            
-            if (onclick && onclick.includes('mostrarSeccion')) {
-                // Extraer el nombre de la sección del onclick
+            if (onclick.includes('mostrarSeccion')) {
                 const match = onclick.match(/mostrarSeccion\('([^']+)'\)/);
-                if (match) {
-                    const seccion = match[1];
+                const seccion = match?.[1];
+                if (seccion) {
                     console.log('Perfil: Navegando a sección:', seccion);
                     mostrarSeccion(seccion);
                 }
             }
         }
     });
-
-    // Formulario de perfil
     const formPerfil = document.getElementById('profileForm');
     if (formPerfil) {
         formPerfil.addEventListener('submit', guardarPerfil);
     }
-
-    // Formulario de contraseña
     const formPassword = document.getElementById('passwordForm');
     if (formPassword) {
         formPassword.addEventListener('submit', cambiarPassword);
     }
-
-    // Upload de imagen de perfil
     const inputImagen = document.getElementById('profileImageInput');
     if (inputImagen) {
         inputImagen.addEventListener('change', cambiarImagenPerfil);
     }
-
-    // Cerrar sesión
     const btnCerrarSesion = document.getElementById('logoutBtn');
     if (btnCerrarSesion) {
-        btnCerrarSesion.addEventListener('click', cerrarSesion);
+        btnCerrarSesion.addEventListener('click', cerrarSesionPerfil);
     }
-
-    // Eliminar cuenta
     const btnEliminarCuenta = document.getElementById('deleteAccountBtn');
     if (btnEliminarCuenta) {
         btnEliminarCuenta.addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+            const modalElement = document.getElementById('deleteAccountModal');
+            if (!modalElement)
+                return;
+            const modal = new bootstrap.Modal(modalElement);
             modal.show();
         });
     }
-
-    // Confirmar eliminación de cuenta
     const btnConfirmarEliminacion = document.getElementById('confirmDeleteBtn');
     if (btnConfirmarEliminacion) {
         btnConfirmarEliminacion.addEventListener('click', eliminarCuenta);
     }
 }
-
-/**
- * Guardar cambios del perfil
- */
 async function guardarPerfil(event) {
     event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    
-    // Preparar datos actualizados - usar 'apellido' (singular) para coincidir con JSON
+    const form = event.target;
+    const formData = new FormData(form);
     const datosActualizados = {
-        nombre: formData.get('nombre'),
-        apellido: formData.get('apellidos'), // Nota: del formulario viene 'apellidos' pero guardamos como 'apellido'
-        email: formData.get('email'),
-        telefono: formData.get('telefono'),
-        fechaNacimiento: formData.get('fechaNacimiento'),
-        direccion: formData.get('direccion')
+        nombre: formData.get('nombre') ?? '',
+        apellido: formData.get('apellidos') ?? '',
+        email: formData.get('email') ?? '',
+        telefono: formData.get('telefono') ?? '',
+        fechaNacimiento: formData.get('fechaNacimiento') ?? '',
+        direccion: formData.get('direccion') ?? '',
     };
-
-    // Mostrar estado de carga
-    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (!submitBtn) {
+        return;
+    }
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
     submitBtn.disabled = true;
-
     try {
-        // Actualizar usando UserManager (esto sincroniza con JSON y localStorage)
         const resultado = await userManager.actualizarUsuario(currentUser.id, datosActualizados);
-        
-        if (resultado.exito) {
-            // Actualizar currentUser local
+        if (resultado.success) {
             currentUser = {
                 ...currentUser,
-                ...datosActualizados
+                ...datosActualizados,
             };
-            
-            // Mostrar mensaje de éxito
             mostrarMensaje('Perfil actualizado correctamente', 'success');
-            
-            // Recargar información en la interfaz
             cargarInformacionUsuario();
-            
-            // Actualizar navbar también
-            if (typeof actualizarNavbar === 'function') {
-                actualizarNavbar();
-            }
-            
+            window.actualizarNavbar?.();
             submitBtn.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
             submitBtn.classList.remove('btn-success');
             submitBtn.classList.add('btn-primary');
-            
-        } else {
+        }
+        else {
             throw new Error(resultado.mensaje || 'Error al actualizar perfil');
         }
-        
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error al guardar perfil:', error);
-        mostrarMensaje('Error al guardar los cambios: ' + error.message, 'error');
-        
+        const mensaje = error instanceof Error ? error.message : 'Error desconocido al actualizar perfil';
+        mostrarMensaje(`Error al guardar los cambios: ${mensaje}`, 'danger');
         submitBtn.innerHTML = '<i class="fas fa-times"></i> Error';
         submitBtn.classList.remove('btn-success');
         submitBtn.classList.add('btn-danger');
     }
-    
-    // Restaurar botón después de un momento
-    setTimeout(() => {
+    window.setTimeout(() => {
         submitBtn.innerHTML = originalText;
         submitBtn.classList.remove('btn-primary', 'btn-danger');
         submitBtn.classList.add('btn-success');
         submitBtn.disabled = false;
     }, 2000);
 }
-
-/**
- * Cambiar contraseña del usuario
- */
 async function cambiarPassword(event) {
     event.preventDefault();
-    
-    const formData = new FormData(event.target);
+    const form = event.target;
+    const formData = new FormData(form);
     const passwordActual = formData.get('currentPassword');
     const passwordNueva = formData.get('newPassword');
     const passwordConfirm = formData.get('confirmPassword');
-
-    // Validaciones
     if (passwordActual !== currentUser.password) {
         mostrarMensaje('La contraseña actual es incorrecta', 'danger');
         return;
     }
-
     if (passwordNueva !== passwordConfirm) {
         mostrarMensaje('Las contraseñas nuevas no coinciden', 'danger');
         return;
     }
-
-    if (passwordNueva.length < 6) {
+    if (!passwordNueva || passwordNueva.length < 6) {
         mostrarMensaje('La nueva contraseña debe tener al menos 6 caracteres', 'danger');
         return;
     }
-
-    // Mostrar estado de carga
-    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (!submitBtn) {
+        return;
+    }
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
     submitBtn.disabled = true;
-
     try {
-        // Actualizar contraseña usando UserManager
-        const resultado = await userManager.actualizarUsuario(currentUser.id, { 
-            password: passwordNueva 
+        const resultado = await userManager.actualizarUsuario(currentUser.id, {
+            password: passwordNueva,
         });
-        
-        if (resultado.exito) {
-            // Actualizar password local
+        if (resultado.success) {
             currentUser.password = passwordNueva;
-            
-            // Limpiar formulario
-            event.target.reset();
-            
+            form.reset();
             mostrarMensaje('Contraseña actualizada correctamente', 'success');
-            
             submitBtn.innerHTML = '<i class="fas fa-check"></i> ¡Actualizada!';
             submitBtn.classList.remove('btn-success');
             submitBtn.classList.add('btn-primary');
-            
-        } else {
+        }
+        else {
             throw new Error(resultado.mensaje || 'Error al actualizar contraseña');
         }
-        
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error al cambiar contraseña:', error);
-        mostrarMensaje('Error al cambiar la contraseña: ' + error.message, 'error');
-        
+        const mensaje = error instanceof Error ? error.message : 'Error desconocido al cambiar contraseña';
+        mostrarMensaje(`Error al cambiar la contraseña: ${mensaje}`, 'danger');
         submitBtn.innerHTML = '<i class="fas fa-times"></i> Error';
         submitBtn.classList.remove('btn-success');
         submitBtn.classList.add('btn-danger');
     }
-    
-    // Restaurar botón después de un momento
-    setTimeout(() => {
+    window.setTimeout(() => {
         submitBtn.innerHTML = originalText;
         submitBtn.classList.remove('btn-primary', 'btn-danger');
         submitBtn.classList.add('btn-success');
         submitBtn.disabled = false;
     }, 2000);
 }
-
-/**
- * Cambiar imagen de perfil
- */
 function cambiarImagenPerfil(event) {
-    const archivo = event.target.files[0];
-    if (!archivo) return;
-
-    // Validar tipo de archivo
+    const input = event.target;
+    const archivo = input.files?.[0];
+    if (!archivo)
+        return;
     if (!archivo.type.startsWith('image/')) {
         mostrarMensaje('Por favor selecciona una imagen válida', 'danger');
         return;
     }
-
-    // Validar tamaño (máximo 5MB)
     if (archivo.size > 5 * 1024 * 1024) {
         mostrarMensaje('La imagen no debe superar los 5MB', 'danger');
         return;
     }
-
     const reader = new FileReader();
-    reader.onload = function(e) {
-        const nuevaImagen = e.target.result;
-        
-        // Actualizar imagen en la interfaz
+    reader.onload = (ev) => {
+        const nuevaImagen = ev.target?.result;
+        if (!nuevaImagen)
+            return;
         const imgElemento = document.getElementById('profileImage');
         if (imgElemento) {
             imgElemento.src = nuevaImagen;
         }
-
-        // Guardar en el usuario
         currentUser.avatar = nuevaImagen;
         localStorage.setItem('sesionActiva', JSON.stringify(currentUser));
-        
         mostrarMensaje('Imagen de perfil actualizada', 'success');
     };
-
     reader.readAsDataURL(archivo);
 }
-
-/**
- * Cerrar sesión del usuario
- */
-function cerrarSesion() {
+function cerrarSesionPerfil() {
     console.log('Perfil: Cerrando sesión...');
     localStorage.removeItem('sesionActiva');
     localStorage.removeItem('isLoggedIn');
-    
-    // Calcular ruta correcta desde perfil.html hacia index.html
     const currentPath = window.location.pathname;
     let redirectPath = '../../../index.html';
-    
-    // Si estamos en una subcarpeta, ajustar la ruta
     if (currentPath.includes('/tienda/')) {
         redirectPath = '../../../index.html';
     }
-    
     console.log('Perfil: Redirigiendo a:', redirectPath);
     window.location.href = redirectPath;
 }
-
-/**
- * Eliminar cuenta del usuario
- */
 function eliminarCuenta() {
-    // Limpiar todos los datos del usuario
     localStorage.removeItem('sesionActiva');
     localStorage.removeItem('isLoggedIn');
-    
-    // Cerrar modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
-    if (modal) {
-        modal.hide();
+    const modalElement = document.getElementById('deleteAccountModal');
+    if (modalElement) {
+        const modalInstance = bootstrap.Modal.getInstance(modalElement) ?? new bootstrap.Modal(modalElement);
+        modalInstance.hide();
     }
-    
-    // Redirigir con mensaje
-    alert('Tu cuenta ha sido eliminada exitosamente.');
+    window.alert('Tu cuenta ha sido eliminada exitosamente.');
     window.location.href = '../../../index.html';
 }
-
-/**
- * Funciones auxiliares
- */
-
 function getBadgeColor(estado) {
     const colores = {
-        'pendiente': 'warning',
-        'procesando': 'info',
-        'enviado': 'primary',
-        'entregado': 'success',
-        'cancelado': 'danger'
+        pendiente: 'warning',
+        procesando: 'info',
+        enviado: 'primary',
+        entregado: 'success',
+        cancelado: 'danger',
     };
     return colores[estado] || 'secondary';
 }
-
 function verDetallePedido(pedidoId) {
-    // Implementar modal o navegación a detalle del pedido
     console.log('Ver detalle del pedido:', pedidoId);
     mostrarMensaje('Funcionalidad en desarrollo', 'info');
 }
-
 function eliminarFavorito(productoId) {
-    if (!currentUser.favoritos) return;
-    
-    currentUser.favoritos = currentUser.favoritos.filter(p => p.id !== productoId);
+    if (!currentUser?.favoritos)
+        return;
+    currentUser.favoritos = currentUser.favoritos.filter((p) => p.id !== productoId);
     localStorage.setItem('sesionActiva', JSON.stringify(currentUser));
-    
     cargarFavoritos();
     mostrarMensaje('Producto eliminado de favoritos', 'success');
 }
-
 function agregarAlCarrito(productoId) {
-    // Implementar lógica de carrito
     console.log('Agregar al carrito:', productoId);
     mostrarMensaje('Producto agregado al carrito', 'success');
 }
-
 function mostrarMensaje(mensaje, tipo = 'info') {
-    // Crear toast o alert para mostrar mensajes
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
     alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
@@ -759,19 +541,13 @@ function mostrarMensaje(mensaje, tipo = 'info') {
         ${mensaje}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
-    
     document.body.appendChild(alertDiv);
-    
-    // Auto-remover después de 5 segundos
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.parentNode.removeChild(alertDiv);
-        }
+    window.setTimeout(() => {
+        alertDiv.remove();
     }, 5000);
 }
-
-// Hacer funciones globales para uso en onclick
 window.mostrarSeccion = mostrarSeccion;
 window.verDetallePedido = verDetallePedido;
 window.eliminarFavorito = eliminarFavorito;
 window.agregarAlCarrito = agregarAlCarrito;
+//# sourceMappingURL=perfil.js.map

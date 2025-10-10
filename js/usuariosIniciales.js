@@ -9,6 +9,7 @@ export const usuariosIniciales = [
         apellido: 'Gajardo',
         rol: RolUsuario.administrador,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaRegistro: '2025-01-01',
     },
     {
@@ -20,6 +21,7 @@ export const usuariosIniciales = [
         apellido: 'Colicheo',
         rol: RolUsuario.administrador,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaRegistro: '2025-01-15',
     },
     {
@@ -31,6 +33,7 @@ export const usuariosIniciales = [
         apellido: 'Diogenes',
         rol: RolUsuario.cliente,
         isActivo: Estado.activo,
+        estado: Estado.activo,
         fechaRegistro: '2025-02-01',
     },
 ];
@@ -42,3 +45,4 @@ export const datosUsuariosIniciales = {
         ultimaActualizacion: '2024-01-01T00:00:00Z',
     },
 };
+//# sourceMappingURL=usuariosIniciales.js.map

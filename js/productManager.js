@@ -1,246 +1,230 @@
-// Importaciones de los tipos y el servicio
 import { CategoriaProducto, Estado } from './models.js';
 import { obtenerDatosProductos, guardarDatosProductos } from './servicioDatos.js';
-class ProductManager {
+export class ProductManager {
     constructor() {
-        // Definimos explícitamente el tipo de la caché
         this.productosCache = null;
-        // La ruta JSON ya no es necesaria. Se elimina.
     }
-    /**
-     * Carga los datos completos (productos y configuración)
-     * Utiliza el servicio para cargar desde localStorage o inicializar.
-     */
-    cargarDatos() {
+    cargarDatosInternos() {
         if (this.productosCache) {
             return this.productosCache;
         }
-        // Usamos el servicio de datos para obtener la estructura completa
         const data = obtenerDatosProductos();
         this.productosCache = data;
         return data;
     }
-    /**
-     * Guarda la estructura IDataProductos completa
-     */
     guardarDatos(data) {
         guardarDatosProductos(data);
         this.productosCache = data;
     }
-    /**
-     * Obtener productos activos (para catálogo)
-     */
+    cargarDatos() {
+        return this.cargarDatosInternos();
+    }
     obtenerProductosActivos() {
-        const data = this.cargarDatos();
-        // Tipado: data.productos es IProducto[], producto es IProducto
-        const productosActivos = data.productos.filter((producto) => producto.isActivo === Estado.activo);
-        return productosActivos;
+        const data = this.cargarDatosInternos();
+        return data.productos.filter((producto) => (producto.estado ?? producto.isActivo) === Estado.activo);
     }
-    /**
-     * Obtener estructura completa de datos
-     */
     obtenerDatosCompletos() {
-        return this.cargarDatos();
+        return this.cargarDatosInternos();
     }
-    /**
-     * Obtener productos por categoría
-     */
     obtenerProductosPorCategoria(categoria) {
         const productosActivos = this.obtenerProductosActivos();
         if (categoria === 'todos') {
             return productosActivos;
         }
-        // Tipado: Usamos el Enum CategoriaProducto para la comparación
         return productosActivos.filter((producto) => producto.categoria === categoria);
     }
-    /**
-     * Obtener producto por ID
-     */
     obtenerProductoPorId(id) {
-        const data = this.cargarDatos();
-        const idBuscado = typeof id === 'string' ? parseInt(id) : id;
-        // Usamos find y el tipo IProducto
+        const idBuscado = typeof id === 'string' ? Number.parseInt(id, 10) : id;
+        const data = this.cargarDatosInternos();
         return data.productos.find((producto) => producto.id === idBuscado);
     }
-    /**
-     * Agregar nuevo producto
-     */
+    obtenerTodosLosProductos() {
+        const data = this.cargarDatosInternos();
+        return data.productos;
+    }
     agregarProducto(datosProducto) {
         try {
-            const data = this.cargarDatos();
-            // Validar datos del producto (se tipa la función abajo)
+            const data = this.cargarDatosInternos();
             const validacion = this.validarDatosProducto(datosProducto);
             if (!validacion.valido) {
                 return {
                     success: false,
-                    mensaje: 'Datos inválidos: ' + validacion.errores.join(', ')
+                    mensaje: 'Datos inválidos: ' + validacion.errores.join(', '),
                 };
             }
-            // Crear nuevo producto, asegurando que cumple con IProducto
+            const estadoProducto = datosProducto.estado ?? datosProducto.isActivo ?? Estado.activo;
             const nuevoProducto = {
                 id: data.configuracion.proximoId,
-                codigo: datosProducto.nombre.substring(0, 3).toUpperCase() + data.configuracion.proximoId, // Generación de código simple
-                nombre: datosProducto.nombre,
-                descripcion: datosProducto.descripcion,
-                precio: parseFloat(datosProducto.precio), // Convertimos a Number
-                stock: parseInt(datosProducto.stock), // Convertimos a Number
-                categoria: datosProducto.categoria,
-                imagen: datosProducto.imagen || 'img/default.jpg',
-                isActivo: datosProducto.estado ?? Estado.activo,
+                codigo: (datosProducto.nombre ?? 'PRD').substring(0, 3).toUpperCase() + data.configuracion.proximoId,
+                nombre: datosProducto.nombre ?? 'Producto sin nombre',
+                descripcion: datosProducto.descripcion ?? '',
+                precio: Number.parseFloat(String(datosProducto.precio ?? 0)),
+                stock: Number.parseInt(String(datosProducto.stock ?? 0), 10),
+                categoria: datosProducto.categoria ?? CategoriaProducto.frutas,
+                imagen: datosProducto.imagen ?? 'img/default.jpg',
+                isActivo: estadoProducto,
+                estado: estadoProducto,
                 fechaCreacion: new Date().toISOString().substring(0, 10),
-                peso: datosProducto.peso || '1kg'
+                peso: datosProducto.peso ?? '1kg',
             };
-            // Agregar y actualizar configuración
             data.productos.push(nuevoProducto);
-            data.configuracion.proximoId++;
+            data.configuracion.proximoId += 1;
             data.configuracion.ultimaActualizacion = new Date().toISOString();
-            // Guardar cambios
             this.guardarDatos(data);
-            this.verificarYDesactivarSinStock(); // Llamada síncrona, ya no es async
+            this.verificarYDesactivarSinStock();
             return {
                 success: true,
                 mensaje: 'Producto creado exitosamente',
-                producto: nuevoProducto
+                producto: nuevoProducto,
             };
         }
         catch (error) {
             console.error('Error agregando producto:', error);
-            // Tipamos el error para asegurar que tenga un mensaje
-            return { success: false, mensaje: 'Error interno al crear producto: ' + error.message };
+            const mensaje = error instanceof Error ? error.message : 'Desconocido';
+            return { success: false, mensaje: 'Error interno al crear producto: ' + mensaje };
         }
     }
-    // ************* Otras funciones refactorizadas (Ejemplo: Actualizar) *************
-    /**
-     * Actualizar producto existente
-     */
     actualizarProducto(productoId, datosActualizados) {
-        const idBuscado = typeof productoId === 'string' ? parseInt(productoId) : productoId;
+        const idBuscado = typeof productoId === 'string' ? Number.parseInt(productoId, 10) : productoId;
         try {
-            const data = this.cargarDatos();
-            const indiceProducto = data.productos.findIndex(p => p.id === idBuscado);
+            const data = this.cargarDatosInternos();
+            const indiceProducto = data.productos.findIndex((p) => p.id === idBuscado);
             if (indiceProducto === -1) {
                 return { success: false, mensaje: 'Producto no encontrado' };
             }
-            // Validar datos actualizados
             const validacion = this.validarDatosProducto(datosActualizados);
             if (!validacion.valido) {
-                return { success: false, mensaje: 'Datos inválidos: ' + validacion.errores.join(', ') };
+                return {
+                    success: false,
+                    mensaje: 'Datos inválidos: ' + validacion.errores.join(', '),
+                };
             }
             const productoOriginal = data.productos[indiceProducto];
             if (!productoOriginal) {
                 return { success: false, mensaje: 'Producto no encontrado' };
             }
-            // Creación del objeto actualizado con tipado IProducto
+            const estadoProducto = datosActualizados.estado ??
+                datosActualizados.isActivo ??
+                productoOriginal.estado ??
+                productoOriginal.isActivo;
             const productoActualizado = {
                 ...productoOriginal,
-                nombre: datosActualizados.nombre,
-                descripcion: datosActualizados.descripcion,
-                precio: parseFloat(datosActualizados.precio),
-                stock: parseInt(datosActualizados.stock),
-                categoria: datosActualizados.categoria,
-                imagen: datosActualizados.imagen || productoOriginal.imagen,
-                isActivo: datosActualizados.estado ?? productoOriginal.isActivo,
-                peso: datosActualizados.peso || productoOriginal.peso,
-                fechaActualizacion: new Date().toISOString().substring(0, 10)
+                nombre: datosActualizados.nombre ?? productoOriginal.nombre,
+                descripcion: datosActualizados.descripcion ?? productoOriginal.descripcion,
+                precio: Number.parseFloat(String(datosActualizados.precio ?? productoOriginal.precio)),
+                stock: Number.parseInt(String(datosActualizados.stock ?? productoOriginal.stock), 10),
+                categoria: datosActualizados.categoria ?? productoOriginal.categoria,
+                imagen: datosActualizados.imagen ?? productoOriginal.imagen,
+                isActivo: estadoProducto,
+                estado: estadoProducto,
+                peso: datosActualizados.peso ?? productoOriginal.peso ?? '1kg',
+                fechaActualizacion: new Date().toISOString().substring(0, 10),
             };
-            // Actualizar, guardar y verificar
             data.productos[indiceProducto] = productoActualizado;
             data.configuracion.ultimaActualizacion = new Date().toISOString();
             this.guardarDatos(data);
             this.verificarYDesactivarSinStock();
-            return { success: true, producto: productoActualizado, mensaje: 'Producto actualizado exitosamente' };
+            return {
+                success: true,
+                mensaje: 'Producto actualizado exitosamente',
+                producto: productoActualizado,
+            };
         }
         catch (error) {
             console.error('ProductManager: Error al actualizar producto:', error);
-            return { success: false, mensaje: 'Error al actualizar producto: ' + error.message };
+            const mensaje = error instanceof Error ? error.message : 'Desconocido';
+            return { success: false, mensaje: 'Error al actualizar producto: ' + mensaje };
         }
     }
-    /**
-     * Verificar y desactivar productos sin stock (Síncrona)
-     */
     verificarYDesactivarSinStock() {
         try {
-            const data = this.cargarDatos();
+            const data = this.cargarDatosInternos();
             let productosDesactivados = 0;
             data.productos.forEach((producto) => {
-                if (producto.stock <= 0 && producto.isActivo === Estado.activo) {
+                if (producto.stock <= 0 && (producto.estado ?? producto.isActivo) === Estado.activo) {
                     producto.isActivo = Estado.inactivo;
-                    productosDesactivados++;
-                    console.log(`Producto ${producto.nombre} desactivado automáticamente por falta de stock`);
+                    producto.estado = Estado.inactivo;
+                    productosDesactivados += 1;
                 }
             });
             if (productosDesactivados > 0) {
                 data.configuracion.ultimaActualizacion = new Date().toISOString();
                 this.guardarDatos(data);
             }
-            return { success: true, productosDesactivados };
+            return { success: true, mensaje: `${productosDesactivados} productos desactivados automáticamente` };
         }
         catch (error) {
             console.error('Error verificando stock:', error);
-            return { success: false, mensaje: 'Error al verificar stock' };
+            const mensaje = error instanceof Error ? error.message : 'Desconocido';
+            return { success: false, mensaje: 'Error al verificar stock: ' + mensaje };
         }
     }
-    /**
-     * Obtener todos los productos para el dashboard
-     */
-    obtenerTodosLosProductos() {
-        const data = this.cargarDatos();
-        return data.productos;
+    obtenerCategorias() {
+        const data = this.cargarDatosInternos();
+        return data.configuracion.categorias ?? Object.values(CategoriaProducto);
     }
-    /**
-     * Validar datos de producto (tipado)
-     */
+    desactivarProducto(productoId) {
+        const idBuscado = typeof productoId === 'string' ? Number.parseInt(productoId, 10) : productoId;
+        try {
+            const data = this.cargarDatosInternos();
+            const producto = data.productos.find((p) => p.id === idBuscado);
+            if (!producto) {
+                return { success: false, mensaje: 'Producto no encontrado' };
+            }
+            producto.isActivo = Estado.inactivo;
+            producto.estado = Estado.inactivo;
+            data.configuracion.ultimaActualizacion = new Date().toISOString();
+            this.guardarDatos(data);
+            return { success: true, mensaje: 'Producto desactivado exitosamente', producto };
+        }
+        catch (error) {
+            console.error('Error al desactivar producto:', error);
+            const mensaje = error instanceof Error ? error.message : 'Desconocido';
+            return { success: false, mensaje: 'Error al desactivar producto: ' + mensaje };
+        }
+    }
+    activarProducto(productoId) {
+        const idBuscado = typeof productoId === 'string' ? Number.parseInt(productoId, 10) : productoId;
+        try {
+            const data = this.cargarDatosInternos();
+            const producto = data.productos.find((p) => p.id === idBuscado);
+            if (!producto) {
+                return { success: false, mensaje: 'Producto no encontrado' };
+            }
+            producto.isActivo = Estado.activo;
+            producto.estado = Estado.activo;
+            data.configuracion.ultimaActualizacion = new Date().toISOString();
+            this.guardarDatos(data);
+            return { success: true, mensaje: 'Producto activado exitosamente', producto };
+        }
+        catch (error) {
+            console.error('Error al activar producto:', error);
+            const mensaje = error instanceof Error ? error.message : 'Desconocido';
+            return { success: false, mensaje: 'Error al activar producto: ' + mensaje };
+        }
+    }
     validarDatosProducto(datos) {
         const errores = [];
         if (!datos.nombre || datos.nombre.trim().length < 2) {
             errores.push('El nombre debe tener al menos 2 caracteres');
         }
-        // ... (resto de validaciones)
-        // Nota: Las validaciones de precio y stock se hacen sobre el string recibido
-        if (!datos.precio || isNaN(parseFloat(datos.precio)) || parseFloat(datos.precio) <= 0) {
+        if (!datos.precio || Number.isNaN(Number.parseFloat(String(datos.precio))) || Number.parseFloat(String(datos.precio)) <= 0) {
             errores.push('El precio debe ser un número mayor a 0');
         }
-        if (!datos.stock || isNaN(parseInt(datos.stock)) || parseInt(datos.stock) < 0) {
+        if (!datos.stock || Number.isNaN(Number.parseInt(String(datos.stock), 10)) || Number.parseInt(String(datos.stock), 10) < 0) {
             errores.push('El stock debe ser un número mayor o igual a 0');
         }
-        // Usamos el Enum para validar categoría
         if (!datos.categoria || !Object.values(CategoriaProducto).includes(datos.categoria)) {
             errores.push('Debe seleccionar una categoría válida');
         }
         return { valido: errores.length === 0, errores };
     }
-    /**
-     * Obtener categorías disponibles
-     */
-    obtenerCategorias() {
-        const data = this.cargarDatos();
-        return data.configuracion.categorias || Object.values(CategoriaProducto);
-    }
 }
-// Crear instancia tipada
 const productManager = new ProductManager();
-// ===============================================
-// FUNCIONES GLOBALES PARA INTEGRACIÓN
-// ===============================================
-/**
- * Obtener productos para mostrar en catálogo (tipado)
- */
-function obtenerProductosCatalogo(categoria = 'todos') {
+export function obtenerProductosCatalogo(categoria = 'todos') {
     return productManager.obtenerProductosPorCategoria(categoria);
 }
-// Exportamos el manager y las funciones globales para que puedan ser usadas.
-// En TypeScript, necesitas exportar lo que usarás en otros módulos o globalmente.
-export { productManager, obtenerProductosCatalogo };
-// Nota: Las funciones window.X deben ser redefinidas en el global scope si se compila
-// como módulo, o se deja como estaba si se compila como script. Por simplicidad,
-// dejaremos la clase y funciones globales para que el compilador las vea.
-// Si tu tsconfig usa módulos (como CommonJS o ES6), las funciones window.X
-// deben ser movidas fuera de la clase y tipadas con (window as any).X o declaradas
-// en un archivo de tipos global.
-// **TIP FINAL:** En un entorno simple sin bundler, para que las funciones
-// globales funcionen, a veces es más fácil dejar solo la instancia global:
 window.productManager = productManager;
-// Y tipar las funciones globales del archivo original:
+window.ProductManager = ProductManager;
 window.obtenerProductosCatalogo = obtenerProductosCatalogo;
-// ************ El resto de funciones globales (verProductos, resetear, etc.) ************
-// ************ Se pueden refactorizar de forma similar fuera de la clase ************
+//# sourceMappingURL=productManager.js.map
