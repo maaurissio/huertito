@@ -468,6 +468,84 @@
         </div>
     </div>
 
+    <!-- Modal para Editar Usuario -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editUserModalLabel">
+                        <i class="fas fa-user-edit me-2"></i>Editar Usuario
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editUserNombre" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Nombre *
+                                </label>
+                                <input type="text" class="form-control" id="editUserNombre" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editUserApellido" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Apellido
+                                </label>
+                                <input type="text" class="form-control" id="editUserApellido">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editUserEmail" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>Email *
+                                </label>
+                                <input type="email" class="form-control" id="editUserEmail" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editUserUsuario" class="form-label">
+                                    <i class="fas fa-at me-1"></i>Usuario *
+                                </label>
+                                <input type="text" class="form-control" id="editUserUsuario" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editUserTelefono" class="form-label">
+                                    <i class="fas fa-phone me-1"></i>Teléfono
+                                </label>
+                                <input type="tel" class="form-control" id="editUserTelefono" placeholder="+56 9 1234 5678">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="editUserRol" class="form-label">
+                                    <i class="fas fa-shield-alt me-1"></i>Rol
+                                </label>
+                                <select class="form-select" id="editUserRol">
+                                    <option value="cliente">Cliente</option>
+                                    <option value="administrador">Administrador</option>
+                                    <option value="vendedor">Vendedor</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="editUserEstado" class="form-label">
+                                    <i class="fas fa-toggle-on me-1"></i>Estado
+                                </label>
+                                <select class="form-select" id="editUserEstado">
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para Agregar Producto -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -635,6 +713,101 @@
                         </button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-1"></i>Actualizar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Reponer Stock -->
+    <div class="modal fade" id="stockModal" tabindex="-1" aria-labelledby="stockModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="stockModalLabel">
+                        <i class="fas fa-boxes me-2"></i>Reponer Stock
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="productStockForm">
+                    <input type="hidden" id="stockProductId" name="stockProductId">
+                    <div class="modal-body">
+                        <p class="mb-1 text-muted">Producto seleccionado:</p>
+                        <h6 id="stockProductName" class="mb-3">Producto</h6>
+                        <div class="alert alert-light border">
+                            <i class="fas fa-warehouse me-2 text-success"></i>
+                            Stock actual: <strong id="stockCurrentStock">0 unidades</strong>
+                        </div>
+                        <div class="mb-3">
+                            <label for="stockQuantity" class="form-label">
+                                <i class="fas fa-plus me-1"></i>Unidades a agregar
+                            </label>
+                            <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" min="1" value="10" required>
+                            <div class="form-text">Los productos se reactivarán automáticamente si estaban inactivos.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-1"></i>Actualizar Stock
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Actualizar Estado de Pedido -->
+    <div class="modal fade" id="orderStatusModal" tabindex="-1" aria-labelledby="orderStatusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="orderStatusModalLabel">
+                        <i class="fas fa-edit me-2"></i>Actualizar estado del pedido
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="orderStatusForm">
+                    <input type="hidden" id="orderStatusOrderId">
+                    <div class="modal-body">
+                        <p class="mb-1 text-muted">Pedido seleccionado</p>
+                        <h6 class="mb-3"><code class="text-primary" id="orderStatusCode">ORD</code></h6>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Cliente</label>
+                            <div id="orderStatusCustomer" class="fw-semibold">Cliente</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Estado actual</label>
+                            <div id="orderStatusCurrent" class="mb-2">
+                                <span class="badge bg-info">Pendiente</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="orderStatusSelect" class="form-label">
+                                <i class="fas fa-exchange-alt me-1"></i>Nuevo estado
+                            </label>
+                            <select class="form-select" id="orderStatusSelect" required>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="procesando">Procesando</option>
+                                <option value="enviado">Enviado</option>
+                                <option value="entregado">Entregado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                            <div class="form-text">El cliente recibirá la actualización la próxima vez que consulte sus pedidos.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Guardar cambios
                         </button>
                     </div>
                 </form>
@@ -860,6 +1033,6 @@
     <!-- Order Management System -->
     <script src="../../js/orderManager.js"></script>
     <!-- Dashboard JavaScript -->
-    <script src="../../js/dashboard.js"></script>
+    <script type="module" src="../../js/dashboard.js"></script>
 </body>
 </html>
